@@ -6,7 +6,7 @@
 \usepackage{url}
 \usepackage[hidelinks]{hyperref}
 \usepackage{wrapfig}
-\usepackage[style=alphabetic,backend=bibtex]{biblatex}
+\usepackage[style=alphabetic,backend=bibtex8]{biblatex}
 
 \addbibresource{literature}
 
@@ -30,13 +30,13 @@ University of Hamburg}
 \subsection{Motivation}
 Controlling dexterous robot hands is a big challenge of robotics, but using has a variety of obvious advantages: The similarity to a human hand gives enables it to grasp objects in nearly all positions and poses the real human hand could. Especially for complex manipulation tasks, where a simple robotic grasper with just a pair of pliers is not sufficient, the larger amount of degrees-of-freedom comes into action. Also, users might be able to better plan actions when they are controlling a device similar to their own hands, meaning the main task for them is to use a control interface to execute actions they would otherwise execute with their own hands.
 
-Creating such a simple and easy-to-learn interface to a dexterous robotic hand is the goal of this bachelor's thesis. The device used is a \textit{Shadow Dexterous Hand C5/C6} by the Shadow Robot Company. It has 5 Fingers controlled by electrical or pneumatic muscles using 20 degrees of freedom\cite{web/robothand/spec}. The hand is connected to a robotic arm allowing it to also be moved in space.
+Creating such a simple and easy-to-learn interface to a dexterous robotic hand is the goal of this bachelor thesis. The device used is a \textit{Shadow Dexterous Hand C5/C6} by the Shadow Robot Company. It has five fingers controlled by electrical or pneumatic muscles using 20 degrees-of-freedom\cite{web/robothand/spec}. The hand is connected to a robotic arm allowing it to also be moved in space.
 
-As a control device, a normal off-the-shelf android tablet will be used, as these devices have become very widespread and - thanks to this - relatively affordable. With screen sizes of 10 inches and above and the capability to record more than 5 independent touch pointers and a number of additional sensors (gyroscope, orientation, ...) and feedback actuators (vibration, sound, ...) they make a good choice for a versatile control device.
+As a control device an off-the-shelf android tablet will be used, as these devices have become very widespread and - thanks to this - relatively affordable. With screen sizes of 10 inches and above and the capability to record more than 5 independent touch pointers and a number of additional sensors (gyroscope, orientation, ...) and feedback actuators (vibration, sound, ...) they make a good choice for a versatile control device.
 
 \subsection{Outline of this exposé}
 
-This exposé will first describe the two main approaches that will be used and evaluated within the thesis, going on to describing the planned implementation in Section \ref{sec:impl}. At last, the possible methods for testing and evaluating the results of the project will be shown.
+This exposé will first describe the two main approaches that will be used and evaluated within the thesis, going on to describing the planned implementation in Section \ref{sec:impl}. At last the possible methods for testing and evaluating the results of the project will be shown.
 
 \section{Basic approaches}
 
@@ -52,7 +52,7 @@ Another solution to extend the limited workspace would be to scale up motion act
 
 Another approach is to simplify the control of each single joint within the robotic hand by executing a principle component analysis on recorded movement data of selected grasping operations\cite{uhh/techrep/paramnewactions}. This parametrises the actions, making it easier to control a grasp as not every joint position has to be recalculated manually, but using mathematical operations to derive the joint positions from the desired grasping pose that shall be executed. While this method allows grasping operations that are not restricted to controlling the fingertips in a planar environment, the user has less control over the distinct positions of each finger. It has to be evaluated, if this is a problem within the real use case.
 
-Grasping operations would be simplified to actions like \textit{open hand} or \textit{close hand}, with the selected grasping pose being executed. This would give the user the ability to use the other fingers or the other hand to control other degrees of freedom like the position of the hand in 3D space simultaneously. With this approach, the user interactions would probably not as intuitive as within the one described in section \ref{sec:direct}. This might lead to a more steep learning curve.
+Grasping operations would be simplified to actions like \textit{open hand} or \textit{close hand}, with the selected grasping pose being executed. This would give the user the ability to use the other fingers or the other hand to control other degrees-of-freedom like the position of the hand in 3D space simultaneously. With this approach, the user interactions would probably not be as intuitive as within the one described in section \ref{sec:direct}. This might lead to a more steep learning curve.
 
 \subsubsection{Absolute vs. relative positioning}
 
@@ -77,7 +77,7 @@ Example: Let a grasping pose be controlled by numbers from $0$ (hand fully open)
 
 When lifting a finger off the touch screen accidentally it would be mandatory to place it at the exact same spot on the touch screen again. Otherwise, a new distance of the fingers will be measured and a new pose state would be set. This could, if not handled by the program in any form, lead to failure and damage to the device or other equipment. These points could be applied to all actions done with the robotic arm including movement of the arm in 3D space and thus require a safety system to be implemented like a dead-man-switch or an easy-to-reach emergency shut down switch, bringing all devices into a safe state.
 
-Using a relative position control would at least minimize the risk of uncontrolled behaviour by accidentally moving fingers. In this approach, all actions are done relatively, meaning that where the fingers are place on the touch screen has no effect on the actions executed. Fingers could be safely placed on and lifted from the screen at any time, as the robot will then remain still within the state it currently is. A two-finger pinch gesture could still be used to open or close the robotic hand, but the actual distance of the touch points would not directly map to the hand's state, but the change in the finger distance would map to a change in the hand's state. This could also be introduced to the arm's position in space, hand rotation etc.
+Using a relative position control would at least minimize the risk of uncontrolled behaviour by accidentally moving fingers. In this approach, all actions are done relatively, meaning that where the fingers are placed on the touch screen has no effect on the actions executed. Fingers could be safely placed on and lifted from the screen at any time, as the robot will then remain still within the state it currently is. A two-finger pinch gesture could still be used to open or close the robotic hand, but the actual distance of the touch points would not directly map to the hand's state, but the change in the finger distance would map to a change in the hand's state. This could also be introduced to the arm's position in space, hand rotation etc.
 
 Using this, the speed at which actions are executed could be controlled more easily, improving the precision and dexterity of the operations. Also, the possible workspace would be much greater, as e.g. moving the hand around in space could be done in multiple swipe operations over the full screen. After placing the arm, the desired grasping operations could then be executed relative to the new position. It would be possible and sensible to introduce multiple speed modes for letting the user choose between fast and not very precise operation to roughly place the hand where it shall be and then switch to a slower mode, allowing the user to very precisely execute all desired operations.
 
