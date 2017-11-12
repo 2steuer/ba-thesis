@@ -6,6 +6,9 @@
 \usepackage{url}
 \usepackage[hidelinks]{hyperref}
 \usepackage{wrapfig}
+\usepackage[style=alphabetic,backend=bibtex]{biblatex}
+
+\addbibresource{literature}
 
 %opening
 \title{Exposé for B.Sc.-Thesis \\
@@ -123,7 +126,7 @@ A big goal is to create software that may be easily reused in other following pr
 	\item \textbf{ROS-Communication layer:} This is the layer taking care of communication with the robot. It takes the joint angle and position information calculated within the touch point processors and passes them to the robot using ROS. No calculation takes place within this layer.
 \end{itemize}
 
-Using this kind of architecture makes it easy to implement multiple approaches and different touch processors without having to change (or even rewrite) the user interface or the communication layers when applying changes to the touch processing. It is even possible to exchange the touch processor at runtime by just moving around some objects within the application, as the communication between the layers will probably be implemented using some sort of the \textit{observer-pattern}. This implementation will most likely be some kind of a Model-View-Controller pattern as the software architecture gets more elaborated.
+Using this kind of architecture makes it easy to implement multiple approaches and different touch processors without having to change (or even rewrite) the user interface or the communication layers when applying changes to the touch processing. It is even possible to exchange the touch processor at runtime by just moving around some objects within the application, as the communication between the layers will probably be implemented using some sort of the \textit{observer-pattern}. This implementation will most likely turn out as some kind of a Model-View-Controller pattern as the software architecture gets more elaborated.
 
 \subsection{Graphical representation of robot state}
 
@@ -145,7 +148,7 @@ When the development of the software gets to an end it could be sensible to eval
 
 \pagebreak
 
-\bibliography{literature}
-\bibliographystyle{alpha}
+
+\printbibliography
 
 \end{document}
