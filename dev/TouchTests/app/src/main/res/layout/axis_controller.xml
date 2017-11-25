@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/name_text"
+        android:textStyle="bold"
+        android:text="Axis Name"/>
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+
+        <Button android:id="@+id/minus_button"
+            android:text="-"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"/>
+
+        <LinearLayout
+            android:id="@+id/angle_field"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <TextView android:id="@+id/target_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.00"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/current_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.00"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/plus_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="+"
+            android:layout_weight="1"/>
+    </LinearLayout>
+</merge>
+

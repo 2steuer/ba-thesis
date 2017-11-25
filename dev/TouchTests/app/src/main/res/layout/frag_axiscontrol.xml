@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:text="Arm"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Arm Axis 0"
+            app:axisIdentifier="lwr_arm_0_joint"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Arm Axis 1"
+            app:axisIdentifier="lwr_arm_1_joint"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Arm Axis 2"
+            app:axisIdentifier="lwr_arm_2_joint"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Arm Axis 3"
+            app:axisIdentifier="lwr_arm_3_joint"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Arm Axis 4"
+            app:axisIdentifier="lwr_arm_4_joint"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Arm Axis 5"
+            app:axisIdentifier="lwr_arm_5_joint"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Arm Axis 6"
+            app:axisIdentifier="lwr_arm_6_joint"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:text="Thumb"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Thumb 1"
+            app:axisIdentifier="THJ1"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Thumb 2"
+            app:axisIdentifier="THJ2"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Thumb 3"
+            app:axisIdentifier="THJ3"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Thumb 4"
+            app:axisIdentifier="THJ4"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Thumb 5"
+            app:axisIdentifier="THJ5"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:text="Wrist"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Wrist 1"
+            app:axisIdentifier="WRJ1"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Wrist 2"
+            app:axisIdentifier="WRJ2"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:text="First Finger"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="First Finger 1"
+            app:axisIdentifier="FFJ1"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="First Finger 2"
+            app:axisIdentifier="FFJ2"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="First Finger 3"
+            app:axisIdentifier="FFJ3"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="First Finger 4"
+            app:axisIdentifier="FFJ4"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:text="Middle Finger"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Middle Finger 1"
+            app:axisIdentifier="MFJ1"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Middle Finger 2"
+            app:axisIdentifier="MFJ2"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Middle Finger 3"
+            app:axisIdentifier="MFJ3"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Middle Finger 4"
+            app:axisIdentifier="MFJ4"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:text="Last Finger"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Last Finger 1"
+            app:axisIdentifier="LFJ1"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Last Finger 2"
+            app:axisIdentifier="LFJ2"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Last Finger 3"
+            app:axisIdentifier="LFJ3"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Last Finger 4"
+            app:axisIdentifier="LFJ4"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Last Finger 5"
+            app:axisIdentifier="LFJ5"/>
+
+    </LinearLayout>
+
+</LinearLayout>
