@@ -75,12 +75,24 @@ public class AxisInformationImpl implements AxisInformation {
         this.currentTargetValue = currentTargetValue;
     }
 
+    public double getCurrentTargetValueAsRobotValue() {
+        return converter.toRobotValue(getCurrentTargetValue());
+    }
+
     public double getCurrentValue() {
         return currentValue;
     }
 
     public void setCurrentValue(double currentValue) {
         this.currentValue = currentValue;
+    }
+
+    public void setCurrentValueFromRobotValue(double robotValue) {
+        setCurrentValue(converter.toRawValue(robotValue));
+    }
+
+    public double getCurrentValueAsRobotValue() {
+        return converter.toRobotValue(getCurrentValue());
     }
 
     public boolean isMoving() {

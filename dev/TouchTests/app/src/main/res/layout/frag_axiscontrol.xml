@@ -160,13 +160,7 @@
             android:layout_height="wrap_content"
             app:axisName="First Finger 4"
             app:axisIdentifier="FFJ4"/>
-    </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
 
         <TextView
             android:layout_width="match_parent"
@@ -198,6 +192,45 @@
             android:layout_height="wrap_content"
             app:axisName="Middle Finger 4"
             app:axisIdentifier="MFJ4"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:text="Ring Finger"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Ring Finger 1"
+            app:axisIdentifier="RFJ1"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Ring Finger 2"
+            app:axisIdentifier="RFJ2"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Ring Finger 3"
+            app:axisIdentifier="RFJ3"/>
+
+        <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.AxisControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:axisName="Ring Finger 4"
+            app:axisIdentifier="RFJ4"/>
+
     </LinearLayout>
 
     <LinearLayout

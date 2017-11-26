@@ -3,8 +3,7 @@
 buildscript {
     
     repositories {
-        google()
-        jcenter()
+
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
@@ -18,8 +17,11 @@ buildscript {
 allprojects {
     repositories {
         maven {
-            url '/opt/rosjava_mvn_repo'
+            url System.getenv("ROS_MAVEN_DEPLOYMENT_REPOSITORY")
         }
+        /*maven {
+            url '/opt/rosjava_mvn_repo'
+        }*/
         google()
         jcenter()
     }

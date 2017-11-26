@@ -25,6 +25,7 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    implementation 'org.ros.rosjava_core:rosjava:[0.3,0.4)'
-    implementation 'org.ros.android_core:android_15:[0.3,0.4)'
+    implementation('org.ros.android_core:android_15:[0.3,0.4)') {
+        exclude group: 'xml-apis'
+    }
 }

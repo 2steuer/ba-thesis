@@ -7,18 +7,20 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Observer;
 
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Material.AxisInformationImpl;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Material.Interfaces.AngleRadianConverter;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Material.Interfaces.AxisInformation;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Material.ValueConverter;
+import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Nodes.Interfaces.RobotJointDataReceiver;
 
 /**
  * Created by merlin on 25.11.17.
  */
 
-public class AxisManager {
+public class AxisManager implements RobotJointDataReceiver {
     private static AxisManager instance = null;
     public static AxisManager getInstance() {
         if(instance == null) {
@@ -46,6 +48,8 @@ public class AxisManager {
     private List<Observer> observers = new ArrayList<Observer>();
 
     private boolean running = false;
+
+    private RobotJointDataReceiver robotNode = null;
 
     private AxisManager() {
         timerHandler = new Handler();
@@ -141,6 +145,15 @@ public class AxisManager {
         notifyObservers();
 
         // send data:
+        if(robotNode != null) {
+            HashMap<String, Double> map = new HashMap<>();
+
+            for(AxisInformationImpl ai : axes.values()) {
+                map.put(ai.getIdentifier(), ai.getCurrentTargetValueAsRobotValue());
+            }
+
+            robotNode.handleJointData(map);
+        }
     }
 
 
@@ -152,8 +165,12 @@ public class AxisManager {
         observers.add(obs);
     }
 
-    private void removeObserver(Observer obs) {
+    public void removeObserver(Observer obs) {
         observers.remove(obs);
+    }
+
+    public void setRobotNode(RobotJointDataReceiver node) {
+        robotNode = node;
     }
 
     public boolean startMoving(String identifier, double speed) {
@@ -244,6 +261,15 @@ public class AxisManager {
     private void notifyObservers() {
         for(Observer o : observers) {
             o.update(null, this);
+        }
+    }
+
+    @Override
+    public void handleJointData(HashMap<String, Double> data) {
+        for(Map.Entry<String, Double> e : data.entrySet()) {
+            if(axes.containsKey(e.getKey())) {
+                axes.get(e.getKey()).setCurrentValueFromRobotValue(e.getValue());
+            }
         }
     }
 }
