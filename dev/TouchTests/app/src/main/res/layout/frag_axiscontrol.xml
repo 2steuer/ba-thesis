@@ -276,6 +276,18 @@
             app:axisName="Last Finger 5"
             app:axisIdentifier="LFJ5"/>
 
+        <Button android:id="@+id/zeroButton"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="ALL ZERO" />
+
+        <Button android:id="@+id/stopButton"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:text="STOP"
+            android:textColor="@color/posNOk"
+            android:textStyle="bold"/>
+
     </LinearLayout>
 
 </LinearLayout>

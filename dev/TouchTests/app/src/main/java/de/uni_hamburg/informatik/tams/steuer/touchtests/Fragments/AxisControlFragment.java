@@ -1,11 +1,15 @@
 package de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import java.util.HashMap;
 import java.util.Observable;
@@ -22,14 +26,24 @@ import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Material.Interface
  * Created by merlin on 25.11.17.
  */
 
-public class AxisControlFragment extends Fragment {
+public class AxisControlFragment extends Fragment implements View.OnClickListener {
     HashMap<String, AxisControlView> controls = new HashMap<String, AxisControlView>();
     AxisManager axisManager;
+
+    Runnable updateRunnable = new Runnable() {
+        @Override
+        public void run() {
+            updateAllControllers();
+        }
+    };
+
+    Button zeroButton;
+    Button stopButton;
 
     AxisControllerObserver axisCallback = new AxisControllerObserver() {
         @Override
         public void onStartMoving(String axisIdentifier, int direction) {
-            axisManager.startMoving(axisIdentifier, 2 * Math.signum(direction));
+            axisManager.startMoving(axisIdentifier, 5 * Math.signum(direction));
         }
 
         @Override
@@ -44,9 +58,16 @@ public class AxisControlFragment extends Fragment {
         axisManager.addObserver(new Observer() {
             @Override
             public void update(Observable observable, Object o) {
-                updateAllControllers();
+               Activity a = getActivity();
+               if(a != null)
+               {
+                   a.runOnUiThread(updateRunnable);
+               }
+
             }
         });
+
+
     }
 
     @Override
@@ -58,6 +79,8 @@ public class AxisControlFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.frag_axiscontrol, container, false);
+
+
     }
 
     @Override
@@ -70,6 +93,10 @@ public class AxisControlFragment extends Fragment {
             populateAxisControllerMap(grp);
         }
 
+        zeroButton = (Button)getView().findViewById(R.id.zeroButton);
+        zeroButton.setOnClickListener(this);
+        stopButton = (Button)getView().findViewById(R.id.stopButton);
+        stopButton.setOnClickListener(this);
 
     }
 
@@ -101,6 +128,30 @@ public class AxisControlFragment extends Fragment {
                 acv.setTargetAngle(i.getTargetValue());
                 acv.setCurrentAngle(i.getCurrentValue());
             }
+        }
+    }
+
+    /**
+     * STOP and ZERO button handler!
+     * @param view the view
+     */
+    @Override
+    public void onClick(View view) {
+        Button b = (Button)view;
+
+        if(b == zeroButton) {
+            AlertDialog.Builder diag = new AlertDialog.Builder(getContext());
+            diag.setMessage("Sind Sie sicher? Dies kannn großen Schaden am Gerät verursachen.")
+                    .setNegativeButton("NEIN!", null)
+                    .setPositiveButton("Ja", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            axisManager.setAllZero(false);
+                        }
+                    }).create().show();
+        }
+        else if(b == stopButton) {
+            axisManager.copyCurrentValuesToTarget();
         }
     }
 }

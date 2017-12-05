@@ -1,12 +1,14 @@
 package de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Nodes;
 
 import org.ros.message.MessageListener;
+import org.ros.message.Time;
 import org.ros.namespace.GraphName;
 import org.ros.node.ConnectedNode;
 import org.ros.node.Node;
 import org.ros.node.NodeMain;
 import org.ros.node.topic.Publisher;
 import org.ros.node.topic.Subscriber;
+import org.ros.time.TimeProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +23,8 @@ import sensor_msgs.JointState;
  * Created by merlin on 26.11.17.
  */
 
-public class C5LwrNode implements NodeMain, RobotJointDataReceiver {
+public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJointDataReceiver {
+    private ConnectedNode cNode = null;
     private String subscribeTopic;
     private String publishTopic;
 
@@ -52,6 +55,7 @@ public class C5LwrNode implements NodeMain, RobotJointDataReceiver {
 
     @Override
     public void onStart(ConnectedNode connectedNode) {
+        cNode = connectedNode;
         jointStatePub = connectedNode.newPublisher(publishTopic, JointState._TYPE);
         jointStateSubsc = connectedNode.newSubscriber(subscribeTopic, JointState._TYPE);
 
@@ -109,6 +113,8 @@ public class C5LwrNode implements NodeMain, RobotJointDataReceiver {
         for(int i = 0; i < name.size(); i++) {
             position[i] = data.get(name.get(i));
         }
+
+        js.getHeader().setStamp(cNode.getCurrentTime());
 
         js.setName(name);
         js.setPosition(position);

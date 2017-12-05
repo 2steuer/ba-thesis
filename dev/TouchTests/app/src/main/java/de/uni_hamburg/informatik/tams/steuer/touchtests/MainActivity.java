@@ -1,5 +1,7 @@
 package de.uni_hamburg.informatik.tams.steuer.touchtests;
 
+import android.app.ProgressDialog;
+import android.os.Looper;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,6 +11,7 @@ import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.TouchFragment;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.GestureView;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Util.ViewPagerAdapter;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.AxisManager;
+import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Material.Interfaces.InitStateListener;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Nodes.C5LwrNode;
 
 import android.support.design.widget.TabLayout;
@@ -23,6 +26,8 @@ public class MainActivity extends RosActivity {
 
     C5LwrNode node;
 
+    ProgressDialog diag = null;
+
     public MainActivity() {
         super("ROS", "ROS TEST");
     }
@@ -31,12 +36,6 @@ public class MainActivity extends RosActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        axisManager = AxisManager.getInstance();
-        node = new C5LwrNode("/joint_states", "/config/fake_controller_joint_states");
-
-        node.addJointDataListener(axisManager);
-        axisManager.setRobotNode(node);
 
         ViewPager pager = (ViewPager)findViewById(R.id.pager);
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
@@ -48,16 +47,49 @@ public class MainActivity extends RosActivity {
 
         TabLayout tab = (TabLayout)findViewById(R.id.tabs);
         tab.setupWithViewPager(pager);
+
+        diag = new ProgressDialog(this);
+        diag.setCancelable(false);
+        diag.setIndeterminate(true);
+        diag.setMessage("Initializing. Please wait.");
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        axisManager.start();
     }
 
     @Override
     protected void init(NodeMainExecutor nodeMainExecutor) {
+        axisManager = AxisManager.getInstance();
+        node = new C5LwrNode("/joint_states", "/config/fake_controller_joint_states");
+
+        node.addJointDataListener(axisManager);
+        axisManager.setRobotNode(node);
+
+        axisManager.setInitStateListener(new InitStateListener() {
+            @Override
+            public void onInitBegin() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        diag.show();
+                    }
+                });
+            }
+
+            @Override
+            public void onInitFinished() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        diag.hide();
+                    }
+                });
+            }
+        });
+
         NodeConfiguration cfg = NodeConfiguration.newPublic(getRosHostname(), getMasterUri());
 
         nodeMainExecutor.execute(node, cfg);
@@ -66,6 +98,20 @@ public class MainActivity extends RosActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        axisManager.stop();
+
+        if(axisManager != null) {
+            axisManager.stop();
+        }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if(axisManager != null) {
+            axisManager.start();
+            axisManager.init();
+        }
     }
 }
