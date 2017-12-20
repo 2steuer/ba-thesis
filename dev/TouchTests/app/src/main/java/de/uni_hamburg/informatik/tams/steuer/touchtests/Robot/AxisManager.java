@@ -42,6 +42,8 @@ public class AxisManager implements RobotJointDataReceiver {
     private boolean init = false;
     private int initSampleCounter = 0;
 
+    private boolean _locked = true;
+
     private final TimerTask timerCaller = new TimerTask() {
         @Override
         public void run() {
@@ -60,6 +62,8 @@ public class AxisManager implements RobotJointDataReceiver {
     private RobotJointDataReceiver robotNode = null;
 
     private AxisManager() {
+        _locked = true;
+
         AngleRadianConverter c = new AngleRadianConverter();
 
         // Arm's joints
@@ -207,7 +211,7 @@ public class AxisManager implements RobotJointDataReceiver {
     }
 
     public boolean startMoving(String identifier, double speed) {
-        if(!running) {
+        if(!running || _locked) {
             return false;
         }
 
@@ -246,6 +250,7 @@ public class AxisManager implements RobotJointDataReceiver {
         }
 
         for(AxisInformationImpl i : axes.values()) {
+            stopMoving(i.getIdentifier());
             setTargetValue(i.getIdentifier(), i.getCurrentValue(), true, false);
         }
 
@@ -272,7 +277,13 @@ public class AxisManager implements RobotJointDataReceiver {
             return false;
         }
 
+        if(_locked && !force)
+        {
+            return false;
+        }
+
         AxisInformationImpl ai = axes.get(identifier);
+
         ai.setTargetValue(value);
         if(force) {
             ai.setCurrentTargetValue(value);
@@ -346,5 +357,21 @@ public class AxisManager implements RobotJointDataReceiver {
 
     public void setInitStateListener(InitStateListener lstnr) {
         initListener = lstnr;
+    }
+
+    public boolean getLocked()
+    {
+        return _locked;
+    }
+
+    public void setLocked(boolean locked)
+    {
+        boolean transitsToLocked = !_locked && locked;
+        _locked = locked;
+
+        if(transitsToLocked)
+        {
+            copyCurrentValuesToTarget();
+        }
     }
 }

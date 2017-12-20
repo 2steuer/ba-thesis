@@ -3,10 +3,13 @@ package de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -98,6 +101,33 @@ public class AxisControlFragment extends Fragment implements View.OnClickListene
         stopButton = (Button)getView().findViewById(R.id.stopButton);
         stopButton.setOnClickListener(this);
 
+        final FloatingActionButton lockButton = ((FloatingActionButton)getView().findViewById(R.id.lockButton));
+
+        lockButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                switch(motionEvent.getAction())
+                {
+                    case MotionEvent.ACTION_DOWN:
+                        axisManager.setLocked(false);
+                        lockButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.posOk)));
+
+                        lockButton.setImageResource(android.R.drawable.ic_media_pause);
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        axisManager.setLocked(true);
+                        lockButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.posNOk)));
+                        lockButton.setImageResource(android.R.drawable.ic_media_play);
+
+                        break;
+                }
+
+                return true;
+            }
+
+
+        });
     }
 
     @Override
