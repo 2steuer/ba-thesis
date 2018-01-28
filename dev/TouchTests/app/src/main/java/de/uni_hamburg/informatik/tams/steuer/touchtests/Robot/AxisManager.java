@@ -87,25 +87,25 @@ public class AxisManager implements RobotJointDataReceiver {
         addAxis("THJ5", -60, 60, 5, c);
 
         // First Finger
-        addAxis("FFJ1", 0, 90, 5, c);
+        addAxis("FFJ1", 0, 90, 5, c, false);
         addAxis("FFJ2", 0, 90, 5, c);
         addAxis("FFJ3", 0, 90, 5, c);
         addAxis("FFJ4", -20, 20, 5, c);
 
         // Middle Finger
-        addAxis("MFJ1", 0, 90, 5, c);
+        addAxis("MFJ1", 0, 90, 5, c, false);
         addAxis("MFJ2", 0, 90, 5, c);
         addAxis("MFJ3", 0, 90, 5, c);
         addAxis("MFJ4", -20, 20, 5, c);
 
         // Ring Finger
-        addAxis("RFJ1", 0, 90, 5, c);
+        addAxis("RFJ1", 0, 90, 5, c, false);
         addAxis("RFJ2", 0, 90, 5, c);
         addAxis("RFJ3", 0, 90, 5, c);
         addAxis("RFJ4", -20, 20, 5, c);
 
         // Last Finger
-        addAxis("LFJ1", 0, 45, 5, c);
+        addAxis("LFJ1", 0, 45, 5, c, false);
         addAxis("LFJ2", 0, 90, 5, c);
         addAxis("LFJ3", 0, 90, 5, c);
         addAxis("LFJ4", -20, 20, 5, c);
@@ -186,16 +186,22 @@ public class AxisManager implements RobotJointDataReceiver {
             HashMap<String, Double> map = new HashMap<>();
 
             for(AxisInformationImpl ai : axes.values()) {
-                map.put(ai.getIdentifier(), ai.getCurrentTargetValueAsRobotValue());
+                if(ai.isEnabled())
+                {
+                    map.put(ai.getIdentifier(), ai.getCurrentTargetValueAsRobotValue());
+                }
             }
 
             robotNode.handleJointData(map);
         }
     }
 
+    private void addAxis(String identifier, double minValue, double maxValue, double maxSpeed, ValueConverter conv, boolean enabled) {
+        axes.put(identifier, new AxisInformationImpl(identifier, minValue, maxValue, maxSpeed, conv, enabled));
+    }
 
     private void addAxis(String identifier, double minValue, double maxValue, double maxSpeed, ValueConverter conv) {
-        axes.put(identifier, new AxisInformationImpl(identifier, minValue, maxValue, maxSpeed, conv));
+        addAxis(identifier, minValue, maxValue, maxSpeed, conv, true);
     }
 
     public void addObserver(Observer obs) {

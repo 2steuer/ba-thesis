@@ -40,6 +40,8 @@ public class AxisControlView extends LinearLayout {
 
     AxisControllerObserver observer = null;
 
+    boolean displayOnly = false;
+
     View.OnTouchListener touchListener = new View.OnTouchListener() {
 
         @Override
@@ -86,6 +88,14 @@ public class AxisControlView extends LinearLayout {
         init(context, attrs);
     }
 
+    public void setDisplayOnly(boolean displayOnly)
+    {
+        displayOnly = displayOnly;
+
+        _plusButton.setEnabled(!displayOnly);
+        _minusButton.setEnabled(!displayOnly);
+    }
+
     private void init(Context context, @Nullable AttributeSet attrs) {
         this.setOrientation(LinearLayout.VERTICAL);
         inflate(getContext(), R.layout.axis_controller, this);
@@ -109,6 +119,7 @@ public class AxisControlView extends LinearLayout {
             setAxisIdentifier(a.getString(R.styleable.AxisControlView_axisIdentifier));
         }
 
+        setDisplayOnly(false);
 
         setCurrentAngle(0);
         setTargetAngle(0);
@@ -148,6 +159,11 @@ public class AxisControlView extends LinearLayout {
     }
 
     private void updateAngleColor() {
+        if(displayOnly)
+        {
+            return;
+        }
+
         double delta = Math.abs(currentAngle - targetAngle);
         LinearLayout field = (LinearLayout)findViewById(R.id.angle_field);
 

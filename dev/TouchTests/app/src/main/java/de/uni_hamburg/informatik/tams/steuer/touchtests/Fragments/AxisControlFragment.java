@@ -142,6 +142,10 @@ public class AxisControlFragment extends Fragment implements View.OnClickListene
             View v = grp.getChildAt(i);
             if(v instanceof AxisControlView) {
                 AxisControlView acv = (AxisControlView)v;
+
+                AxisInformation in = axisManager.getAxisInfo(acv.getAxisIdentifier());
+                acv.setDisplayOnly(!in.isEnabled());
+
                 controls.put(acv.getAxisIdentifier(), acv);
                 acv.setObserver(axisCallback);
             }

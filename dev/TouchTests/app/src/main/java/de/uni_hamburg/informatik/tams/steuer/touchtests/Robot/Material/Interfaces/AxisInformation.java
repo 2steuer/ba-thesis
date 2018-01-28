@@ -16,4 +16,5 @@ public interface AxisInformation {
     double getCurrentValue();
     boolean isMoving();
     double getSpeed();
+    boolean isEnabled();
 }

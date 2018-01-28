@@ -30,16 +30,29 @@ public class AxisInformationImpl implements AxisInformation {
     private boolean moving;
     private double speed; // positive or negative
 
+    private boolean enabled;
+
     public AxisInformationImpl(String identifier,
                                double minvalue,
                                double maxvalue,
                                double maxspeed,
-                               ValueConverter converter) {
+                               ValueConverter converter,
+                               boolean enabled) {
         this.identifier = identifier;
         this.maxValue = maxvalue;
         this.minValue = minvalue;
         this.maxSpeed = maxspeed;
         this.converter = converter;
+        this.enabled = enabled;
+    }
+
+    public AxisInformationImpl(String identifier,
+                               double minValue,
+                               double maxValue,
+                               double maxspeed,
+                               ValueConverter converter)
+    {
+        this(identifier, minValue, maxValue, maxspeed, converter, true);
     }
 
 
@@ -58,6 +71,8 @@ public class AxisInformationImpl implements AxisInformation {
     public double getMaxSpeed() {
         return maxSpeed;
     }
+
+    public boolean isEnabled() { return enabled; }
 
     public double getTargetValue() {
         return targetValue;
