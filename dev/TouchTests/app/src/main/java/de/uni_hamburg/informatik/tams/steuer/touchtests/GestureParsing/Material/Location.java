@@ -40,4 +40,8 @@ public class Location {
     public float distanceTo(Location loc) {
         return (float)Math.sqrt(Math.pow(loc.x - this.x, 2) + Math.pow(loc.y - this.y, 2));
     }
+
+    public boolean isSame(Location l2) {
+        return l2.getX() == x && l2.getY() == y;
+    }
 }
