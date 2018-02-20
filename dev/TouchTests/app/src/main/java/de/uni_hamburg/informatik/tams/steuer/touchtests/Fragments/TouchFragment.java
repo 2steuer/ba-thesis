@@ -33,16 +33,6 @@ public class TouchFragment extends Fragment {
     public TouchFragment() {
         _axes = AxisManager.getInstance();
 
-        GraspSynergy testSyn = new GraspSynergy(21);
-        try {
-            testSyn.parseMatlabSynergyMean(getResources().openRawResource(R.raw.g1mean_n));
-            testSyn.parseMatlabSynergyVecs(getResources().openRawResource(R.raw.g1vecs_n));
-        } catch (Exception ex) {
-            Log.e("TouchFragment", "Error while parsing test synergy.");
-            Log.e("TouchFragment", ex.getMessage());
-        }
-
-        _synergyProxy.setGraspSynergy(testSyn);
 
 
     }
@@ -63,6 +53,7 @@ public class TouchFragment extends Fragment {
         super.onStart();
 
         _gestures = ((GestureView)getView().findViewById(R.id.gestView)).getGestureParser();
+        _gestures.addObserver(_synergyProxy);
         final FloatingActionButton lockButton = ((FloatingActionButton)getView().findViewById(R.id.lockButton));
 
         lockButton.setOnTouchListener(new View.OnTouchListener() {
@@ -78,7 +69,7 @@ public class TouchFragment extends Fragment {
                         break;
 
                     case MotionEvent.ACTION_UP:
-                        _axes.setLocked(true);
+                        _axes.setLocked(false);
                         lockButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.posNOk)));
                         lockButton.setImageResource(android.R.drawable.ic_media_play);
 
@@ -90,12 +81,25 @@ public class TouchFragment extends Fragment {
 
 
         });
+
+        GraspSynergy testSyn = new GraspSynergy(21);
+        try {
+            testSyn.parseMatlabSynergyMean(getResources().openRawResource(R.raw.g1mean));
+            testSyn.parseMatlabSynergyVecs(getResources().openRawResource(R.raw.g1vecs));
+        } catch (Exception ex) {
+            Log.e("TouchFragment", "Error while parsing test synergy.");
+            Log.e("TouchFragment", ex.getMessage());
+        }
+
+        _synergyProxy.setGraspSynergy(testSyn);
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
         _synergyProxy.setAxisManager(_axes);
+
     }
 
     @Override

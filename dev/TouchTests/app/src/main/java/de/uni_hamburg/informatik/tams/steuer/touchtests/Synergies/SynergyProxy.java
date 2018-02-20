@@ -3,7 +3,6 @@ package de.uni_hamburg.informatik.tams.steuer.touchtests.Synergies;
 import android.util.Log;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.Interfaces.GestureObserver;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.Material.Gesture;
@@ -48,23 +47,18 @@ public class SynergyProxy implements GestureObserver {
             "THJ5",
     };
 
-    private static final int _zeroAmplitudeSize = 200;
-    private static final int _fullAmplitudeSize = 10;
+    private static final int _zeroAmplitudeSize = 800;
+    private static final int _fullAmplitudeSize = 40;
 
     GraspSynergy _currentSynergy = null;
 
-    HashMap<Integer, GestureState> _gestures = new HashMap<>();
+    HashMap<Gesture, GestureState> _stateByGesture = new HashMap<>();
 
-    private double[] _amplitudes = new double[CONTROLLED_AMPLITUDES];
+    private double[] _amplitudes = new double[JointMapping.length];
 
     AxisManager _axes = null;
 
     public SynergyProxy() {
-        _gestures.put(1, new GestureState());
-        _gestures.put(2, new GestureState());
-        _gestures.put(3, new GestureState());
-        _gestures.put(4, new GestureState());
-        _gestures.put(5, new GestureState());
     }
 
     public void setAxisManager(AxisManager manager) {
@@ -78,51 +72,22 @@ public class SynergyProxy implements GestureObserver {
     @Override
     public void onGestureAdd(Gesture g) {
         int pc = g.getPointerCount();
-        GestureState gs = _gestures.get(pc);
+        GestureState gs = new GestureState();
+        gs.setGesture(g);
 
-        if(gs == null) {
-            return;
-        }
-
-        if(_gestures.get(pc).getGesture() == null)
-        {
-            _gestures.get(pc).setGesture(g);
-        }
+        _stateByGesture.put(g, gs);
     }
 
     @Override
     public void onGestureRemove(Gesture g) {
-        int pc = g.getPointerCount();
-        GestureState gs = _gestures.get(pc);
-
-        if(gs == null) {
-            return;
-        }
-
-        if(_gestures.get(pc).getGesture() == g)
-        {
-            _gestures.get(pc).setGesture(null);
-        }
+            _stateByGesture.remove(g);
     }
 
     @Override
     public void onGestureChanged(Gesture g) {
         int pc = g.getPointerCount();
-        GestureState gs = _gestures.get(pc);
+        GestureState gs = _stateByGesture.get(g);
         if(gs == null || gs.getGesture() != g) {
-            return;
-        }
-
-        if(gs.getPointerCount() != g.getPointerCount()) {
-            gs.setGesture(null);
-
-            GestureState newGs = _gestures.get(pc);
-            if(newGs != null && newGs.getGesture() == null) {
-                newGs.setGesture(g);
-            }
-
-            // If the pointer count has changed, we do want to
-            // exit further execution and do not react to size or position changes.
             return;
         }
 
@@ -143,7 +108,7 @@ public class SynergyProxy implements GestureObserver {
     }
 
     private void handleSizeChange(GestureState oldState, double newSize) {
-        if(_currentSynergy != null || _axes != null) {
+        if(_currentSynergy == null || _axes == null) {
             return;
         }
 

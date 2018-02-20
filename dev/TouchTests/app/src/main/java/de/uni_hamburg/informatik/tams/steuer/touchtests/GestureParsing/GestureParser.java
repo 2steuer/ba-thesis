@@ -28,7 +28,7 @@ public class GestureParser {
 
     private List<Gesture> gestures = new ArrayList<Gesture>();
 
-    private List<GestureObserver> observers = new LinkedList<>();
+    private Set<GestureObserver> observers = new HashSet<>();
 
     public void handleTouchEvent(MotionEvent e)
     {
@@ -66,7 +66,8 @@ public class GestureParser {
                         pointToGestures.put(newP, gest);
 
                         for (GestureObserver o : observers) {
-                            o.onGestureChanged(gest);
+                            o.onGestureRemove(gest);
+                            o.onGestureAdd(gest);
                         }
                     }
                     else {
@@ -102,7 +103,8 @@ public class GestureParser {
                     }
                     else {
                         for (GestureObserver o : observers) {
-                            o.onGestureChanged(g);
+                            o.onGestureRemove(g);
+                            o.onGestureAdd(g);
                         }
                     }
 
