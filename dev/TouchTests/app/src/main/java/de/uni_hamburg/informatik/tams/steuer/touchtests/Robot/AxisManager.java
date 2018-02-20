@@ -1,5 +1,6 @@
 package de.uni_hamburg.informatik.tams.steuer.touchtests.Robot;
 
+import android.content.res.Resources;
 import android.os.Handler;
 
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import de.uni_hamburg.informatik.tams.steuer.touchtests.R;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Material.AxisInformationImpl;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Material.Interfaces.AngleRadianConverter;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Material.Interfaces.AxisInformation;
