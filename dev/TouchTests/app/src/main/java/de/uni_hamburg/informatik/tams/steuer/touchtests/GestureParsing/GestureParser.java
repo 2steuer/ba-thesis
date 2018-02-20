@@ -1,5 +1,7 @@
 package de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing;
 
+import android.gesture.GestureOverlayView;
+import android.gesture.GestureUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -7,9 +9,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.Interfaces.GestureObserver;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.Material.Gesture;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.Material.Pointer;
 
@@ -23,6 +27,8 @@ public class GestureParser {
     private HashMap<Pointer, Gesture> pointToGestures = new HashMap<Pointer, Gesture>();
 
     private List<Gesture> gestures = new ArrayList<Gesture>();
+
+    private List<GestureObserver> observers = new LinkedList<>();
 
     public void handleTouchEvent(MotionEvent e)
     {
@@ -58,12 +64,20 @@ public class GestureParser {
                     if(gest != null) {
                         gest.addPointer(newP);
                         pointToGestures.put(newP, gest);
+
+                        for (GestureObserver o : observers) {
+                            o.onGestureChanged(gest);
+                        }
                     }
                     else {
                         Gesture newGesture = new Gesture();
                         newGesture.addPointer(newP);
                         gestures.add(newGesture);
                         pointToGestures.put(newP, newGesture);
+
+                        for (GestureObserver o : observers) {
+                            o.onGestureAdd(newGesture);
+                        }
                     }
                 }
                 break;
@@ -77,23 +91,46 @@ public class GestureParser {
 
                     Gesture g = pointToGestures.get(p);
                     g.removePointer(p);
+                    pointToGestures.remove(p);
 
                     if(g.getPointerCount() == 0) {
                         gestures.remove(g);
+
+                        for (GestureObserver o : observers) {
+                            o.onGestureRemove(g);
+                        }
                     }
+                    else {
+                        for (GestureObserver o : observers) {
+                            o.onGestureChanged(g);
+                        }
+                    }
+
                 }
                 break;
 
             case MotionEvent.ACTION_MOVE:
+                Set<Gesture> gs = new HashSet<>();
                 for(int i = 0; i < e.getPointerCount(); i++) {
                     int pid = e.findPointerIndex(i);
 
                     if(pointers.containsKey(pid)) {
-                        pointers.get(pid).setLocation(e.getX(i), e.getY(i));
+                        Pointer p = pointers.get(pid);
+                        p.setLocation(e.getX(i), e.getY(i));
+
+                        Gesture g = pointToGestures.get(p);
+                        if(!gs.contains(g)) {
+                            gs.add(g);
+                        }
                     }
                 }
 
-
+                // Notify observers about all changes gestures.
+                for(Gesture g : gs) {
+                    for(GestureObserver obs : observers) {
+                        obs.onGestureChanged(g);
+                    }
+                }
                 break;
         }
     }
@@ -104,5 +141,13 @@ public class GestureParser {
 
     public Collection<Gesture> getGestures() {
         return gestures;
+    }
+
+    public void addObserver(GestureObserver observer) {
+        observers.add(observer);
+    }
+
+    public void removeObserver(GestureObserver observer) {
+        observers.remove(observer);
     }
 }
