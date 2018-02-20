@@ -33,6 +33,17 @@ public class AxisControlFragment extends Fragment implements View.OnClickListene
     HashMap<String, AxisControlView> controls = new HashMap<String, AxisControlView>();
     AxisManager axisManager;
 
+    Observer obs = new Observer() {
+        @Override
+        public void update(Observable observable, Object o) {
+            Activity a = getActivity();
+            if(a != null)
+            {
+                a.runOnUiThread(updateRunnable);
+            }
+
+        }
+    };
     Runnable updateRunnable = new Runnable() {
         @Override
         public void run() {
@@ -58,25 +69,15 @@ public class AxisControlFragment extends Fragment implements View.OnClickListene
     public AxisControlFragment() {
         axisManager = AxisManager.getInstance();
 
-        axisManager.addObserver(new Observer() {
-            @Override
-            public void update(Observable observable, Object o) {
-               Activity a = getActivity();
-               if(a != null)
-               {
-                   a.runOnUiThread(updateRunnable);
-               }
-
-            }
-        });
-
-
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
+
+
+
 
     @Nullable
     @Override
@@ -129,6 +130,19 @@ public class AxisControlFragment extends Fragment implements View.OnClickListene
 
         });
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        axisManager.removeObserver(obs);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        axisManager.addObserver(obs);
+    }
+
 
     @Override
     public void onStop() {
