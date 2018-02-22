@@ -3,11 +3,13 @@ package de.uni_hamburg.informatik.tams.steuer.touchtests.Synergies;
 import android.util.Log;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.Interfaces.GestureObserver;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.Material.Gesture;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.Material.Location;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.AxisManager;
+import de.uni_hamburg.informatik.tams.steuer.touchtests.Synergies.Interfaces.SynergyAmplitudeListener;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Synergies.Material.GestureState;
 import hdbt.shadow.GraspSynergy;
 
@@ -47,8 +49,8 @@ public class SynergyProxy implements GestureObserver {
             "THJ5",
     };
 
-    private static final double _zeroAmplitudeSize = 800;
-    private static final double _fullAmplitudeSize = 40;
+    private static final double _zeroAmplitudeSize = 1000;
+    private static final double _fullAmplitudeSize = 200;
 
     private static final double _zeroAmplitudeValue = 50;
     private static final double _fullAmplitudeValue = -50;
@@ -61,6 +63,10 @@ public class SynergyProxy implements GestureObserver {
 
     AxisManager _axes = null;
 
+    private HashSet<SynergyAmplitudeListener> listeners = new HashSet<>();
+
+    private boolean locked = true;
+
     public SynergyProxy() {
     }
 
@@ -70,6 +76,18 @@ public class SynergyProxy implements GestureObserver {
 
     public void setGraspSynergy(GraspSynergy grasp) {
         _currentSynergy = grasp;
+    }
+
+    public void addListener(SynergyAmplitudeListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeListener(SynergyAmplitudeListener listener) {
+        listeners.remove(listener);
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
     }
 
     @Override
@@ -111,7 +129,7 @@ public class SynergyProxy implements GestureObserver {
     }
 
     private void handleSizeChange(GestureState oldState, Gesture gesture) {
-        if(_currentSynergy == null || _axes == null) {
+        if(locked || _currentSynergy == null || _axes == null) {
             return;
         }
 
@@ -127,7 +145,7 @@ public class SynergyProxy implements GestureObserver {
 
         double val = m * newSize + b;
 
-        val = Math.max(_zeroAmplitudeValue, Math.min(val, _fullAmplitudeValue)); // Clip between 0 .. 1.
+        val = Math.max(Math.min(_zeroAmplitudeValue, _fullAmplitudeValue), Math.min(val, Math.max(_zeroAmplitudeValue, _fullAmplitudeValue))); // Clip between 0 .. 1.
 
         _amplitudes[amplitudeIndex] = val;
 
@@ -142,6 +160,10 @@ public class SynergyProxy implements GestureObserver {
             // only notify observers on last axis everytime
             // should increase performance
             _axes.setTargetValue(JointMapping[i], jointData[i], false, (i + 1 == jointData.length));
+        }
+
+        for(SynergyAmplitudeListener l : listeners) {
+            l.setAmplitudes(_amplitudes, CONTROLLED_AMPLITUDES);
         }
     }
 

@@ -52,9 +52,11 @@ public class TouchFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        _gestures = ((GestureView)getView().findViewById(R.id.gestView)).getGestureParser();
+        GestureView gview = ((GestureView)getView().findViewById(R.id.gestView));
+        _gestures = gview.getGestureParser();
         _gestures.addObserver(_synergyProxy);
         final FloatingActionButton lockButton = ((FloatingActionButton)getView().findViewById(R.id.lockButton));
+
 
         lockButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -63,13 +65,15 @@ public class TouchFragment extends Fragment {
                 {
                     case MotionEvent.ACTION_DOWN:
                         _axes.setLocked(false);
+                        _synergyProxy.setLocked(false);
                         lockButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.posOk)));
 
                         lockButton.setImageResource(android.R.drawable.ic_media_pause);
                         break;
 
                     case MotionEvent.ACTION_UP:
-                        _axes.setLocked(false);
+                        _axes.setLocked(true);
+                        _synergyProxy.setLocked(true);
                         lockButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.posNOk)));
                         lockButton.setImageResource(android.R.drawable.ic_media_play);
 
@@ -92,6 +96,7 @@ public class TouchFragment extends Fragment {
         }
 
         _synergyProxy.setGraspSynergy(testSyn);
+        _synergyProxy.addListener(gview);
 
     }
 

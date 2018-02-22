@@ -13,17 +13,21 @@ import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.GesturePa
 import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.Material.Gesture;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.Material.Location;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.Material.Pointer;
+import de.uni_hamburg.informatik.tams.steuer.touchtests.Synergies.Interfaces.SynergyAmplitudeListener;
 
 /**
  * Created by merlin on 22.11.17.
  */
 
-public class GestureView extends View {
+public class GestureView extends View implements SynergyAmplitudeListener {
     GestureParser gestures = new GestureParser();
 
     Paint paintRed = new Paint();
     Paint paintBlack = new Paint();
     Paint paintOrange = new Paint();
+
+    double[] _amplitudes = new double[0];
+    int _controlledAmplitudes = 0;
 
     public GestureView(Context context) {
         super(context);
@@ -75,6 +79,25 @@ public class GestureView extends View {
             }
 
             canvas.drawCircle(com.getX(), com.getY(), 20, paintBlack);
+
+
         }
+
+        int textOffset = 100;
+
+        paintBlack.setTextSize(32);
+
+        for(int i = 0; i < Math.min(_amplitudes.length, _controlledAmplitudes); i++) {
+            String str = String.format("%d: %f", i, _amplitudes[i]);
+            canvas.drawText(str, 10, textOffset, paintBlack);
+            textOffset += 50;
+        }
+
+    }
+
+    @Override
+    public void setAmplitudes(double[] amplitudes, int controlledAmplitudes) {
+        _amplitudes = amplitudes;
+        _controlledAmplitudes = controlledAmplitudes;
     }
 }
