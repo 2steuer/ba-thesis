@@ -69,49 +69,49 @@ public class AxisManager implements RobotJointDataReceiver {
         AngleRadianConverter c = new AngleRadianConverter();
 
         // Arm's joints
-        addAxis("lwr_arm_0_joint", -168, 168, 5, c);
-        addAxis("lwr_arm_1_joint", -118, 118, 5, c);
-        addAxis("lwr_arm_2_joint", -168, 168, 5, c);
-        addAxis("lwr_arm_3_joint", -118, 118, 5, c);
-        addAxis("lwr_arm_4_joint", -168, 168, 5, c);
-        addAxis("lwr_arm_5_joint", -118, 118, 5, c);
-        addAxis("lwr_arm_6_joint", -168, 168, 5, c);
+        addAxis("lwr_arm_0_joint", -168, 168, 10, c);
+        addAxis("lwr_arm_1_joint", -118, 118, 10, c);
+        addAxis("lwr_arm_2_joint", -168, 168, 10, c);
+        addAxis("lwr_arm_3_joint", -118, 118, 10, c);
+        addAxis("lwr_arm_4_joint", -168, 168, 10, c);
+        addAxis("lwr_arm_5_joint", -118, 118, 10, c);
+        addAxis("lwr_arm_6_joint", -168, 168, 10, c);
 
         // Wrist
-        addAxis("WRJ1", 0, 90, 5, c);
-        addAxis("WRJ2", 0, 90, 5, c);
+        addAxis("WRJ1", 0, 90, 10, c);
+        addAxis("WRJ2", 0, 90, 10, c);
 
         // Thumb
-        addAxis("THJ1", 0, 90, 5, c);
-        addAxis("THJ2", -40, 40, 5, c);
-        addAxis("THJ3", -12, 12, 5, c);
-        addAxis("THJ4", 0, 70, 5, c);
-        addAxis("THJ5", -60, 60, 5, c);
+        addAxis("THJ1", 0, 90, 10, c);
+        addAxis("THJ2", -40, 40, 10, c);
+        addAxis("THJ3", -12, 12, 10, c);
+        addAxis("THJ4", 0, 70, 10, c);
+        addAxis("THJ5", -60, 60, 10, c);
 
         // First Finger
-        addAxis("FFJ1", 0, 90, 5, c, false);
-        addAxis("FFJ2", 0, 90, 5, c);
-        addAxis("FFJ3", 0, 90, 5, c);
-        addAxis("FFJ4", -20, 20, 5, c);
+        addAxis("FFJ1", 0, 90, 10, c, false);
+        addAxis("FFJ2", 0, 90, 10, c);
+        addAxis("FFJ3", 0, 90, 10, c);
+        addAxis("FFJ4", -20, 20, 10, c);
 
         // Middle Finger
-        addAxis("MFJ1", 0, 90, 5, c, false);
-        addAxis("MFJ2", 0, 90, 5, c);
-        addAxis("MFJ3", 0, 90, 5, c);
-        addAxis("MFJ4", -20, 20, 5, c);
+        addAxis("MFJ1", 0, 90, 10, c, false);
+        addAxis("MFJ2", 0, 90, 10, c);
+        addAxis("MFJ3", 0, 90, 10, c);
+        addAxis("MFJ4", -20, 20, 10, c);
 
         // Ring Finger
-        addAxis("RFJ1", 0, 90, 5, c, false);
-        addAxis("RFJ2", 0, 90, 5, c);
-        addAxis("RFJ3", 0, 90, 5, c);
-        addAxis("RFJ4", -20, 20, 5, c);
+        addAxis("RFJ1", 0, 90, 10, c, false);
+        addAxis("RFJ2", 0, 90, 10, c);
+        addAxis("RFJ3", 0, 90, 10, c);
+        addAxis("RFJ4", -20, 20, 10, c);
 
         // Last Finger
-        addAxis("LFJ1", 0, 45, 5, c, false);
-        addAxis("LFJ2", 0, 90, 5, c);
-        addAxis("LFJ3", 0, 90, 5, c);
-        addAxis("LFJ4", -20, 20, 5, c);
-        addAxis("LFJ5", 0, 45, 5, c);
+        addAxis("LFJ1", 0, 45, 10, c, false);
+        addAxis("LFJ2", 0, 90, 10, c);
+        addAxis("LFJ3", 0, 90, 10, c);
+        addAxis("LFJ4", -20, 20, 10, c);
+        addAxis("LFJ5", 0, 45, 10, c);
     }
 
     public void start() {

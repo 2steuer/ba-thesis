@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/lockButton"
@@ -14,12 +15,43 @@
         android:src="@android:drawable/ic_media_play"
         android:backgroundTint="@color/posNOk"
         app:fabSize="normal"
-        app:layout_constraintBottom_toBottomOf="parent"
         />
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/gest_spinner"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="All Zero"
+            android:id="@+id/amp_all_zero"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="All Extend"
+            android:id="@+id/amp_all_extend"
+            />
+
+
+    </LinearLayout>
 
     <de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.GestureView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/gestView" />
 
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>
+
+
+</android.support.design.widget.CoordinatorLayout>

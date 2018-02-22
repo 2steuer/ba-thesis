@@ -10,8 +10,16 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Spinner;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.GestureView;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.GestureParser;
@@ -24,11 +32,14 @@ import hdbt.shadow.GraspSynergy;
  * Created by merlin on 25.11.17.
  */
 
-public class TouchFragment extends Fragment {
+public class TouchFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
     GestureParser _gestures;
     AxisManager _axes;
     SynergyProxy _synergyProxy = new SynergyProxy();
+
+    List<String> synergyNames = new LinkedList<>();
+    Map<String, GraspSynergy> synergies = new HashMap<>();
 
     public TouchFragment() {
         _axes = AxisManager.getInstance();
@@ -86,19 +97,64 @@ public class TouchFragment extends Fragment {
 
         });
 
-        GraspSynergy testSyn = new GraspSynergy(21);
+
+
+        loadSynergy("Grasp 1", R.raw.g1mean_n, R.raw.g1vecs_n);
+        loadSynergy("Grasp 2", R.raw.g2mean_n, R.raw.g2vecs_n);
+        loadSynergy("Grasp 3", R.raw.g3mean_n, R.raw.g3vecs_n);
+        loadSynergy("Grasp 4", R.raw.g4mean_n, R.raw.g4vecs_n);
+        loadSynergy("Grasp 5", R.raw.g5mean_n, R.raw.g5vecs_n);
+        loadSynergy("Grasp 6", R.raw.g6mean_n, R.raw.g6vecs_n);
+        loadSynergy("Grasp 7", R.raw.g7mean_n, R.raw.g7vecs_n);
+        loadSynergy("Grasp 8", R.raw.g8mean_n, R.raw.g8vecs_n);
+
+        _synergyProxy.addListener(gview);
+
+        Spinner sp = (Spinner)(getView().findViewById(R.id.gest_spinner));
+
+        String[] array = new String[synergyNames.size()];
+        array = synergyNames.toArray(array);
+
+        ArrayAdapter<String> entries = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, array);
+        sp.setAdapter(entries);
+
+        sp.setOnItemSelectedListener(this);
+
+        sp.setSelection(0);
+
+        ((Button) (getView().findViewById(R.id.amp_all_zero))).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                _synergyProxy.allAmplitudesZero();
+            }
+        });
+
+        ((Button) (getView().findViewById(R.id.amp_all_extend))).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                _synergyProxy.allAmplitudesZeroValue();
+            }
+        });
+    }
+
+    private GraspSynergy loadSynergy(String name, int mean_res, int vec_res) {
         try {
-            testSyn.parseMatlabSynergyMean(getResources().openRawResource(R.raw.g1mean));
-            testSyn.parseMatlabSynergyVecs(getResources().openRawResource(R.raw.g1vecs));
+            GraspSynergy synergy = new GraspSynergy(21);
+            synergy.parseMatlabSynergyMean(getResources().openRawResource(mean_res));
+            synergy.parseMatlabSynergyVecs(getResources().openRawResource(vec_res));
+
+            synergyNames.add(name);
+            synergies.put(name, synergy);
+
+            return synergy;
         } catch (Exception ex) {
             Log.e("TouchFragment", "Error while parsing test synergy.");
             Log.e("TouchFragment", ex.getMessage());
+            return null;
         }
-
-        _synergyProxy.setGraspSynergy(testSyn);
-        _synergyProxy.addListener(gview);
-
     }
+
+
 
     @Override
     public void onResume() {
@@ -114,4 +170,14 @@ public class TouchFragment extends Fragment {
     }
 
 
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long l) {
+        String name = synergyNames.get(pos);
+        _synergyProxy.setGraspSynergy(synergies.get(name));
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+        _synergyProxy.setGraspSynergy(null);
+    }
 }

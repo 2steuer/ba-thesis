@@ -89,7 +89,7 @@ public class GestureView extends View implements SynergyAmplitudeListener {
 
         for(int i = 0; i < Math.min(_amplitudes.length, _controlledAmplitudes); i++) {
             String str = String.format("%d: %f", i, _amplitudes[i]);
-            canvas.drawText(str, 10, textOffset, paintBlack);
+            canvas.drawText(str, 200, textOffset, paintBlack);
             textOffset += 50;
         }
 

@@ -76,6 +76,10 @@ public class SynergyProxy implements GestureObserver {
 
     public void setGraspSynergy(GraspSynergy grasp) {
         _currentSynergy = grasp;
+
+        if(_currentSynergy != null) {
+            allAmplitudesZero();
+        }
     }
 
     public void addListener(SynergyAmplitudeListener listener) {
@@ -149,6 +153,10 @@ public class SynergyProxy implements GestureObserver {
 
         _amplitudes[amplitudeIndex] = val;
 
+        updateJoints();
+    }
+
+    private void updateJoints() {
         double[] jointData = _currentSynergy.toSafeAbduction(_currentSynergy.toJoints(_amplitudes));
 
         if(jointData.length > JointMapping.length) {
@@ -165,6 +173,24 @@ public class SynergyProxy implements GestureObserver {
         for(SynergyAmplitudeListener l : listeners) {
             l.setAmplitudes(_amplitudes, CONTROLLED_AMPLITUDES);
         }
+    }
+
+    // Set all amplitudes to literally zero
+    public void allAmplitudesZero() {
+        for(int i = 0; i < _amplitudes.length; i++) {
+            _amplitudes[i] = 0;
+        }
+
+        updateJoints();
+    }
+
+    // Set all amplitudes to the value for "Zero Grasp".
+    public void allAmplitudesZeroValue() {
+        for(int i = 0; i < Math.min(_amplitudes.length, CONTROLLED_AMPLITUDES); i++) {
+            _amplitudes[i] = _zeroAmplitudeValue;
+        }
+
+        updateJoints();
     }
 
     private void handleLocationChanged(GestureState oldState, Gesture gesture) {
