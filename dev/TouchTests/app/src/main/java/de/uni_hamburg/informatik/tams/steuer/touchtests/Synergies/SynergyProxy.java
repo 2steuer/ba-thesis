@@ -47,8 +47,11 @@ public class SynergyProxy implements GestureObserver {
             "THJ5",
     };
 
-    private static final int _zeroAmplitudeSize = 800;
-    private static final int _fullAmplitudeSize = 40;
+    private static final double _zeroAmplitudeSize = 800;
+    private static final double _fullAmplitudeSize = 40;
+
+    private static final double _zeroAmplitudeValue = 50;
+    private static final double _fullAmplitudeValue = -50;
 
     GraspSynergy _currentSynergy = null;
 
@@ -119,12 +122,12 @@ public class SynergyProxy implements GestureObserver {
             return;
         }
 
-        double m = 1.0 / (_fullAmplitudeSize - _zeroAmplitudeSize);
-        double b = 1.0 - (m * _fullAmplitudeSize);
+        double m = (_fullAmplitudeValue - _zeroAmplitudeValue) / (_fullAmplitudeSize - _zeroAmplitudeSize);
+        double b = _fullAmplitudeValue - (m * _fullAmplitudeSize);
 
         double val = m * newSize + b;
 
-        val = Math.max(0.0, Math.min(val, 1.0)); // Clip between 0 .. 1.
+        val = Math.max(_zeroAmplitudeValue, Math.min(val, _fullAmplitudeValue)); // Clip between 0 .. 1.
 
         _amplitudes[amplitudeIndex] = val;
 
