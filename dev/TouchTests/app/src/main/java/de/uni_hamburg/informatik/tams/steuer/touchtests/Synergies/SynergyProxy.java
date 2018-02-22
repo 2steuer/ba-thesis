@@ -94,23 +94,25 @@ public class SynergyProxy implements GestureObserver {
         double newSize = g.getSize();
 
         if (gs.getSize() != newSize) {
-            handleSizeChange(gs, newSize);
+            handleSizeChange(gs, g);
         }
 
         Location newLoc = g.getCenter();
 
         if(!gs.getCenter().isSame(newLoc)) {
-            handleLocationChanged(gs, newLoc);
+            handleLocationChanged(gs, g);
         }
 
         gs.setCenter(g.getCenter());
         gs.setSize(g.getSize());
     }
 
-    private void handleSizeChange(GestureState oldState, double newSize) {
+    private void handleSizeChange(GestureState oldState, Gesture gesture) {
         if(_currentSynergy == null || _axes == null) {
             return;
         }
+
+        double newSize = gesture.getSize();
 
         int amplitudeIndex = oldState.getPointerCount() - 2;
         if(amplitudeIndex < 0 || amplitudeIndex >= CONTROLLED_AMPLITUDES) {
@@ -134,11 +136,13 @@ public class SynergyProxy implements GestureObserver {
         }
 
         for(int i = 0; i < jointData.length; i++) {
-            _axes.setTargetValue(JointMapping[i], jointData[i]);
+            // only notify observers on last axis everytime
+            // should increase performance
+            _axes.setTargetValue(JointMapping[i], jointData[i], false, (i + 1 == jointData.length));
         }
     }
 
-    private void handleLocationChanged(GestureState oldState, Location newLocation) {
+    private void handleLocationChanged(GestureState oldState, Gesture gesture) {
         if(_currentSynergy != null || _axes != null) {
             return;
         }
