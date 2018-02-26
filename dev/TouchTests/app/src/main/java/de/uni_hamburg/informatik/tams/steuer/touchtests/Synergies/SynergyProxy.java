@@ -49,8 +49,8 @@ public class SynergyProxy implements GestureObserver {
             "THJ5",
     };
 
-    private static final double _zeroAmplitudeSize = 1000;
-    private static final double _fullAmplitudeSize = 200;
+    private static final double _zeroAmplitudeSize = 1200;
+    private static final double _fullAmplitudeSize = 300;
 
     private static final double _zeroAmplitudeValue = 50;
     private static final double _fullAmplitudeValue = -50;
