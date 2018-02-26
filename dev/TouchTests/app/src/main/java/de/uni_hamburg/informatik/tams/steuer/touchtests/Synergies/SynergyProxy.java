@@ -191,7 +191,7 @@ public class SynergyProxy implements GestureObserver {
     }
 
     private void handleLocationChanged(GestureState oldState, Gesture gesture) {
-        if(_currentSynergy == null || _axes == null) {
+        if(locked || _currentSynergy == null || _axes == null) {
             return;
         }
 
@@ -204,7 +204,7 @@ public class SynergyProxy implements GestureObserver {
     }
 
     private void handleOrientationChanges(GestureState oldState, Gesture gesture) {
-        if(_currentSynergy == null || _axes == null) {
+        if(locked || _currentSynergy == null || _axes == null) {
             return;
         }
 

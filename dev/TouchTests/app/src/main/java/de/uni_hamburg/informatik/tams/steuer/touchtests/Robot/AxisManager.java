@@ -188,7 +188,7 @@ public class AxisManager implements RobotJointDataReceiver {
             HashMap<String, Double> map = new HashMap<>();
 
             for(AxisInformationImpl ai : axes.values()) {
-                if(ai.isEnabled())
+                if(/*ai.isEnabled()*/true)
                 {
                     map.put(ai.getIdentifier(), ai.getCurrentTargetValueAsRobotValue());
                 }
