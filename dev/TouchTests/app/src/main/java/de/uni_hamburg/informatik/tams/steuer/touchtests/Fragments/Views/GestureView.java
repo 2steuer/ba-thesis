@@ -6,10 +6,15 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.GestureParser;
+import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.Interfaces.GestureObserver;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.Material.Gesture;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.Material.Location;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.Material.Pointer;
@@ -19,7 +24,9 @@ import de.uni_hamburg.informatik.tams.steuer.touchtests.Synergies.Interfaces.Syn
  * Created by merlin on 22.11.17.
  */
 
-public class GestureView extends View implements SynergyAmplitudeListener {
+public class GestureView extends View implements SynergyAmplitudeListener, GestureObserver {
+    private static final int REMEMBER_POINTS_POINTERCOUNT = 2;
+
     GestureParser gestures = new GestureParser();
 
     Paint paintRed = new Paint();
@@ -30,6 +37,11 @@ public class GestureView extends View implements SynergyAmplitudeListener {
 
     double[] _amplitudes = new double[0];
     int _controlledAmplitudes = 0;
+
+    private Gesture _currentControlGesture = null;
+
+    private List<Pointer> _rememberPointers = new LinkedList<>();
+    private boolean _drawRememberPointers = false;
 
     public GestureView(Context context) {
         super(context);
@@ -66,6 +78,8 @@ public class GestureView extends View implements SynergyAmplitudeListener {
         this.paintYellow.setColor(Color.YELLOW);
         this.paintYellow.setStyle(Paint.Style.FILL);
         this.paintYellow.setStrokeWidth(8);
+
+        gestures.addObserver(this);
     }
 
     @Override
@@ -117,6 +131,13 @@ public class GestureView extends View implements SynergyAmplitudeListener {
             canvas.drawText(String.format("O: %.3f", orientation), textX, textY + 100, paintBlack);
         }
 
+        if(_drawRememberPointers) {
+            for(Pointer p : _rememberPointers) {
+                canvas.drawCircle(p.getLocation().getX(), p.getLocation().getY(), 50, paintRed);
+            }
+
+        }
+
         int textOffset = 100;
 
         for(int i = 0; i < Math.min(_amplitudes.length, _controlledAmplitudes); i++) {
@@ -131,5 +152,29 @@ public class GestureView extends View implements SynergyAmplitudeListener {
     public void setAmplitudes(double[] amplitudes, int controlledAmplitudes) {
         _amplitudes = amplitudes;
         _controlledAmplitudes = controlledAmplitudes;
+    }
+
+    @Override
+    public void onGestureAdd(Gesture g) {
+        if(_currentControlGesture == null && g.getPointerCount() == REMEMBER_POINTS_POINTERCOUNT) {
+            _rememberPointers.clear();
+            _currentControlGesture = g;
+            _rememberPointers.addAll(g.getPointers());
+            _drawRememberPointers = false;
+        }
+
+    }
+
+    @Override
+    public void onGestureRemove(Gesture g) {
+        if(g == _currentControlGesture) {
+            _drawRememberPointers = true;
+            _currentControlGesture = null;
+        }
+    }
+
+    @Override
+    public void onGestureChanged(Gesture g) {
+
     }
 }
