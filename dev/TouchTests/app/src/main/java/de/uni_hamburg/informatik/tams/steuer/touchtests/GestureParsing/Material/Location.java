@@ -43,6 +43,8 @@ public class Location {
 
     public double getAngleTo(Location loc) {
         double val = Math.acos(scalarProduct(loc) / (getVectorLength() * loc.getVectorLength()));
+
+        // perpendicular dot product
         if(x * loc.getY() - y * loc.getX() < 0) {
             val *= -1;
         }
