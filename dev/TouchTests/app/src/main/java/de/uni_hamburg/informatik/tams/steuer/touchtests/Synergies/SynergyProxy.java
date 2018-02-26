@@ -12,6 +12,7 @@ import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.Material.
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.AxisManager;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Synergies.Interfaces.SynergyAmplitudeListener;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Synergies.Material.GestureState;
+import de.uni_hamburg.informatik.tams.steuer.touchtests.Synergies.Material.LinearEquation;
 import hdbt.shadow.GraspSynergy;
 
 /**
@@ -20,6 +21,12 @@ import hdbt.shadow.GraspSynergy;
 
 public class SynergyProxy implements GestureObserver {
     private static final int CONTROLLED_AMPLITUDES = 3;
+
+    private static final int HAND_GEST_POINTER_COUNT = 2;
+
+    private static final int SIZE_AMPLITUDE = 0;
+    private static final int XPOS_AMPLITUDE = 1;
+    private static final int ROT_AMPLITUDE = 2;
 
     // Mappings from synergy output index to axis name
     private static final String[] JointMapping = {
@@ -62,6 +69,12 @@ public class SynergyProxy implements GestureObserver {
 
     private double[] _amplitudes = new double[JointMapping.length];
 
+    private LinearEquation[] _eqs = new LinearEquation[] {
+        new LinearEquation(1200, 50, 300, -50, -50, 50),
+        new LinearEquation(0, 50, 1000, -50, -50, 50),
+        new LinearEquation(-(Math.PI / 2.0), 50, Math.PI / 2.0, -50, -50, 50)
+    };
+
     AxisManager _axes = null;
 
     private HashSet<SynergyAmplitudeListener> listeners = new HashSet<>();
@@ -89,6 +102,9 @@ public class SynergyProxy implements GestureObserver {
     public void setCanvasSize(float width, float height) {
         _canvasHeight = height;
         _canvasWidth = width;
+
+        LinearEquation leq = _eqs[XPOS_AMPLITUDE];
+        leq.calculateParameters(_canvasWidth * 0.25, 50, _canvasWidth * 0.75, -50);
     }
 
     public void addListener(SynergyAmplitudeListener listener) {
@@ -146,6 +162,8 @@ public class SynergyProxy implements GestureObserver {
         gs.setCenter(newLoc);
         gs.setSize(newSize);
         gs.setOrientation(orientation);
+
+        updateJoints();
     }
 
     private void handleSizeChange(GestureState oldState, Gesture gesture) {
@@ -153,21 +171,55 @@ public class SynergyProxy implements GestureObserver {
             return;
         }
 
-        double newSize = gesture.getSize();
-
-        int amplitudeIndex = oldState.getPointerCount() - 2;
-        if(amplitudeIndex < 0 || amplitudeIndex >= CONTROLLED_AMPLITUDES) {
+        if(gesture.getPointerCount() != 2) {
             return;
         }
 
-        double m = (_fullAmplitudeValue - _zeroAmplitudeValue) / (_fullAmplitudeSize - _zeroAmplitudeSize);
-        double b = _fullAmplitudeValue - (m * _fullAmplitudeSize);
+        double newSize = gesture.getSize();
 
-        double val = m * newSize + b;
+        _amplitudes[SIZE_AMPLITUDE] = _eqs[SIZE_AMPLITUDE].calculateClipped(newSize);
 
-        val = Math.max(Math.min(_zeroAmplitudeValue, _fullAmplitudeValue), Math.min(val, Math.max(_zeroAmplitudeValue, _fullAmplitudeValue))); // Clip between 0 .. 1.
+    }
 
-        _amplitudes[amplitudeIndex] = val;
+    // Set all amplitudes to literally zero
+    public void allAmplitudesZero() {
+        for(int i = 0; i < _amplitudes.length; i++) {
+            _amplitudes[i] = 0;
+        }
+
+        updateJoints();
+    }
+
+    private void handleLocationChanged(GestureState oldState, Gesture gesture) {
+        if(_currentSynergy == null || _axes == null) {
+            return;
+        }
+
+        if(gesture.getPointerCount() != 2) {
+            return;
+        }
+
+        _amplitudes[XPOS_AMPLITUDE] = _eqs[XPOS_AMPLITUDE].calculateClipped(gesture.getCenter().getX());
+
+    }
+
+    private void handleOrientationChanges(GestureState oldState, Gesture gesture) {
+        if(_currentSynergy == null || _axes == null) {
+            return;
+        }
+
+        if(gesture.getPointerCount() != 2) {
+            return;
+        }
+
+        _amplitudes[ROT_AMPLITUDE] = _eqs[ROT_AMPLITUDE].calculateClipped(gesture.getOrientation());
+    }
+
+    // Set all amplitudes to the value for "Zero Grasp".
+    public void allAmplitudesZeroValue() {
+        for(int i = 0; i < Math.min(_amplitudes.length, CONTROLLED_AMPLITUDES); i++) {
+            _amplitudes[i] = _zeroAmplitudeValue;
+        }
 
         updateJoints();
     }
@@ -191,33 +243,5 @@ public class SynergyProxy implements GestureObserver {
         }
     }
 
-    // Set all amplitudes to literally zero
-    public void allAmplitudesZero() {
-        for(int i = 0; i < _amplitudes.length; i++) {
-            _amplitudes[i] = 0;
-        }
 
-        updateJoints();
-    }
-
-    // Set all amplitudes to the value for "Zero Grasp".
-    public void allAmplitudesZeroValue() {
-        for(int i = 0; i < Math.min(_amplitudes.length, CONTROLLED_AMPLITUDES); i++) {
-            _amplitudes[i] = _zeroAmplitudeValue;
-        }
-
-        updateJoints();
-    }
-
-    private void handleLocationChanged(GestureState oldState, Gesture gesture) {
-        if(_currentSynergy != null || _axes != null) {
-            return;
-        }
-    }
-
-    private void handleOrientationChanges(GestureState oldState, Gesture gesture) {
-        if(_currentSynergy != null || _axes != null) {
-            return;
-        }
-    }
 }
