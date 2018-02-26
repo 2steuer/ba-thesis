@@ -128,8 +128,15 @@ public class SynergyProxy implements GestureObserver {
             handleLocationChanged(gs, g);
         }
 
-        gs.setCenter(g.getCenter());
-        gs.setSize(g.getSize());
+        double orientation = g.getOrientation();
+
+        if(orientation != gs.getOrientation()) {
+            handleOrientationChanges(gs, g);
+        }
+
+        gs.setCenter(newLoc);
+        gs.setSize(newSize);
+        gs.setOrientation(orientation);
     }
 
     private void handleSizeChange(GestureState oldState, Gesture gesture) {
@@ -194,6 +201,12 @@ public class SynergyProxy implements GestureObserver {
     }
 
     private void handleLocationChanged(GestureState oldState, Gesture gesture) {
+        if(_currentSynergy != null || _axes != null) {
+            return;
+        }
+    }
+
+    private void handleOrientationChanges(GestureState oldState, Gesture gesture) {
         if(_currentSynergy != null || _axes != null) {
             return;
         }

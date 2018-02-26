@@ -13,10 +13,13 @@ public class GestureState {
     private double size;
     private Location center;
 
+    private double orientation;
+
     public GestureState() {
         gesture = null;
         pointerCount = 0;
         size = 0;
+        orientation = 0;
     }
 
     public Gesture getGesture() {
@@ -29,11 +32,13 @@ public class GestureState {
             pointerCount = gesture.getPointerCount();
             size = gesture.getSize();
             center = gesture.getCenter();
+            orientation = gesture.getOrientation();
         }
         else {
             pointerCount = 0;
             size = 0;
             center = new Location();
+            orientation = 0;
         }
 
     }
@@ -61,4 +66,13 @@ public class GestureState {
     public void setCenter(Location center) {
         this.center = center;
     }
+
+    public double getOrientation() {
+        return orientation;
+    }
+
+    public void setOrientation(double orientation) {
+        this.orientation = orientation;
+    }
+
 }
