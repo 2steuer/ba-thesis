@@ -1,6 +1,7 @@
 package de.uni_hamburg.informatik.tams.steuer.touchtests.Synergies;
 
 import android.util.Log;
+import android.util.Size;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,6 +68,9 @@ public class SynergyProxy implements GestureObserver {
 
     private boolean locked = true;
 
+    private double _canvasWidth = 0;
+    private double _canvasHeight = 0;
+
     public SynergyProxy() {
     }
 
@@ -80,6 +84,11 @@ public class SynergyProxy implements GestureObserver {
         if(_currentSynergy != null) {
             allAmplitudesZero();
         }
+    }
+
+    public void setCanvasSize(float width, float height) {
+        _canvasHeight = height;
+        _canvasWidth = width;
     }
 
     public void addListener(SynergyAmplitudeListener listener) {

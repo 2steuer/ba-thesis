@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -63,11 +64,19 @@ public class TouchFragment extends Fragment implements AdapterView.OnItemSelecte
     public void onStart() {
         super.onStart();
 
-        GestureView gview = ((GestureView)getView().findViewById(R.id.gestView));
+        final GestureView gview = ((GestureView)getView().findViewById(R.id.gestView));
         _gestures = gview.getGestureParser();
         _gestures.addObserver(_synergyProxy);
         final FloatingActionButton lockButton = ((FloatingActionButton)getView().findViewById(R.id.lockButton));
 
+        _synergyProxy.setCanvasSize(gview.getWidth(), gview.getHeight());
+
+        gview.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
+                _synergyProxy.setCanvasSize(gview.getWidth(), gview.getHeight());
+            }
+        });
 
         lockButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
