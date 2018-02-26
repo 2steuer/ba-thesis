@@ -81,6 +81,14 @@ public class GestureView extends View implements SynergyAmplitudeListener {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        float w = getWidth();
+        float xrossX = w / 2f;
+        float h = getHeight();
+        float xrossY = h / 2f;
+
+        canvas.drawLine(xrossX, 0, xrossX, h, paintBlack);
+        canvas.drawLine(0, xrossY, w, xrossY, paintBlack);
+
         for (Gesture g : gestures.getGestures()) {
             Location com = g.getCenter();
             float radius = g.getSize() / 2;
