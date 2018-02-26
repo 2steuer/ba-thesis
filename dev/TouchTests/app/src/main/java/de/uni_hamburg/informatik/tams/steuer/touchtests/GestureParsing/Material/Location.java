@@ -29,6 +29,27 @@ public class Location {
         return new Location(this.x + loc.x, this.y + loc.y);
     }
 
+    public Location substract(Location loc) {
+        return new Location(this.x - loc.x, this.y - loc.y);
+    }
+
+    public double getVectorLength() {
+        return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+    }
+
+    public double scalarProduct(Location loc) {
+        return x*loc.x + y * loc.y;
+    }
+
+    public double getAngleTo(Location loc) {
+        double val = Math.acos(scalarProduct(loc) / (getVectorLength() * loc.getVectorLength()));
+        if(x * loc.getY() - y * loc.getX() < 0) {
+            val *= -1;
+        }
+
+        return val;
+    }
+
     public Location multiply(float c) {
         return new Location(this.x * c, this.y * c);
     }
@@ -39,6 +60,14 @@ public class Location {
 
     public float distanceTo(Location loc) {
         return (float)Math.sqrt(Math.pow(loc.x - this.x, 2) + Math.pow(loc.y - this.y, 2));
+    }
+
+
+    public Location getTurned(double angleRad) {
+        double newX = x * Math.cos(angleRad) - y * Math.sin(angleRad);
+        double newY = y * Math.cos(angleRad) + x * Math.sin(angleRad);
+
+        return new Location((float)newX, (float)newY);
     }
 
     public boolean isSame(Location l2) {

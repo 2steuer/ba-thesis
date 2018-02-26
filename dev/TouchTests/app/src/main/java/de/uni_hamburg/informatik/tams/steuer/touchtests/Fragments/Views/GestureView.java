@@ -26,23 +26,46 @@ public class GestureView extends View implements SynergyAmplitudeListener {
     Paint paintBlack = new Paint();
     Paint paintOrange = new Paint();
 
+    Paint paintYellow = new Paint();
+
     double[] _amplitudes = new double[0];
     int _controlledAmplitudes = 0;
 
     public GestureView(Context context) {
         super(context);
+        setPaints();
     }
 
     public GestureView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        setPaints();
     }
 
     public GestureView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        setPaints();
     }
 
     public GestureParser getGestureParser() {
         return gestures;
+    }
+
+    private void setPaints() {
+        this.paintRed.setColor(Color.RED);
+        this.paintRed.setStyle(Paint.Style.FILL);
+
+        this.paintBlack.setColor(Color.BLACK);
+        this.paintBlack.setStyle(Paint.Style.FILL);
+        this.paintBlack.setTextSize(32);
+        //this.paintBlack.setStrokeWidth(5);
+
+        this.paintOrange.setARGB(128, 255,165,0);
+        this.paintOrange.setStyle(Paint.Style.FILL);
+
+
+        this.paintYellow.setColor(Color.YELLOW);
+        this.paintYellow.setStyle(Paint.Style.FILL);
+        this.paintYellow.setStrokeWidth(8);
     }
 
     @Override
@@ -58,19 +81,10 @@ public class GestureView extends View implements SynergyAmplitudeListener {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        this.paintRed.setColor(Color.RED);
-        this.paintRed.setStyle(Paint.Style.FILL);
-
-        this.paintBlack.setColor(Color.BLACK);
-        this.paintBlack.setStyle(Paint.Style.FILL);
-
-        this.paintOrange.setARGB(128, 255,165,0);
-        this.paintOrange.setStyle(Paint.Style.FILL);
-
         for (Gesture g : gestures.getGestures()) {
             Location com = g.getCenter();
-
-            canvas.drawCircle(com.getX(), com.getY(), g.getSize() / 2, paintOrange);
+            float radius = g.getSize() / 2;
+            canvas.drawCircle(com.getX(), com.getY(), radius, paintOrange);
 
             for (Pointer p : g.getPointers()) {
                 Location ploc = p.getLocation();
@@ -80,12 +94,14 @@ public class GestureView extends View implements SynergyAmplitudeListener {
 
             canvas.drawCircle(com.getX(), com.getY(), 20, paintBlack);
 
-
+            // draw rotation line
+            Location offs = new Location(0, -radius);
+            offs = offs.getTurned(g.getOrientation());
+            Location target = com.add(offs);
+            canvas.drawLine(com.getX(), com.getY(), target.getX(), target.getY(), paintYellow);
         }
 
         int textOffset = 100;
-
-        paintBlack.setTextSize(32);
 
         for(int i = 0; i < Math.min(_amplitudes.length, _controlledAmplitudes); i++) {
             String str = String.format("%d: %f", i, _amplitudes[i]);
