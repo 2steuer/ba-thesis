@@ -95,10 +95,18 @@ public class GestureView extends View implements SynergyAmplitudeListener {
             canvas.drawCircle(com.getX(), com.getY(), 20, paintBlack);
 
             // draw rotation line
+            double orientation = g.getOrientation();
             Location offs = new Location(0, -radius);
-            offs = offs.getTurned(g.getOrientation());
+            offs = offs.getTurned(orientation);
             Location target = com.add(offs);
             canvas.drawLine(com.getX(), com.getY(), target.getX(), target.getY(), paintYellow);
+
+            // Draw information:
+            float textX = com.getX() + 25;
+            float textY = com.getY();
+            canvas.drawText(String.format("X: %.3f Y: %.3f", com.getX(), com.getY()), textX, textY, paintBlack);
+            canvas.drawText(String.format("S: %.1f", radius * 2), textX, textY + 50, paintBlack);
+            canvas.drawText(String.format("O: %.3f", orientation), textX, textY + 100, paintBlack);
         }
 
         int textOffset = 100;
