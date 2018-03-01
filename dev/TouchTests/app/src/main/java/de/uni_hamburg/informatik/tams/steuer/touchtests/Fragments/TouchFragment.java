@@ -42,6 +42,7 @@ public class TouchFragment extends Fragment implements AdapterView.OnItemSelecte
     List<String> synergyNames = new LinkedList<>();
     Map<String, GraspSynergy> synergies = new HashMap<>();
 
+
     public TouchFragment() {
         _axes = AxisManager.getInstance();
 
@@ -79,23 +80,26 @@ public class TouchFragment extends Fragment implements AdapterView.OnItemSelecte
         });
 
         lockButton.setOnTouchListener(new View.OnTouchListener() {
+            boolean locked = true;
+
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch(motionEvent.getAction())
                 {
                     case MotionEvent.ACTION_DOWN:
-                        _axes.setLocked(false);
-                        _synergyProxy.setLocked(false);
+                        //_axes.setLocked(false);
+                        //_synergyProxy.setLocked(false);
                         lockButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.posOk)));
 
                         lockButton.setImageResource(android.R.drawable.ic_media_pause);
                         break;
 
                     case MotionEvent.ACTION_UP:
-                        _axes.setLocked(true);
-                        _synergyProxy.setLocked(true);
+                        locked = !locked;
+                        _axes.setLocked(locked);
+                        _synergyProxy.setLocked(locked);
                         lockButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.posNOk)));
-                        lockButton.setImageResource(android.R.drawable.ic_media_play);
+                        lockButton.setImageResource(locked ? android.R.drawable.ic_media_play : android.R.drawable.ic_media_pause);
 
                         break;
                 }
