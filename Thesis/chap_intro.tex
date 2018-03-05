@@ -1,0 +1,20 @@
+\chapter{Introduction}
+\section{Motivation}
+
+Controlling dexterous robot hands is a big challenge of robotics, but using has a variety of obvious advantages: The similarity to a human hand gives enables it to grasp objects in nearly all positions and poses the real human hand could. Especially for complex manipulation tasks, where a simple robotic grasper with just a pair of pliers is not sufficient, the larger amount of degrees-of-freedom comes into action. Also, users might be able to better plan actions when they are controlling a device similar to their own hands, meaning the main task for them is to use a control interface to execute actions they would otherwise execute with their own hands.
+
+\section{Objectives of this thesis}
+
+Within this thesis, a touch-interface for controlling such robotic hands shall be developed. This interface shall take advantage of the multi-touch capabilities of modern tablets. The user shall be able to control the position of the robotic hand (using the connected robotic arm) and grasp objects with it. All actions shall be mapped to corresponding multi-touch gestures the user can easily understand and learn.
+
+The hardware used within this bachelor thesis is a \textit{Shadow Dexterous Hand C5/C6} by the Shadow Robot Company. It has five fingers controlled by electrical or pneumatic muscles using 20 degrees-of-freedom\cite{web:robothand:spec}. The hand is connected to a robotic arm (\textit{KUKA Lightweight Robot}) allowing it to also be moved in space. % FOTO DES AUFBAUS
+
+As a control device an off-the-shelf android tablet will be used, as these devices have become very widespread and - thanks to this - relatively affordable. With screen sizes of 10 inches and above combined with the capability to record more than 5 independent touch pointers and a number of additional sensors (gyroscope, orientation, ...) and feedback actuators (vibration, sound, ...) they make a good choice for a versatile control device.
+
+Specifically, development during this thesis will take place on a \textit{Samsung Galaxy Tab S3}. It has a screen size of 9.7 inches\cite{samsung:galaxytabs3} with a resolution of 2048x1536 pixels accompanied by a 2.15GHz Quad-Core processor. These properties give it the ability to also perform some calculation-heavy tasks locally, giving the overall application a better performance.
+
+A native Android application will be developed and run directly on the tablet. As a programming language Java is chosen, as it is the language natively used on Android. Multiple approaches to the problem will be implemented and each of them will be evaluated regarding it's usability, intuitivity and user-friendliness by multiple persons.
+
+\section[Outline]{Outline of this thesis}
+
+\section{Related work}

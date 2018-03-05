@@ -16,8 +16,17 @@
 
 % Import von Paketen und Optionen die das gesamte Dokument betreffen
 % sind in myPreamble.sty ausgelagert.
+
 \usepackage{myPreamble}
-   
+
+\usepackage[backend=bibtex8,
+	style=alphabetic,
+	citestyle=authoryear]{biblatex}
+  
+\addbibresource{Bachelorarbeit.bib}  
+
+
+
 % Arbeitet man nur an einem Kapitel, wird durch folgenden Befehl nur dieses eingebunden.
 % Spart manuelles auskommentieren von vielen include-Befehlen;
 % hat keine Auswirkung auf input-Befehle
@@ -39,23 +48,9 @@
 % Hauptteil einleiten --> Seitennummerierung wieder arabisch
 \mainmatter
 
-\chapter{Introduction}
-\section{Motivation}
+\include{chap_intro}
 
-\section{Objectives of this thesis}
-
-\section{Outline}
-
-
-\chapter{Basics}
-
-\section{ROS - The Robot Operating System}
-\subsection{rosjava / rosandroid}
-
-\section{The Shadow C6 Robotic Hand}
-\subsection{Integration into ROS}
-
-\section{Inverse Kinetics with BioIK}
+\include{chap_basics}
 
 \chapter{Implementation}
 \section{Preparations}
@@ -82,8 +77,10 @@
 % VERZEICHNISSE (Abbildungen, Tabellen)
 % Literatur 
 
-\bibliographystyle{alphadin}
-\bibliography{Bachelorarbeit}
+\begin{otherlanguage}{german}
+	\printbibliography
+\end{otherlanguage}
+
 \cleardoublepage
 
 % ERKLÄRUNG

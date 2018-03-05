@@ -1,0 +1,28 @@
+\chapter{Basics}
+
+\section{ROS - The Robot Operating System}
+
+The \textit{Robot Operating System} (ROS) is an open-source software framework providing a robust communication layer for distributed robot computing\cite{ros:intro}. Despite the name it is not an operating system in the traditional manner, as it does not provide or implement any processing, scheduling or data access functionality. It is a set of programs and libraries enabling developers to develop so-called \textit{nodes} that communicate with each other using the \textit{Publish-Subscribe-Pattern}. % QUELLE
+This pattern allows multiple loosely-coupled nodes (applications) to exchange messages. This design allows a greater code-reuse since software for robots is written very modular. For example, on a robot with a laser scanner and a motor, one node would decode the laser scanner data, publish the results to a specific topic which is subscribed by a controller node, that processes the data and then publishes motor control messages to another topic, which is again subscribed by the motor controller node. All nodes do not have to know each other. This makes it very easy to reuse the code for either the laser scanner or the motor driver node in other configurations or robots or exchange the controller node that processes the data. Using wireless connections, it is also possible to move specific processing tasks to external (\textit{Off-Board}) nodes. This comes in handy for example in terms of image processing, which is a task that usually overloads small on-board processing units on robots.
+
+The communication is organized by a program called \textit{ROS Core}. All nodes connect to this Core and tell it what they'd like to do (e.g. subscribing to topics, publishing to topics etc.). To reduce communication overhead, the actual data exchange is then done in a peer-to-peer manner, meaning the nodes directly exchange data with each other over TCP/IP. This also means that all nodes have to be able to reach each other, which might lead to problems when running ROS in bigger networks.
+
+Sometimes, the publish-subscribe-pattern (and it's inherent asynchrony) do not do the trick, as some calculations might be needed to be done synchronously but still are to calculation-heavy to be executed locally. For this case, ROS introduces so-called \textit{services}. These are basically function calls that are offered by a node which may then be called by each other node. These calls are executed synchronously and directly return a result.
+
+Nodes have names seperated in so-called \textit{name spaces}. an example node name can look like in Listing \ref{code:ros:nodename}.
+\begin{figure}
+	\begin{lstlisting}[caption={An example ROS node name},label=code:ros:nodename]
+	/robot/hand/controller
+	\end{lstlisting}
+\end{figure}
+
+where \textit{/robot/hand} is the name space and \textit{controller} the node name. Topics and services do also have a specific name including a name space. This addressing scheme allows it to have multiple equally-called nodes or topics (e.g. for multiple sensors of the same type) by just putting them into different name spaces but preserving there names.
+
+Numerous implementations of the ROS client libraries are available, the most known and developed is written in C/C++
+
+\subsection{rosjava / rosandroid}
+
+\section{The Shadow C6 Robotic Hand}
+\subsection{Integration into ROS}
+
+\section{Inverse Kinetics with BioIK}
