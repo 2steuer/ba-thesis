@@ -10,19 +10,25 @@ The communication is organized by a program called \textit{ROS Core}. All nodes 
 Sometimes, the publish-subscribe-pattern (and it's inherent asynchrony) do not do the trick, as some calculations might be needed to be done synchronously but still are to calculation-heavy to be executed locally. For this case, ROS introduces so-called \textit{services}. These are basically function calls that are offered by a node which may then be called by each other node. These calls are executed synchronously and directly return a result.
 
 Nodes have names seperated in so-called \textit{name spaces}. an example node name can look like in Listing \ref{code:ros:nodename}.
-\begin{figure}
-	\begin{lstlisting}[caption={An example ROS node name},label=code:ros:nodename]
-	/robot/hand/controller
-	\end{lstlisting}
-\end{figure}
+\begin{lstlisting}[caption={An example ROS node name},label=code:ros:nodename]
+/robot/hand/controller
+\end{lstlisting}
+
 
 where \textit{/robot/hand} is the name space and \textit{controller} the node name. Topics and services do also have a specific name including a name space. This addressing scheme allows it to have multiple equally-called nodes or topics (e.g. for multiple sensors of the same type) by just putting them into different name spaces but preserving there names.
 
-Numerous implementations of the ROS client libraries are available, the most known and developed is written in C/C++
+Numerous implementations of the ROS client libraries are available, the most common ones are developed and used in C/C++ and Python\cite{ros:client_libraries}. For developing a ROS-enabled Android application, an implementation of the ROS client library in Java is chosen. 
 
 \subsection{rosjava / rosandroid}
 
+There is an implementation of the ROS client library published on GitHub\footnote{\url{https://github.com/rosjava/rosjava_core}}. It includes support for all needed communication structures within ROS as well as the most common message types exchanged with ROS nodes. \textit{rosjava} is specifically designed to develop ROS-enabled Android applications and is originally developed by Google\cite{ros:rosjava:readme}.
+
+The package \textit{rosandroid}\footnote{\url{https://github.com/rosjava/android_core}} is an extension of \textit{rosjava}. It offers functionalities to easily include ROS support into an Android application by offering readily usable \textit{Activities}\footnote{Activities are offering the user interface in Android applications} to connect the application to a ROS core or start an independent core within the application itself. It also includes some basic user controls like a joystick control which we will not make use of within this thesis.
+
+\textit{rosandroid} is designed for the newest versions of Android, which leads to the fact that a small change has to be made to the code to make it compatible with older versions of Android, too. These changes are described in chapter \ref{impl:compiling_rosandroid}.
+
 \section{The Shadow C6 Robotic Hand}
+% FOTO DER HAND
 \subsection{Integration into ROS}
 
 \section{Inverse Kinetics with BioIK}
