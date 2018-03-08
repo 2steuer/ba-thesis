@@ -27,10 +27,52 @@ The package \textit{rosandroid}\footnote{\url{https://github.com/rosjava/android
 
 \textit{rosandroid} is designed for the newest versions of Android, which leads to the fact that a small change has to be made to the code to make it compatible with older versions of Android, too. These changes are described in chapter \ref{impl:compiling_rosandroid}.
 
-\section{The Shadow C6 Robotic Hand}
+\section{The Shadow C5 Robotic Hand}
 % FOTO DER HAND
-The \textit{Shadow C6 Robotic Hand} was developed by the \textit{Shadow Company}
+The \textit{Shadow C5 Robotic Hand} was developed by the \textit{Shadow Company}. It is designed to be as similar to a human hand as possible\cite{web:robothand:spec} in terms of force output, movement speed and movement sensitivity. It has 24 degrees-of-freedom, all controlled by 48 pneumatic muscles. These muscles, when pressurized, contract a little, applying force to the elements of the mechanical hand over imitated tendons. The developers tried to design the product as close to the average human forearm as they could. It weighs about 4kg and has a maximum movement speed of about half the speed at the joints a human could reach. The pneumatic muscles work with a pressure of 3.5 bar and having a maximum flow of 24 litres per minute, resulting in the need of a quite powerful air compressor and air pipe system installed near the hand installation. Joint angles of all joints (controllable as non-controllable) are measured by hall-sensors at an accuracy of 0.2 degrees.
+A similar robotic hand powered by electrical motors instead of pneumatic muscles is also present at the TAMS group at the University of Hamburg. This thesis will, however, mainly work with the pneumatic powered hand. 
 
 \subsection{Integration into ROS}
+
+\begin{wrapfigure}{L}{0.4\textwidth}
+	\caption{\label{fig:hand:ros_integration}Schematic overview of the hand's integration into a ROS environment}
+	\includegraphics[width=0.4\textwidth]{assets/chpt_basics/hand/ros_integration.eps}
+\end{wrapfigure}
+
+The Shadow Robotic Hand has by default a CAN\footnote{Controller Area Network}-Bus interface over which it is controlled\cite{web:robothand:spec}. The CAN protocol has been implemented using a parallel port on a distinct machine next to the robotic hand. To have the ability to communicate with the hand over network, a server application has been implemented by members of the TAMS group at University of Hamburg. The line-based protocol implemented by this server is described in % TODO
+. Multiple applications have been developed to control the robotic hand without the integration of ROS. To make use of the features and advantages of a ROS environment, a ROS proxy was implemented. It basically listens to a ROS topic where it receives joint target states and publishes to another ROS topic where it sends the current measured joint angles to. The ROS hand proxy node communicates with the hand server over the line-based protocol and converts all data it receives for the corresponding other side. This set-up makes it easy to integrate the Shadow C6 hand into a ROS environment. See figure \ref{fig:hand:ros_integration} for a schematic overview of how the robotic hand is integrated into ROS.
+
+\begin{table}
+	\caption{\label{tab:rosmsg:topics}Topics used to send and receive joint states}
+	\begin{tabularx}{\linewidth}{|c|X|}
+		\hline
+		\textbf{/hand/joint\_states} & The ROS hand proxy publishes the current measured joint states it received from the hand server to this topic \\
+		\hline
+		\textbf{/hand/joint\_goals} & The ROS hand proxy receives packages containing joint states sent to this topic and passes it on to the hand server, causing the hand to try to reach the sent joint angles. \\
+		\hline
+	\end{tabularx}
+\end{table}
+
+The two important topics used throughout this thesis are denoted in Table \ref{tab:rosmsg:topics}. The message type used for both of these topics is \textit{sensor\_msgs/JointState}. These messages consist of the data fields denoted in Table \ref{tab:rosmsg:contents}. A few things are important to be considered while using the data contained in these messages. First, how the data is interpreted is application-specific. While the data fields contain arbitrary data it is important to know that the set-up used in this thesis only has rotating joints, meaning the data in the position field is in radians. For other types of joints (e.g. linear joints) this could possibly deviate. Second is, the order of elements is not important, however it is very important to maintain corresponding elements' positions at the same index within the \textit{names} and the \textit{position} fields. This means that e.g. the position for joint \textit{TH1} must have the same index in the \textit{position} field as the string \textit{TH1} in the \textit{names} field. Finally it is important to note that the \textit{effort} and \textit{velocity} fields are currently not used for the set-up. When these rules are followed it is easy to send joint states to the robot and observe its movement.
+
+\begin{table}
+	\caption{\label{tab:rosmsg:contents}Contents of the  \mbox{sensor\_msgs/JointState} message type}
+	
+	\begin{tabularx}{\linewidth}{|c|X|}
+		\hline
+		\textbf{Field} & \textbf{Description} \\
+		\hline
+		header & Header information including a time-stamp of when the message was sent and a sequence number of the message \\
+		\hline
+		names & Array of strings containing the joint names the other fields contain information about \\
+		\hline
+		position & Array of floats containing the position of each joint \\
+		\hline
+		velocity & Array of floats containing information about the velocity at which each joint is currently or shall be moving \\
+		\hline
+		effort & Array of floats containing information about with how much efford (e.g. force) a joint shall be or is moved \\
+		\hline
+	\end{tabularx}
+\end{table}
 
 \section{Inverse Kinematics with BioIK}
