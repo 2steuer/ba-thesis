@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.AxisControlFragment;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.AbsoluteSynergyTouchFragment;
+import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.RelativeSynergyTouchFragment;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Util.ViewPagerAdapter;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.AxisManager;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Material.Interfaces.InitStateListener;
@@ -36,7 +37,8 @@ public class MainActivity extends RosActivity {
         ViewPager pager = (ViewPager)findViewById(R.id.pager);
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        adapter.addFragment(new AbsoluteSynergyTouchFragment(), "Touch");
+        adapter.addFragment(new RelativeSynergyTouchFragment(), "Relative");
+        adapter.addFragment(new AbsoluteSynergyTouchFragment(), "Absolute");
         adapter.addFragment(new AxisControlFragment(), "Axis Control");
 
         pager.setAdapter(adapter);

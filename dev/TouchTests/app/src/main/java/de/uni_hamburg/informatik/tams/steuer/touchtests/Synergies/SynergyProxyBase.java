@@ -169,6 +169,14 @@ public abstract class SynergyProxyBase implements GestureObserver {
         _amplitudes[amplitude] = value;
     }
 
+    protected double getAmplitude(int amplitude) {
+        if(amplitude < 0 || amplitude >= _amplitudes.length) {
+            return Double.NaN;
+        }
+
+        return _amplitudes[amplitude];
+    }
+
     // Set all amplitudes to the value for "Zero Grasp".
     public void allAmplitudesZeroValue() {
         for(int i = 0; i < Math.min(_amplitudes.length, CONTROLLED_AMPLITUDES); i++) {
