@@ -24,11 +24,14 @@ The commands to install ROS are denoted in Listing \ref{lst:ros:install}. After 
 \end{minipage}
 
 ROS is by default installed to \textit{/opt/ros/kinetic/}. To make use of all available command line tools provided by ROS it is important to load the file \textit{/opt/ros/kinetic/setup.bash} into the currently open (bash)-command-prompt. This is either temporarily done by issuing
-\begin{lstlisting}
+
+\begin{lstlisting}[caption={Temporarily loading the ROS environment into bash}]
 source /opt/ros/kinetic/setup.bash
 \end{lstlisting}
+
 or permanently by adding this line to the file \textit{$\sim$/.bashrc} by executing the following command:
-\begin{lstlisting}
+
+\begin{lstlisting}[caption={Permamently installing the ROS environment into bash}]
 echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 \end{lstlisting}
@@ -36,6 +39,20 @@ source ~/.bashrc
 When this is done, ROS is completely set up on the development machine.
 
 \subsubsection{Setting up a catkin workspace} 
+
+\textit{Catkin\footnote{http://wiki.ros.org/catkin}} is a build system and workspace management utility provided with ROS. It supports developers to create, develop and build packages for ROS applications. To create a catkin workspace within the current user's home directory, issue the commands from Listing \ref{lst:ros:catkin} after setting up ROS and sourcing the \textit{setup.bash}-file.
+
+\begin{minipage}{\linewidth}
+	\begin{lstlisting}[caption={Setting up a catkin workspace},label=lst:ros:catkin]
+mkdir -p ~/catkin_ws/src
+cd ~/catkin_ws/
+catkin_make
+
+source devel/setup.bash
+	\end{lstlisting}
+\end{minipage}
+
+ROS and catkin are now fully set up and can be used for further development.
 
 \subsection{Installing Android Studio}
 \subsection{Modifying and compiling rosandroid}
