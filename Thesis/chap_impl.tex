@@ -1,7 +1,43 @@
 \chapter{Implementation}
 \section{Preparations}
+\subsection{Setting up a virtual machine}
+
+For all developments within this thesis a virtual machine was used. This makes it easy to reproduce the environment within the labs at the TKRN group as well as having a portable development solution isolated from the rest of the computer's operating system. As the ROS version called \textit{Kinetic} is widely used within the set-ups around the robot, I will also develop the application using this version. This reduces the risk of incompatibility issues during development. ROS \textit{Kinetic} is available as packages for Ubuntu up to version 16.04\cite{ros:install}, which is why we install this version of Ubuntu within a new virtual machine. Enough virtual hard disk space and memory is assigned to the virtual machine (200GB HDD, 8 GB RAM) as well as 4 processing cores. This set-up should be sufficient for all purposes during this thesis. 
+
+If the virtual machine shall run ROS nodes which have to be accessible by ROS nodes outside the machine itself (i.e. the Android tablet running the control application) the network interface of the virtual machine should be configured as a bridged network connection. This lets the network's DHCP (if present) assign the virtual machine it's own IP address reachable from the network. However, this was not possible within the university's network, as Oracle VirtualBox was not able to create a working bridged network adapter using the computer's Wi-Fi connection. During development within the lab another computer directly connected to the university network was used to run \textit{roscore}.
+
 \subsection{Setting up ROS}
-\subsection{Installing the Android IDE}
+
+\subsubsection{Installing ROS}
+
+Setting up ROS \textit{Kinetic} within a fresh Ubuntu 16.04 installation is fairly simple. First, the ROS apt\footnote{Aptitude is the package management system for Debian-based Linux distributions like Ubuntu}-repository has to be added to the packages sources file and the corresponding key has to be added to the key storage to enable downloading the packages. Once this is done, the package \textit{ros-kinetic-desktop-full} cann be installed which will download and install all available packages for ROS \textit{Kinetic}.
+
+The commands to install ROS are denoted in Listing \ref{lst:ros:install}. After these commands have been executed in a terminal window ROS is readily installed.
+
+\begin{minipage}{\linewidth}
+	\begin{lstlisting}[caption={Commands for installing ROS\cite{ros:install}},label={lst:ros:install}]
+	sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+	sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
+	sudo apt-get update
+	sudo apt-get install ros-kinetic-desktop-full
+	\end{lstlisting}
+\end{minipage}
+
+ROS is by default installed to \textit{/opt/ros/kinetic/}. To make use of all available command line tools provided by ROS it is important to load the file \textit{/opt/ros/kinetic/setup.bash} into the currently open (bash)-command-prompt. This is either temporarily done by issuing
+\begin{lstlisting}
+source /opt/ros/kinetic/setup.bash
+\end{lstlisting}
+or permanently by adding this line to the file \textit{$\sim$/.bashrc} by executing the following command:
+\begin{lstlisting}
+echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+\end{lstlisting}
+
+When this is done, ROS is completely set up on the development machine.
+
+\subsubsection{Setting up a catkin workspace} 
+
+\subsection{Installing Android Studio}
 \subsection{Modifying and compiling rosandroid}
 \label{impl:compiling_rosandroid}
 \section{User Interface}
