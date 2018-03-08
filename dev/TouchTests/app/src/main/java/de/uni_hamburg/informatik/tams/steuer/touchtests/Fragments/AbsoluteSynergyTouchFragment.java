@@ -6,7 +6,6 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,7 +15,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,28 +24,26 @@ import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.GestureV
 import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.GestureParser;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.R;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.AxisManager;
-import de.uni_hamburg.informatik.tams.steuer.touchtests.Synergies.SynergyProxy;
+import de.uni_hamburg.informatik.tams.steuer.touchtests.Synergies.AbsoluteSynergyProxy;
+import de.uni_hamburg.informatik.tams.steuer.touchtests.Synergies.SynergyProxyBase;
 import hdbt.shadow.GraspSynergy;
 
 /**
  * Created by merlin on 25.11.17.
  */
 
-public class TouchFragment extends Fragment implements AdapterView.OnItemSelectedListener {
+public class AbsoluteSynergyTouchFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
     GestureParser _gestures;
     AxisManager _axes;
-    SynergyProxy _synergyProxy = new SynergyProxy();
+    AbsoluteSynergyProxy _synergyProxy = new AbsoluteSynergyProxy();
 
     List<String> synergyNames = new LinkedList<>();
     Map<String, GraspSynergy> synergies = new HashMap<>();
 
 
-    public TouchFragment() {
+    public AbsoluteSynergyTouchFragment() {
         _axes = AxisManager.getInstance();
-
-
-
     }
 
     @Override

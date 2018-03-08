@@ -1,21 +1,17 @@
 package de.uni_hamburg.informatik.tams.steuer.touchtests;
 
 import android.app.ProgressDialog;
-import android.os.Looper;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.AxisControlFragment;
-import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.TouchFragment;
-import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.GestureView;
+import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.AbsoluteSynergyTouchFragment;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Util.ViewPagerAdapter;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.AxisManager;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Material.Interfaces.InitStateListener;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Nodes.C5LwrNode;
 
 import android.support.design.widget.TabLayout;
-import android.support.v7.app.AppCompatDelegate;
 
 import org.ros.android.RosActivity;
 import org.ros.node.NodeConfiguration;
@@ -40,7 +36,7 @@ public class MainActivity extends RosActivity {
         ViewPager pager = (ViewPager)findViewById(R.id.pager);
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        adapter.addFragment(new TouchFragment(), "Touch");
+        adapter.addFragment(new AbsoluteSynergyTouchFragment(), "Touch");
         adapter.addFragment(new AxisControlFragment(), "Axis Control");
 
         pager.setAdapter(adapter);

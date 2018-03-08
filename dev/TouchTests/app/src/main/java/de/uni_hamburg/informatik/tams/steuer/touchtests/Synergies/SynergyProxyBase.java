@@ -19,14 +19,8 @@ import hdbt.shadow.GraspSynergy;
  * Created by merlin on 20.02.18.
  */
 
-public class SynergyProxy implements GestureObserver {
-    private static final int CONTROLLED_AMPLITUDES = 3;
-
-    private static final int HAND_GEST_POINTER_COUNT = 2;
-
-    private static final int SIZE_AMPLITUDE = 0;
-    private static final int XPOS_AMPLITUDE = 1;
-    private static final int ROT_AMPLITUDE = 2;
+public abstract class SynergyProxyBase implements GestureObserver {
+    protected static final int CONTROLLED_AMPLITUDES = 3;
 
     // Mappings from synergy output index to axis name
     private static final String[] JointMapping = {
@@ -69,22 +63,13 @@ public class SynergyProxy implements GestureObserver {
 
     private double[] _amplitudes = new double[JointMapping.length];
 
-    private LinearEquation[] _eqs = new LinearEquation[] {
-        new LinearEquation(1200, 50, 300, -50, -50, 50),
-        new LinearEquation(0, 50, 1000, -50, -50, 50),
-        new LinearEquation(-(Math.PI / 2.0), 50, Math.PI / 2.0, -50, -50, 50)
-    };
-
     AxisManager _axes = null;
 
     private HashSet<SynergyAmplitudeListener> listeners = new HashSet<>();
 
     private boolean locked = true;
 
-    private double _canvasWidth = 0;
-    private double _canvasHeight = 0;
-
-    public SynergyProxy() {
+    public SynergyProxyBase() {
     }
 
     public void setAxisManager(AxisManager manager) {
@@ -99,13 +84,6 @@ public class SynergyProxy implements GestureObserver {
         }
     }
 
-    public void setCanvasSize(float width, float height) {
-        _canvasHeight = height;
-        _canvasWidth = width;
-
-        LinearEquation leq = _eqs[XPOS_AMPLITUDE];
-        leq.calculateParameters(_canvasWidth * 0.25, 50, _canvasWidth * 0.75, -50);
-    }
 
     public void addListener(SynergyAmplitudeListener listener) {
         listeners.add(listener);
@@ -142,21 +120,24 @@ public class SynergyProxy implements GestureObserver {
         }
 
         double newSize = g.getSize();
-
-        if (gs.getSize() != newSize) {
-            handleSizeChange(gs, g);
-        }
-
         Location newLoc = g.getCenter();
-
-        if(!gs.getCenter().isSame(newLoc)) {
-            handleLocationChanged(gs, g);
-        }
-
         double orientation = g.getOrientation();
 
-        if(orientation != gs.getOrientation()) {
-            handleOrientationChanges(gs, g);
+        if(!locked && _axes != null && _currentSynergy != null) {
+
+            if (gs.getSize() != newSize) {
+                handleSizeChange(gs, g);
+            }
+
+
+            if(!gs.getCenter().isSame(newLoc)) {
+                handleLocationChanged(gs, g);
+            }
+
+
+            if(orientation != gs.getOrientation()) {
+                handleOrientationChanges(gs, g);
+            }
         }
 
         gs.setCenter(newLoc);
@@ -166,20 +147,9 @@ public class SynergyProxy implements GestureObserver {
         updateJoints();
     }
 
-    private void handleSizeChange(GestureState oldState, Gesture gesture) {
-        if(locked || _currentSynergy == null || _axes == null) {
-            return;
-        }
-
-        if(gesture.getPointerCount() != 2) {
-            return;
-        }
-
-        double newSize = gesture.getSize();
-
-        _amplitudes[SIZE_AMPLITUDE] = _eqs[SIZE_AMPLITUDE].calculateClipped(newSize);
-
-    }
+    protected abstract void handleSizeChange(GestureState oldState, Gesture gesture);
+    protected abstract void handleLocationChanged(GestureState oldState, Gesture gesture);
+    protected abstract void handleOrientationChanges(GestureState oldState, Gesture gesture);
 
     // Set all amplitudes to literally zero
     public void allAmplitudesZero() {
@@ -190,29 +160,13 @@ public class SynergyProxy implements GestureObserver {
         updateJoints();
     }
 
-    private void handleLocationChanged(GestureState oldState, Gesture gesture) {
-        if(locked || _currentSynergy == null || _axes == null) {
+
+    protected void setAmplitude(int amplitude, double value) {
+        if(amplitude < 0 || amplitude >= _amplitudes.length) {
             return;
         }
 
-        if(gesture.getPointerCount() != 2) {
-            return;
-        }
-
-        _amplitudes[XPOS_AMPLITUDE] = _eqs[XPOS_AMPLITUDE].calculateClipped(gesture.getCenter().getX());
-
-    }
-
-    private void handleOrientationChanges(GestureState oldState, Gesture gesture) {
-        if(locked || _currentSynergy == null || _axes == null) {
-            return;
-        }
-
-        if(gesture.getPointerCount() != 2) {
-            return;
-        }
-
-        _amplitudes[ROT_AMPLITUDE] = _eqs[ROT_AMPLITUDE].calculateClipped(gesture.getOrientation());
+        _amplitudes[amplitude] = value;
     }
 
     // Set all amplitudes to the value for "Zero Grasp".
