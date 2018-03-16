@@ -20,6 +20,7 @@ import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Material.Interface
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Material.Interfaces.InitStateListener;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Material.ValueConverter;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Nodes.Interfaces.RobotJointDataReceiver;
+import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.ValueTypes.JointType;
 
 /**
  * Created by merlin on 25.11.17.
@@ -69,49 +70,49 @@ public class AxisManager implements RobotJointDataReceiver {
         AngleRadianConverter c = new AngleRadianConverter();
 
         // Arm's joints
-        addAxis("lwr_arm_0_joint", -168, 168, 10, c);
-        addAxis("lwr_arm_1_joint", -118, 118, 10, c);
-        addAxis("lwr_arm_2_joint", -168, 168, 10, c);
-        addAxis("lwr_arm_3_joint", -118, 118, 10, c);
-        addAxis("lwr_arm_4_joint", -168, 168, 10, c);
-        addAxis("lwr_arm_5_joint", -118, 118, 10, c);
-        addAxis("lwr_arm_6_joint", -168, 168, 10, c);
+        addAxis("lwr_arm_0_joint", -168, 168, 10, c, JointType.ARM);
+        addAxis("lwr_arm_1_joint", -118, 118, 10, c, JointType.ARM);
+        addAxis("lwr_arm_2_joint", -168, 168, 10, c, JointType.ARM);
+        addAxis("lwr_arm_3_joint", -118, 118, 10, c, JointType.ARM);
+        addAxis("lwr_arm_4_joint", -168, 168, 10, c, JointType.ARM);
+        addAxis("lwr_arm_5_joint", -118, 118, 10, c, JointType.ARM);
+        addAxis("lwr_arm_6_joint", -168, 168, 10, c, JointType.ARM);
 
         // Wrist
-        addAxis("WRJ1", 0, 90, 10, c);
-        addAxis("WRJ2", 0, 90, 10, c);
+        addAxis("WRJ1", 0, 90, 10, c, JointType.HAND);
+        addAxis("WRJ2", 0, 90, 10, c, JointType.HAND);
 
         // Thumb
-        addAxis("THJ1", 0, 90, 10, c);
-        addAxis("THJ2", -40, 40, 10, c);
-        addAxis("THJ3", -12, 12, 10, c);
-        addAxis("THJ4", 0, 70, 10, c);
-        addAxis("THJ5", -60, 60, 10, c);
+        addAxis("THJ1", 0, 90, 10, c, JointType.HAND);
+        addAxis("THJ2", -40, 40, 10, c, JointType.HAND);
+        addAxis("THJ3", -12, 12, 10, c, JointType.HAND);
+        addAxis("THJ4", 0, 70, 10, c, JointType.HAND);
+        addAxis("THJ5", -60, 60, 10, c, JointType.HAND);
 
         // First Finger
-        addAxis("FFJ1", 0, 90, 10, c, false);
-        addAxis("FFJ2", 0, 90, 10, c);
-        addAxis("FFJ3", 0, 90, 10, c);
-        addAxis("FFJ4", -20, 20, 10, c);
+        addAxis("FFJ1", 0, 90, 10, c, JointType.HAND, false);
+        addAxis("FFJ2", 0, 90, 10, c, JointType.HAND);
+        addAxis("FFJ3", 0, 90, 10, c, JointType.HAND);
+        addAxis("FFJ4", -20, 20, 10, c, JointType.HAND);
 
         // Middle Finger
-        addAxis("MFJ1", 0, 90, 10, c, false);
-        addAxis("MFJ2", 0, 90, 10, c);
-        addAxis("MFJ3", 0, 90, 10, c);
-        addAxis("MFJ4", -20, 20, 10, c);
+        addAxis("MFJ1", 0, 90, 10, c, JointType.HAND, false);
+        addAxis("MFJ2", 0, 90, 10, c, JointType.HAND);
+        addAxis("MFJ3", 0, 90, 10, c, JointType.HAND);
+        addAxis("MFJ4", -20, 20, 10, c, JointType.HAND);
 
         // Ring Finger
-        addAxis("RFJ1", 0, 90, 10, c, false);
-        addAxis("RFJ2", 0, 90, 10, c);
-        addAxis("RFJ3", 0, 90, 10, c);
-        addAxis("RFJ4", -20, 20, 10, c);
+        addAxis("RFJ1", 0, 90, 10, c, JointType.HAND, false);
+        addAxis("RFJ2", 0, 90, 10, c, JointType.HAND);
+        addAxis("RFJ3", 0, 90, 10, c, JointType.HAND);
+        addAxis("RFJ4", -20, 20, 10, c, JointType.HAND);
 
         // Last Finger
-        addAxis("LFJ1", 0, 45, 10, c, false);
-        addAxis("LFJ2", 0, 90, 10, c);
-        addAxis("LFJ3", 0, 90, 10, c);
-        addAxis("LFJ4", -20, 20, 10, c);
-        addAxis("LFJ5", 0, 45, 10, c);
+        addAxis("LFJ1", 0, 45, 10, c, JointType.HAND, false);
+        addAxis("LFJ2", 0, 90, 10, c, JointType.HAND);
+        addAxis("LFJ3", 0, 90, 10, c, JointType.HAND);
+        addAxis("LFJ4", -20, 20, 10, c, JointType.HAND);
+        addAxis("LFJ5", 0, 45, 10, c, JointType.HAND);
     }
 
     public void start() {
@@ -184,26 +185,31 @@ public class AxisManager implements RobotJointDataReceiver {
         notifyObservers();
 
         // send data:
+        sendJointData(JointType.ARM);
+        sendJointData(JointType.HAND);
+    }
+
+    private void sendJointData(int jointType) {
         if(robotNode != null) {
             HashMap<String, Double> map = new HashMap<>();
 
             for(AxisInformationImpl ai : axes.values()) {
-                if(/*ai.isEnabled()*/true)
+                if(/*ai.isEnabled() && */ai.getJointType() == jointType)
                 {
                     map.put(ai.getIdentifier(), ai.getCurrentTargetValueAsRobotValue());
                 }
             }
 
-            robotNode.handleJointData(map);
+            robotNode.handleJointData(jointType, map);
         }
     }
 
-    private void addAxis(String identifier, double minValue, double maxValue, double maxSpeed, ValueConverter conv, boolean enabled) {
-        axes.put(identifier, new AxisInformationImpl(identifier, minValue, maxValue, maxSpeed, conv, enabled));
+    private void addAxis(String identifier, double minValue, double maxValue, double maxSpeed, ValueConverter conv, int jointType, boolean enabled) {
+        axes.put(identifier, new AxisInformationImpl(identifier, minValue, maxValue, maxSpeed, conv, jointType, enabled));
     }
 
-    private void addAxis(String identifier, double minValue, double maxValue, double maxSpeed, ValueConverter conv) {
-        addAxis(identifier, minValue, maxValue, maxSpeed, conv, true);
+    private void addAxis(String identifier, double minValue, double maxValue, double maxSpeed, ValueConverter conv, int jointType) {
+        addAxis(identifier, minValue, maxValue, maxSpeed, conv, jointType, true);
     }
 
     public void addObserver(Observer obs) {
@@ -331,7 +337,7 @@ public class AxisManager implements RobotJointDataReceiver {
     }
 
     @Override
-    public void handleJointData(HashMap<String, Double> data) {
+    public void handleJointData(int jointType, HashMap<String, Double> data) {
         for(Map.Entry<String, Double> e : data.entrySet()) {
             if(axes.containsKey(e.getKey())) {
                 axes.get(e.getKey()).setCurrentValueFromRobotValue(e.getValue());

@@ -61,7 +61,7 @@ public class MainActivity extends RosActivity {
     @Override
     protected void init(NodeMainExecutor nodeMainExecutor) {
         axisManager = AxisManager.getInstance();
-        node = new C5LwrNode("/joint_states", "/config/fake_controller_joint_states");
+        node = new C5LwrNode("/joint_states", "/hand/joint_goals", "/lwr/jointPositionGoal");
 
         node.addJointDataListener(axisManager);
         axisManager.setRobotNode(node);

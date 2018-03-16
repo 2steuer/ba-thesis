@@ -32,11 +32,14 @@ public class AxisInformationImpl implements AxisInformation {
 
     private boolean enabled;
 
+    private int jointType;
+
     public AxisInformationImpl(String identifier,
                                double minvalue,
                                double maxvalue,
                                double maxspeed,
                                ValueConverter converter,
+                               int jointType,
                                boolean enabled) {
         this.identifier = identifier;
         this.maxValue = maxvalue;
@@ -44,15 +47,17 @@ public class AxisInformationImpl implements AxisInformation {
         this.maxSpeed = maxspeed;
         this.converter = converter;
         this.enabled = enabled;
+        this.jointType = jointType;
     }
 
     public AxisInformationImpl(String identifier,
                                double minValue,
                                double maxValue,
                                double maxspeed,
-                               ValueConverter converter)
+                               ValueConverter converter,
+                               int jointType)
     {
-        this(identifier, minValue, maxValue, maxspeed, converter, true);
+        this(identifier, minValue, maxValue, maxspeed, converter, jointType, true);
     }
 
 
@@ -129,5 +134,10 @@ public class AxisInformationImpl implements AxisInformation {
         }
 
         this.speed = speed;
+    }
+
+    public int getJointType()
+    {
+        return this.jointType;
     }
 }
