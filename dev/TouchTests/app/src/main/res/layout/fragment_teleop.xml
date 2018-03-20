@@ -1,0 +1,42 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.TeleopFragment">
+
+    <Button android:id="@+id/button_up" android:text="Up"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_alignRight="@id/button_home"
+        android:layout_alignLeft="@id/button_home"
+        android:textSize="28dp"/>
+
+    <Button android:id="@+id/button_home" android:text="Home"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_below="@id/button_up"
+        android:layout_toRightOf="@id/button_left"
+        android:textSize="28dp"
+        />
+
+    <Button android:id="@+id/button_down" android:text="Down"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_below="@id/button_home"
+        android:layout_alignRight="@id/button_home"
+        android:textSize="28dp"
+        />
+
+    <Button android:id="@+id/button_left" android:text="Left"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_alignBaseline="@id/button_home"
+        android:textSize="28dp"/>
+
+    <Button android:id="@+id/button_right" android:text="Right"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_toRightOf="@id/button_home"
+        android:layout_alignBaseline="@id/button_home"
+        android:textSize="28dp"/>
+</RelativeLayout>

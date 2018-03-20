@@ -1,11 +1,19 @@
 package de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Nodes;
 
+import org.ros.exception.RemoteException;
+import org.ros.exception.ServiceNotFoundException;
+import org.ros.internal.message.RawMessage;
+import org.ros.internal.node.response.StatusCode;
+import org.ros.message.Duration;
+import org.ros.message.MessageFactory;
 import org.ros.message.MessageListener;
 import org.ros.message.Time;
 import org.ros.namespace.GraphName;
 import org.ros.node.ConnectedNode;
 import org.ros.node.Node;
 import org.ros.node.NodeMain;
+import org.ros.node.service.ServiceClient;
+import org.ros.node.service.ServiceResponseListener;
 import org.ros.node.topic.Publisher;
 import org.ros.node.topic.Subscriber;
 import org.ros.time.TimeProvider;
@@ -19,8 +27,13 @@ import java.util.Map;
 
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Nodes.Interfaces.RobotJointDataReceiver;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.ValueTypes.JointType;
+import geometry_msgs.Point;
+import geometry_msgs.Pose;
+import geometry_msgs.Quaternion;
+import moveit_msgs.RobotState;
 import sensor_msgs.JointState;
 import ros_fri_msgs.*;
+import bio_ik_msgs.*;
 
 /**
  * Created by merlin on 26.11.17.
@@ -36,9 +49,9 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
     Publisher<sensor_msgs.JointState> handJointStatePub;
     Publisher<ros_fri_msgs.RMLPositionInputParameters> armJointStatePub;
 
+    ServiceClient<IKRequest, IKResponse> ikService;
+
     List<RobotJointDataReceiver> dataReceivers = new ArrayList<>();
-
-
 
     public C5LwrNode(String subscrbTopic, String handPubTopic, String armPubTopic) {
         this.subscribeTopic = subscrbTopic;
@@ -87,6 +100,13 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
                 }
             }
         });
+
+        try {
+            ikService = connectedNode.newServiceClient("/bio_ik/get_bio_ik", GetIK._TYPE);
+        } catch (ServiceNotFoundException e) {
+            ikService = null;
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -172,5 +192,58 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
                 publishArm(data);
                 break;
         }
+    }
+
+    public void GetIkJoints(String tool, String map, Map<String, Double> currentState, double x, double y, double z, ServiceResponseListener<IKResponse> hdl)
+    {
+        if(ikService == null)
+        {
+            hdl.onFailure(new RemoteException(StatusCode.ERROR, "No IK Service registered"));
+            return;
+        }
+
+        IKRequest req = ikService.newMessage();
+        List<PoseGoal> goals = req.getPoseGoals();
+
+        req.setGroupName("all");
+        req.setAttempts(1);
+        req.setTimeout(Duration.fromMillis(1000));
+        req.setApproximate(true);
+
+        MessageFactory fact = cNode.getServiceRequestMessageFactory();
+
+        // Store current robot state...
+        RobotState rs = fact.newFromType(RobotState._TYPE);
+        List<String> names = rs.getJointState().getName();
+        double[] angles = new double[currentState.size()];
+
+        for (String n:currentState.keySet()) {
+            // it is important to add the angle first otherwise
+            // it will be an off-by-one error
+            angles[names.size()] = currentState.get(n);
+            names.add(n);
+
+        }
+        rs.getJointState().setPosition(angles);
+
+
+        // Store pose goal...
+        PoseGoal p = fact.newFromType(PoseGoal._TYPE);
+
+        p.setLinkName("r_gripper_l_finger_tip_link");
+        Point point = p.getPose().getPosition();
+        point.setX(x);
+        point.setY(y);
+        point.setZ(z);
+
+        Quaternion quat = p.getPose().getOrientation();
+        quat.setX(0);
+        quat.setY(0);
+        quat.setZ(0);
+        quat.setW(1);
+
+        goals.add(p);
+
+        ikService.call(req, hdl);
     }
 }

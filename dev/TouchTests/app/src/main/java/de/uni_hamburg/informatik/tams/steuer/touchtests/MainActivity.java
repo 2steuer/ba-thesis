@@ -7,6 +7,7 @@ import android.os.Bundle;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.AxisControlFragment;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.AbsoluteSynergyTouchFragment;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.RelativeSynergyTouchFragment;
+import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.TeleopFragment;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Util.ViewPagerAdapter;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.AxisManager;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Material.Interfaces.InitStateListener;
@@ -40,6 +41,7 @@ public class MainActivity extends RosActivity {
         adapter.addFragment(new RelativeSynergyTouchFragment(), "Relative");
         adapter.addFragment(new AbsoluteSynergyTouchFragment(), "Absolute");
         adapter.addFragment(new AxisControlFragment(), "Axis Control");
+        adapter.addFragment(new TeleopFragment(), "TeleOp Arm");
 
         pager.setAdapter(adapter);
 
