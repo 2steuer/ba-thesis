@@ -23,9 +23,9 @@ import sensor_msgs.JointState;
  */
 
 public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.GetIKResponse> {
-    private static final double Y_MIN = -0.8;
-    private static final double Y_MAX = -0.3;
-    private static final double X_MIN = -0.2;
+    private static final double Y_MIN = -1.2;
+    private static final double Y_MAX = -0.8;
+    private static final double X_MIN = 0.0;
     private static final double X_MAX = 0.5;
     private static final double Z_MIN = 1.1;
     private static final double Z_MAX = 1.4;
@@ -100,7 +100,7 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
         }
 
         waiting = true;
-        node.GetIkJointsPalm(mgr.getRobotState(), homePos.getX(), homePos.getY(), homePos.getZ(), 0.5, 0.5, 0.5, 0.5, this);
+        node.GetIkJointsPalm(mgr.getRobotState(), homePos.getX(), homePos.getY(), homePos.getZ(), 0.7071, 0.0, 0.0, 0.7071, this);
 
         return true;
     }
