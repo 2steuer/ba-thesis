@@ -49,7 +49,7 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
     Publisher<sensor_msgs.JointState> handJointStatePub;
     Publisher<ros_fri_msgs.RMLPositionInputParameters> armJointStatePub;
 
-    ServiceClient<IKRequest, IKResponse> ikService;
+    ServiceClient<bio_ik_msgs.GetIKRequest, bio_ik_msgs.GetIKResponse> ikService;
 
     List<RobotJointDataReceiver> dataReceivers = new ArrayList<>();
 
@@ -102,7 +102,7 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
         });
 
         try {
-            ikService = connectedNode.newServiceClient("/bio_ik/get_bio_ik", GetIK._TYPE);
+            ikService = connectedNode.newServiceClient("/bio_ik/get_bio_ik", bio_ik_msgs.GetIK._TYPE);
         } catch (ServiceNotFoundException e) {
             ikService = null;
             e.printStackTrace();
@@ -194,7 +194,7 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
         }
     }
 
-    public void GetIkJoints(String tool, String map, Map<String, Double> currentState, double x, double y, double z, ServiceResponseListener<IKResponse> hdl)
+    public void GetIkJointsPalm(Map<String, Double> currentState, double x, double y, double z, double rotx, double roty, double rotz, double rotw, ServiceResponseListener<GetIKResponse> hdl)
     {
         if(ikService == null)
         {
@@ -202,15 +202,16 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
             return;
         }
 
-        IKRequest req = ikService.newMessage();
+        bio_ik_msgs.GetIKRequest greq = ikService.newMessage();
+        IKRequest req = greq.getIkRequest();
         List<PoseGoal> goals = req.getPoseGoals();
 
-        req.setGroupName("all");
+        req.setGroupName("lwr_with_c5hand");
         req.setAttempts(1);
         req.setTimeout(Duration.fromMillis(1000));
         req.setApproximate(true);
 
-        MessageFactory fact = cNode.getServiceRequestMessageFactory();
+        MessageFactory fact = cNode.getTopicMessageFactory();
 
         // Store current robot state...
         RobotState rs = fact.newFromType(RobotState._TYPE);
@@ -230,20 +231,20 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
         // Store pose goal...
         PoseGoal p = fact.newFromType(PoseGoal._TYPE);
 
-        p.setLinkName("r_gripper_l_finger_tip_link");
+        p.setLinkName("palm");
         Point point = p.getPose().getPosition();
         point.setX(x);
         point.setY(y);
         point.setZ(z);
 
         Quaternion quat = p.getPose().getOrientation();
-        quat.setX(0);
-        quat.setY(0);
-        quat.setZ(0);
-        quat.setW(1);
+        quat.setX(rotx);
+        quat.setY(roty);
+        quat.setZ(rotz);
+        quat.setW(rotw);
 
         goals.add(p);
 
-        ikService.call(req, hdl);
+        ikService.call(greq, hdl);
     }
 }

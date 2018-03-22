@@ -10,6 +10,7 @@ import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.RelativeSynerg
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.TeleopFragment;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Util.ViewPagerAdapter;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.AxisManager;
+import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.CartesianArmManager;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Material.Interfaces.InitStateListener;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Nodes.C5LwrNode;
 
@@ -67,7 +68,7 @@ public class MainActivity extends RosActivity {
 
         node.addJointDataListener(axisManager);
         axisManager.setRobotNode(node);
-
+        CartesianArmManager.getInstance().setNode(node);
         axisManager.setInitStateListener(new InitStateListener() {
             @Override
             public void onInitBegin() {

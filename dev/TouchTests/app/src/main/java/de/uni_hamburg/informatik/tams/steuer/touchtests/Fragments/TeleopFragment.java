@@ -7,16 +7,22 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import de.uni_hamburg.informatik.tams.steuer.touchtests.R;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.AxisManager;
+import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.CartesianArmManager;
 
-public class TeleopFragment extends Fragment {
+public class TeleopFragment extends Fragment implements View.OnClickListener {
 
     AxisManager axes;
+    CartesianArmManager arm;
+
+    Button home = null;
 
     public TeleopFragment() {
         axes = AxisManager.getInstance();
+        arm = CartesianArmManager.getInstance();
     }
 
     @Override
@@ -43,4 +49,17 @@ public class TeleopFragment extends Fragment {
         super.onDetach();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        home = ((Button)getView().findViewById(R.id.button_home));
+        home.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view == home) {
+            arm.goHome();
+        }
+    }
 }
