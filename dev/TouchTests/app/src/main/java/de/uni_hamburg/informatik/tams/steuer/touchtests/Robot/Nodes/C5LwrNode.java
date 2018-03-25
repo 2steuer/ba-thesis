@@ -194,7 +194,7 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
         }
     }
 
-    public void GetIkJointsPalm(Map<String, Double> currentState, double x, double y, double z, double rotx, double roty, double rotz, double rotw, ServiceResponseListener<GetIKResponse> hdl)
+    public void GetIkJointsPalm(Map<String, Double> currentState, List<String> lockedAxes, double x, double y, double z, double rotx, double roty, double rotz, double rotw, ServiceResponseListener<GetIKResponse> hdl)
     {
         if(ikService == null)
         {
@@ -209,7 +209,9 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
         req.setGroupName("lwr_with_c5hand");
         req.setAttempts(1);
         req.setTimeout(Duration.fromMillis(1000));
-        req.setApproximate(true);
+        req.setApproximate(false);
+        req.setFixedJoints(lockedAxes);
+
 
         MessageFactory fact = cNode.getTopicMessageFactory();
 
@@ -226,7 +228,7 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
 
         }
         rs.getJointState().setPosition(angles);
-
+        req.setRobotState(rs);
 
         // Store pose goal...
         PoseGoal p = fact.newFromType(PoseGoal._TYPE);

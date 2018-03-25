@@ -1,5 +1,6 @@
 package de.uni_hamburg.informatik.tams.steuer.touchtests.Robot;
 
+import android.os.SystemClock;
 import android.util.Log;
 
 import org.ros.exception.RemoteException;
@@ -25,10 +26,10 @@ import sensor_msgs.JointState;
 public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.GetIKResponse> {
     private static final double Y_MIN = -1.2;
     private static final double Y_MAX = -0.8;
-    private static final double X_MIN = 0.0;
-    private static final double X_MAX = 0.5;
-    private static final double Z_MIN = 1.1;
-    private static final double Z_MAX = 1.4;
+    private static final double X_MIN = -0.2;
+    private static final double X_MAX = 0.4;
+    private static final double Z_MIN = 1.0;
+    private static final double Z_MAX = 1.2;
 
     private static CartesianArmManager instance = null;
     public static CartesianArmManager getInstance() {
@@ -45,9 +46,11 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
     AxisManager mgr = AxisManager.getInstance();
 
     PointInSpace currentPos = new PointInSpace();
-    PointInSpace homePos = new PointInSpace(X_MAX, Y_MIN, Z_MAX);
+    PointInSpace homePos = new PointInSpace(0, Y_MIN, Z_MAX);
 
     boolean waiting = false;
+
+    long timeCounter = 0;
 
     private CartesianArmManager() {
         lockedAxes.add("THJ1");
@@ -77,6 +80,9 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
         lockedAxes.add("LFJ4");
         lockedAxes.add("LFJ5");
 
+        lockedAxes.add("WRJ1");
+        lockedAxes.add("WRJ2");
+
         setPos(0, 0, 0);
     }
 
@@ -100,7 +106,30 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
         }
 
         waiting = true;
-        node.GetIkJointsPalm(mgr.getRobotState(), homePos.getX(), homePos.getY(), homePos.getZ(), 0.7071, 0.0, 0.0, 0.7071, this);
+        timeCounter = SystemClock.elapsedRealtime();
+        node.GetIkJointsPalm(mgr.getRobotState(), lockedAxes, homePos.getX(), homePos.getY(), homePos.getZ(), 0.7071, 0.0, 0.0, 0.7071, this);
+
+        setPos(homePos.getX(), homePos.getY(), homePos.getZ());
+
+        return true;
+    }
+
+    public boolean movePalm(PointInSpace offset)
+    {
+
+        if(waiting || node == null) {
+            return false;
+        }
+
+        double newX = currentPos.getX() + offset.getX();
+        double newY = currentPos.getY() + offset.getY();
+        double newZ = currentPos.getZ() + offset.getZ();
+
+        setPos(newX, newY, newZ);
+
+        waiting = true;
+        timeCounter = SystemClock.elapsedRealtime();
+        node.GetIkJointsPalm(mgr.getRobotState(), lockedAxes, currentPos.getX(), currentPos.getY(), currentPos.getZ(), 0.7071, 0, 0, 0.7071, this);
 
         return true;
     }
@@ -108,6 +137,9 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
     @Override
     public void onSuccess(GetIKResponse getikResponse) {
         IKResponse ikResponse = getikResponse.getIkResponse();
+
+        long elapsed = SystemClock.elapsedRealtime() - timeCounter;
+        Log.i("IK", "Calculations took " + elapsed + "ms");
 
         if(ikResponse.getErrorCode().getVal() != MoveItErrorCodes.SUCCESS) {
             Log.w("IK", "IK Failed, Error: " + ikResponse.getErrorCode().getVal());

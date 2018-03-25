@@ -11,6 +11,21 @@
         android:layout_alignLeft="@id/button_home"
         android:textSize="28dp"/>
 
+    <Button android:id="@+id/button_forward" android:text="Forward"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_alignRight="@id/button_right"
+        android:layout_alignLeft="@id/button_right"
+        android:textSize="17dp"/>
+
+    <Button android:id="@+id/button_back" android:text="Back"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_alignRight="@id/button_right"
+        android:layout_alignLeft="@id/button_right"
+        android:layout_alignTop="@id/button_down"
+        android:textSize="17dp"/>
+
     <Button android:id="@+id/button_home" android:text="Home"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
