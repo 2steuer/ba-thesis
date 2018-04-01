@@ -17,4 +17,5 @@ public interface AxisInformation {
     boolean isMoving();
     double getSpeed();
     boolean isEnabled();
+    int getJointType();
 }

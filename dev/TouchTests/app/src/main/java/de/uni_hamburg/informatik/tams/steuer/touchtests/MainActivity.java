@@ -7,8 +7,10 @@ import android.os.Bundle;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.AxisControlFragment;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.AbsoluteSynergyTouchFragment;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.RelativeSynergyTouchFragment;
+import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.TeleopFragment;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Util.ViewPagerAdapter;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.AxisManager;
+import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.CartesianArmManager;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Material.Interfaces.InitStateListener;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Nodes.C5LwrNode;
 
@@ -40,6 +42,7 @@ public class MainActivity extends RosActivity {
         adapter.addFragment(new RelativeSynergyTouchFragment(), "Relative");
         adapter.addFragment(new AbsoluteSynergyTouchFragment(), "Absolute");
         adapter.addFragment(new AxisControlFragment(), "Axis Control");
+        adapter.addFragment(new TeleopFragment(), "TeleOp Arm");
 
         pager.setAdapter(adapter);
 
@@ -61,11 +64,11 @@ public class MainActivity extends RosActivity {
     @Override
     protected void init(NodeMainExecutor nodeMainExecutor) {
         axisManager = AxisManager.getInstance();
-        node = new C5LwrNode("/joint_states", "/config/fake_controller_joint_states");
+        node = new C5LwrNode("/joint_states", "/hand/joint_goals", "/lwr/jointPositionGoal");
 
         node.addJointDataListener(axisManager);
         axisManager.setRobotNode(node);
-
+        CartesianArmManager.getInstance().setNode(node);
         axisManager.setInitStateListener(new InitStateListener() {
             @Override
             public void onInitBegin() {
