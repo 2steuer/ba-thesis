@@ -1,13 +1,18 @@
 \chapter{Introduction}
 \section{Motivation}
 
+\begin{wrapfigure}{L}{0.2\textwidth}
+	\caption{KuKa LWR Arm with Shadow C5 Hand installation\label{fig:armwithhand}}
+	\includegraphics[width=0.2\textwidth]{assets/chpt_intro/lwr_c5hand.jpg}
+\end{wrapfigure}
+
 Controlling dexterous robot hands is a big challenge of robotics, but using has a variety of obvious advantages: The similarity to a human hand gives enables it to grasp objects in nearly all positions and poses the real human hand could. Especially for complex manipulation tasks, where a simple robotic grasper with just a pair of pliers is not sufficient, the larger amount of degrees-of-freedom comes into action. Also, users might be able to better plan actions when they are controlling a device similar to their own hands, meaning the main task for them is to use a control interface to execute actions they would otherwise execute with their own hands.
 
 \section{Objectives of this thesis}
 
 Within this thesis, a touch-interface for controlling such robotic hands shall be developed. This interface shall take advantage of the multi-touch capabilities of modern tablets. The user shall be able to control the position of the robotic hand (using the connected robotic arm) and grasp objects with it. All actions shall be mapped to corresponding multi-touch gestures the user can easily understand and learn.
 
-The hardware used within this bachelor thesis is a \textit{Shadow Dexterous Hand C5/C6} by the Shadow Robot Company. It has five fingers controlled by electrical or pneumatic muscles using 20 degrees-of-freedom\cite{web:robothand:spec}. The hand is connected to a robotic arm (\textit{KUKA Lightweight Robot}) allowing it to also be moved in space. % FOTO DES AUFBAUS
+The hardware used within this bachelor thesis is a \textit{Shadow Dexterous Hand C5/C6} by the Shadow Robot Company. It has five fingers controlled by electrical or pneumatic muscles using 20 degrees-of-freedom\cite{web:robothand:spec}. The hand is connected to a robotic arm (\textit{KUKA Lightweight Robot}) allowing it to also be moved in space. See Figure \ref{fig:armwithhand} for an image of the installation.
 
 As a control device an off-the-shelf android tablet will be used, as these devices have become very widespread and - thanks to this - relatively affordable. With screen sizes of 10 inches and above combined with the capability to record more than 5 independent touch pointers and a number of additional sensors (gyroscope, orientation, ...) and feedback actuators (vibration, sound, ...) they make a good choice for a versatile control device.
 
@@ -17,6 +22,6 @@ A native Android application will be developed and run directly on the tablet. A
 
 \section[Outline]{Outline of this thesis}
 
-
+In Chapter \ref{chap:basics} a brief overview over the technology used during the development of this thesis will be described and explained to give the reader a profound basis of knowledge to understand the processes and decisions described later easier. Chapter \ref{chap:concepts} depicts the concepts and architectural design process decisions made for later development. The implementation is then described in detail within Chapter \ref{chap:implementation}. Proposes for user studies and usability evaluations are then made in Chapter \ref{chap:eval}, as they are not part of this thesis.
 
 \chapter{Related work}
