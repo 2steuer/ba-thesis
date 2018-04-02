@@ -56,8 +56,21 @@ source devel/setup.bash
 ROS and catkin are now fully set up and can be used for further development.
 
 \subsection{Installing Android Studio}
+
+Android Studio is used as IDE during development of this thesis and should be installed according to the official documentation\footnote{\url{https://developer.android.com/studio/install.html}}. It is sensible to add the \textit{bin} directory in the installation path to the \textit{PATH} environment variable to make Android Studio accessible by just typing \textit{studio.sh} into a terminal window.
+
+After Android Studio was installed successfully, it is important to select and install the correct Android SDK versions as the project will compile with the Android 7 compiler to work with Android 4. To do so, open The SDK Manager (\textit{Tools > Android > SDK Manager}) and select the SDKs according to Figure \ref{fig:android:sdk}. When this is done, Android Studio is set up to develop and compile the application.
+
+\begin{figure}
+	\caption{Needed Android SDKs\label{fig:android:sdk}}
+	\begin{center}
+		\includegraphics[scale=0.7]{assets/chpt_impl/sdks.PNG}
+	\end{center}
+\end{figure}
+
 \subsection{Modifying and compiling rosandroid}
 \label{impl:compiling_rosandroid}
+
 \section{User Interface}
 \section{Software Architecture}
 \section{Approaches}
