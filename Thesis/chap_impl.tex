@@ -71,6 +71,26 @@ After Android Studio was installed successfully, it is important to select and i
 \subsection{Modifying and compiling rosandroid}
 \label{impl:compiling_rosandroid}
 
+Since the application developed in this thesis shall work on Android from versions beginning at 4.0.3 we have to modify the rosandroid code on one little detail to make everything work fine. In the created catkin workspace, go to the \textit{src} folder and clone the rosjava and rosandroid repositories there:
+\begin{lstlisting}[caption={Cloning the rosandroid and rosjava repositories}]
+git clone https://github.com/rosjava/rosjava_core.git
+git clone https://github.com/rosjava/android_core.git
+git clone https://github.com/rosjava/rosjava_messages.git
+\end{lstlisting}
+
+Then line 38 in the file
+\begin{lstlisting}[numbers=none]
+android_core/android_10/src/org/ros/android/RosActivity.java
+\end{lstlisting}
+
+has to be replaced by
+
+\begin{lstlisting}[caption={Change to make to RosActivity.java},firstnumber=38,breaklines=true]
+public abstract class RosActivity extends android.support.v7.app.AppCompatActivity {
+\end{lstlisting}
+
+This gives us the ability to use the already-built features in rosandroid like the automatically displayed activity to connect to a ROS master and built-in node handling even in older Android versions. When changes are made, issue a \textit{catkin\_make} command in the catkin workspace's root directory. \textit{Rosjava} and \textit{rosandroid} will then be built from source and deployed to a \textit{Maven} repository from where the binaries will be loaded by Android Studio on compile time.
+
 \section{User Interface}
 \section{Software Architecture}
 \section{Approaches}
