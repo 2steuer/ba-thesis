@@ -75,4 +75,26 @@ The two important topics used throughout this thesis are denoted in Table \ref{t
 	\end{tabularx}
 \end{table}
 
-\section{Inverse Kinematics with BioIK}
+\section{Inverse Kinematics}
+
+Inverse kinematics is one of the challenging fields in many applications like robotics or computer animations\cite{Starke2017}. To understand what inverse kinematics is it is important to look at a robot (or e.g. animated figures in video games) from two different points of view. The normal viewer would describe the position and pose of a robot or effector in his own coordinate system, usually in Cartesian coordinates. This position can be described as an $n$-dimensional vector $X$. To describe movement of the robot, the viewer would then tell a difference between the new and the old position vectors $X_{new}-X=\Delta X$. A robot, however, often cannot move in Cartesian space, as it's kinematic chain (i.e. the parts of the robot connected by rotational or translational joints) can have $m$ degrees-of-freedom (DOF) with $m > n$. The position in the so-called \textit{joint-space} is referred to as $\theta$. To control such a robot with a high number of DOF, the controller has to be aware of the current position of the robot in Cartesian space $X$, the desired position change $\Delta X$ and the change in joint-space $\Delta \theta$ that has to be applied to the current position in joint space $\theta$. $\theta$ is known by the current state of the robot, finding $X$ is done by applying \textit{forward-kinematics} to $\theta$:
+\begin{equation*}
+	X = f(\theta)
+\end{equation*}
+
+Forward kinematics usually is a straight-forward process of beginning at the robot's base and iterating through all joints up to the \textit{end-effector} to find it's position. The inverse kinematics to find the corresponding position in joint-space to reach the desired position in Cartesian space
+\begin{equation*}
+\theta = f^{-1}(X)
+\end{equation*}
+however is not as easy as the forward kinematics as with rising numbers of DOF no analytical solution is possible and multiple valid joint-positions can exist - or even none at all\cite{DextquotesingleSouza}.
+
+Many approaches to this problem have come up during the years. \citeauthor{andreasaristidou2009inverse} give a good overview over the existing methods in their technical report\cite{DextquotesingleSouza}.
+
+\begin{figure}
+	\caption{Forward and inverse kinematics\label{fig:basics:kinematics}}
+	\begin{center}
+		\includegraphics[width=0.6\textwidth]{assets/chpt_basics/Kinematics.pdf}
+	\end{center}
+\end{figure}
+
+\subsection{BioIK}
