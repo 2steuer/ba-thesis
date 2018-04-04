@@ -93,6 +93,9 @@ public class GestureView extends View implements SynergyAmplitudeListener, Gestu
 
     @Override
     protected void onDraw(Canvas canvas) {
+
+
+
         super.onDraw(canvas);
 
         float w = getWidth();

@@ -63,9 +63,6 @@ public class RelativeSynergyProxy extends SynergyProxyBase {
 
             CartesianArmManager.getInstance().movePalm(armoffset);
         }
-
-
-
     }
 
     protected void handleOrientationChanges(GestureState oldState, Gesture gesture) {

@@ -209,7 +209,7 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
         req.setGroupName("lwr_with_c5hand");
         req.setAttempts(1);
         req.setTimeout(Duration.fromMillis(1000));
-        req.setApproximate(false);
+        req.setApproximate(true);
 
 
         LinkedList<String> la = new LinkedList<>();

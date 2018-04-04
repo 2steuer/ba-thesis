@@ -1,11 +1,13 @@
 package de.uni_hamburg.informatik.tams.steuer.touchtests;
 
+import android.accessibilityservice.FingerprintGestureController;
 import android.app.ProgressDialog;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.AxisControlFragment;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.AbsoluteSynergyTouchFragment;
+import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.FingertipFragment;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.RelativeSynergyTouchFragment;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.TeleopFragment;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Util.ViewPagerAdapter;
@@ -43,6 +45,7 @@ public class MainActivity extends RosActivity {
         adapter.addFragment(new AbsoluteSynergyTouchFragment(), "Absolute");
         adapter.addFragment(new AxisControlFragment(), "Axis Control");
         adapter.addFragment(new TeleopFragment(), "TeleOp Arm");
+        adapter.addFragment(new FingertipFragment(), "DFTM");
 
         pager.setAdapter(adapter);
 
