@@ -12,6 +12,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.Interfaces.GestureObserver;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.Material.Gesture;
@@ -29,6 +31,9 @@ public class GestureParser {
     private List<Gesture> gestures = new ArrayList<Gesture>();
 
     private Set<GestureObserver> observers = new HashSet<>();
+
+    private static final int UNLOCK_DELAY = 1000;
+    private Timer unlockTimer = new Timer();
 
     public void handleTouchEvent(MotionEvent e)
     {
@@ -65,6 +70,9 @@ public class GestureParser {
                         gest.addPointer(newP);
                         pointToGestures.put(newP, gest);
 
+                        gest.setLocked(true);
+                        unlockTimer.schedule(new GestureUnlocker(gest), UNLOCK_DELAY, UNLOCK_DELAY);
+
                         for (GestureObserver o : observers) {
                             o.onGestureRemove(gest);
                             o.onGestureAdd(gest);
@@ -75,6 +83,9 @@ public class GestureParser {
                         newGesture.addPointer(newP);
                         gestures.add(newGesture);
                         pointToGestures.put(newP, newGesture);
+
+                        newGesture.setLocked(true);
+                        unlockTimer.schedule(new GestureUnlocker(newGesture), UNLOCK_DELAY, UNLOCK_DELAY);
 
                         for (GestureObserver o : observers) {
                             o.onGestureAdd(newGesture);
@@ -102,6 +113,9 @@ public class GestureParser {
                         }
                     }
                     else {
+                        g.setLocked(true);
+                        unlockTimer.schedule(new GestureUnlocker(g), UNLOCK_DELAY, UNLOCK_DELAY);
+
                         for (GestureObserver o : observers) {
                             o.onGestureRemove(g);
                             o.onGestureAdd(g);
@@ -151,5 +165,20 @@ public class GestureParser {
 
     public void removeObserver(GestureObserver observer) {
         observers.remove(observer);
+    }
+
+    private class GestureUnlocker extends TimerTask {
+
+        Gesture g;
+
+        public GestureUnlocker(Gesture gest) {
+            g = gest;
+        }
+
+        @Override
+        public void run() {
+            g.setLocked(false);
+            cancel();
+        }
     }
 }

@@ -11,6 +11,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import bio_ik_msgs.GetIKResponse;
 import bio_ik_msgs.IKResponse;
@@ -26,12 +28,12 @@ import sensor_msgs.JointState;
  */
 
 public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.GetIKResponse> {
-    private static final double Y_MIN = -1.2;
-    private static final double Y_MAX = -0.8;
-    private static final double X_MIN = -0.2;
-    private static final double X_MAX = 0.4;
-    private static final double Z_MIN = 1.0;
-    private static final double Z_MAX = 1.2;
+    public static final double Y_MIN = -1.2;
+    public static final double Y_MAX = -0.8;
+    public static final double X_MIN = -0.2;
+    public static final double X_MAX = 0.4;
+    public static final double Z_MIN = 1.05;
+    public static final double Z_MAX = 1.17;
 
     private static CartesianArmManager instance = null;
     public static CartesianArmManager getInstance() {
@@ -53,6 +55,10 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
     boolean waiting = false;
 
     long timeCounter = 0;
+
+    Lock runningLock = new ReentrantLock();
+    private boolean running = false;
+    private boolean posChanged = false;
 
     private CartesianArmManager() {
 
@@ -104,49 +110,59 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
     }
 
     public boolean goHome() {
-        if(waiting || node == null) {
-            return false;
-        }
-
-        waiting = true;
-        timeCounter = SystemClock.elapsedRealtime();
-        node.GetIkJointsPalm(mgr.getRobotState(), lockedAxes.toArray(new String[0]), homePos.getX(), homePos.getY(), homePos.getZ(), 0.7071, 0.0, 0.0, 0.7071, this);
-
-        setPos(homePos.getX(), homePos.getY(), homePos.getZ());
-
-        return true;
+        return movePalmTo(homePos);
     }
 
     public boolean movePalm(PointInSpace offset)
     {
-
-        if(waiting || node == null) {
-            return false;
-        }
-
         double newX = currentPos.getX() + offset.getX();
         double newY = currentPos.getY() + offset.getY();
         double newZ = currentPos.getZ() + offset.getZ();
 
-        setPos(newX, newY, newZ);
 
-        waiting = true;
-        timeCounter = SystemClock.elapsedRealtime();
-        node.GetIkJointsPalm(mgr.getRobotState(), lockedAxes.toArray(new String[0]), currentPos.getX(), currentPos.getY(), currentPos.getZ(), 0.7071, 0, 0, 0.7071, this);
+        return movePalmTo(new PointInSpace(newX, newY, newZ));
+    }
+
+    public boolean movePalmTo(PointInSpace position) {
+        if(node == null) {
+            return false;
+        }
+
+        setPos(position.getX(), position.getY(), position.getZ());
+
+        runningLock.lock();
+        posChanged = true;
+        if(!running) {
+            node.GetIkJointsPalm(mgr.getRobotState(), lockedAxes.toArray(new String[0]), currentPos.getX(), currentPos.getY(), currentPos.getZ(), 0.7071, 0.0, 0.0, 0.7071, this);
+            running = true;
+        }
+        runningLock.unlock();
+
 
         return true;
+    }
+
+    public PointInSpace getPosition() {
+        return currentPos;
+    }
+
+    public void stop() {
+        runningLock.lock();
+        running = false;
+        runningLock.unlock();
     }
 
     @Override
     public void onSuccess(GetIKResponse getikResponse) {
         IKResponse ikResponse = getikResponse.getIkResponse();
 
-        long elapsed = SystemClock.elapsedRealtime() - timeCounter;
-        Log.i("IK", "Calculations took " + elapsed + "ms");
-
         if(ikResponse.getErrorCode().getVal() != MoveItErrorCodes.SUCCESS) {
             Log.w("IK", "IK Failed, Error: " + ikResponse.getErrorCode().getVal());
             waiting = false;
+
+            runningLock.lock();
+            running = false;
+            runningLock.unlock();
             return;
         }
 
@@ -167,11 +183,26 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
         }
 
 
-        waiting = false;
+        runningLock.lock();
+        // if still running is requested, restart with the current position
+        // this is an unsynchronized free-running endless loop
+        // until running is set to false.
+        if(running && posChanged) {
+            posChanged = false;
+            node.GetIkJointsPalm(mgr.getRobotState(), lockedAxes.toArray(new String[0]), currentPos.getX(), currentPos.getY(), currentPos.getZ(), 0.7071, 0.0, 0.0, 0.7071, this);
+        }
+        else {
+            running = false;
+        }
+        runningLock.unlock();
     }
 
     @Override
     public void onFailure(RemoteException e) {
         waiting = false;
+
+        runningLock.lock();
+        running = false;
+        runningLock.unlock();
     }
 }

@@ -115,7 +115,7 @@ public abstract class SynergyProxyBase implements GestureObserver {
     public void onGestureChanged(Gesture g) {
         int pc = g.getPointerCount();
         GestureState gs = _stateByGesture.get(g);
-        if(gs == null || gs.getGesture() != g) {
+        if(gs == null || gs.getGesture() != g || g.isLocked()) {
             return;
         }
 
@@ -187,6 +187,11 @@ public abstract class SynergyProxyBase implements GestureObserver {
     }
 
     private void updateJoints() {
+        if(_axes == null)
+        {
+            return;
+        }
+
         double[] jointData = _currentSynergy.toSafeAbduction(_currentSynergy.toJoints(_amplitudes));
 
         if(jointData.length > JointMapping.length) {

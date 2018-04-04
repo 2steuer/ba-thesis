@@ -15,8 +15,18 @@ public class Gesture {
 
     private Pointer _thumbPointer = null;
 
+    private boolean isLocked = true;
+
     public Collection<Pointer> getPointers() {
         return pointers;
+    }
+
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    public void setLocked(boolean locked) {
+        isLocked = locked;
     }
 
     public void addPointer(Pointer p) {

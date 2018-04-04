@@ -1,10 +1,13 @@
 package de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -28,6 +31,8 @@ public class TeleopFragment extends Fragment implements View.OnClickListener {
 
     Button forward = null;
     Button back = null;
+
+    private boolean locked = true;
 
     public TeleopFragment() {
         axes = AxisManager.getInstance();
@@ -81,10 +86,45 @@ public class TeleopFragment extends Fragment implements View.OnClickListener {
 
         back = ((Button)getView().findViewById(R.id.button_back));
         back.setOnClickListener(this);
+
+        final FloatingActionButton lockButton = ((FloatingActionButton)getView().findViewById(R.id.lockButton));
+
+        lockButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                switch(motionEvent.getAction())
+                {
+                    case MotionEvent.ACTION_DOWN:
+                        locked = false;
+                        axes.setLocked(false);
+                        lockButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.posOk)));
+
+                        lockButton.setImageResource(android.R.drawable.ic_media_pause);
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        locked = true;
+                        axes.setLocked(true);
+                        arm.stop();
+                        lockButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.posNOk)));
+                        lockButton.setImageResource(android.R.drawable.ic_media_play);
+
+                        break;
+                }
+
+                return true;
+            }
+
+
+        });
     }
 
     @Override
     public void onClick(View view) {
+        if(locked) {
+            return;
+        }
+
         if(view == home) {
             arm.goHome();
         }

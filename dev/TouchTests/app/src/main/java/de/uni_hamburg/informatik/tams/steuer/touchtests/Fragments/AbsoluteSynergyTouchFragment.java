@@ -24,6 +24,7 @@ import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.Views.GestureV
 import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.GestureParser;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.R;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.AxisManager;
+import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.CartesianArmManager;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Synergies.AbsoluteSynergyProxy;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Synergies.SynergyProxyBase;
 import hdbt.shadow.GraspSynergy;
@@ -94,6 +95,7 @@ public class AbsoluteSynergyTouchFragment extends Fragment implements AdapterVie
                         locked = !locked;
                         _axes.setLocked(locked);
                         _synergyProxy.setLocked(locked);
+                        CartesianArmManager.getInstance().stop();
                         lockButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.posNOk)));
                         lockButton.setImageResource(locked ? android.R.drawable.ic_media_play : android.R.drawable.ic_media_pause);
 

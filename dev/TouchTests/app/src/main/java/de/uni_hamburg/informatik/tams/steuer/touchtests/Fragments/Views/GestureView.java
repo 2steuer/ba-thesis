@@ -106,7 +106,7 @@ public class GestureView extends View implements SynergyAmplitudeListener, Gestu
         for (Gesture g : gestures.getGestures()) {
             Location com = g.getCenter();
             float radius = g.getSize() / 2;
-            canvas.drawCircle(com.getX(), com.getY(), radius, paintOrange);
+            canvas.drawCircle(com.getX(), com.getY(), radius, g.isLocked() ? paintRed : paintOrange);
 
             for (Pointer p : g.getPointers()) {
                 Location ploc = p.getLocation();
