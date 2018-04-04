@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Material.PointInSpace;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Nodes.Interfaces.RobotJointDataReceiver;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.ValueTypes.JointType;
 import geometry_msgs.Point;
@@ -253,6 +254,55 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
         quat.setW(rotw);
 
         goals.add(p);
+
+        ikService.call(greq, hdl);
+    }
+
+    public void GetIKJointsFingertips(Map<String, Double> currentState, Map<String, PointInSpace> fingertips, ServiceResponseListener<GetIKResponse> hdl) {
+        if(ikService == null)
+        {
+            hdl.onFailure(new RemoteException(StatusCode.ERROR, "No IK Service registered"));
+            return;
+        }
+
+        bio_ik_msgs.GetIKRequest greq = ikService.newMessage();
+        IKRequest req = greq.getIkRequest();
+
+        req.setGroupName("lwr_with_c5hand");
+        req.setAttempts(1);
+        req.setTimeout(Duration.fromMillis(1000));
+        req.setApproximate(true);
+
+        MessageFactory fact = cNode.getTopicMessageFactory();
+
+        // Store current robot state...
+        RobotState rs = fact.newFromType(RobotState._TYPE);
+        List<String> names = rs.getJointState().getName();
+        double[] angles = new double[currentState.size()];
+
+        for (String n:currentState.keySet()) {
+            // it is important to add the angle first otherwise
+            // it will be an off-by-one error
+            angles[names.size()] = currentState.get(n);
+            names.add(n);
+
+        }
+        rs.getJointState().setPosition(angles);
+        req.setRobotState(rs);
+
+        List<bio_ik_msgs.PositionGoal> goals = req.getPositionGoals();
+
+        for(String effector : fingertips.keySet()) {
+            PointInSpace p = fingertips.get(effector);
+
+            PositionGoal g = fact.newFromType(PositionGoal._TYPE);
+            g.setLinkName(effector);
+            g.getPosition().setX(p.getX());
+            g.getPosition().setY(p.getY());
+            g.getPosition().setZ(p.getZ());
+
+            goals.add(g);
+        }
 
         ikService.call(greq, hdl);
     }

@@ -41,4 +41,16 @@ public class PointInSpace {
     public void setZ(double z) {
         this.z = z;
     }
+
+    public PointInSpace add(PointInSpace pw) {
+        return new PointInSpace(
+            x + pw.getX(),
+                y + pw.getY(),
+                z + pw.getZ()
+        );
+    }
+
+    public PointInSpace multiply(double v) {
+        return new PointInSpace(x * v, y * v, z * v);
+    }
 }

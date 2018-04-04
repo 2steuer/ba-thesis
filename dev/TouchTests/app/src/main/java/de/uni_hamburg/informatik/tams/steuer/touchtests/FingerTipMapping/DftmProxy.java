@@ -4,15 +4,27 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import org.ros.exception.RemoteException;
+import org.ros.node.service.ServiceResponseListener;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import bio_ik_msgs.GetIKResponse;
+import bio_ik_msgs.IKResponse;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.FingerTipMapping.Material.FingertipPointer;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.Material.Location;
+import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.AxisManager;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Material.PointInSpace;
+import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Nodes.C5LwrNode;
 
 /**
  * Created by merlin on 04.04.18.
  */
 
-public class DftmProxy implements View.OnTouchListener {
+public class DftmProxy implements View.OnTouchListener, ServiceResponseListener<GetIKResponse> {
     public static final int MAX_CONTROLLABLE_FINGERS = 3;
     public static final int CATCH_RADIUS = 200;
 
@@ -42,10 +54,20 @@ public class DftmProxy implements View.OnTouchListener {
         return instance;
     }
 
+    private C5LwrNode node = null;
+    private AxisManager axes = AxisManager.getInstance();
+
+    boolean running = false;
+    Lock runningLock = new ReentrantLock();
+
     private DftmProxy() {
         for(int i = 0; i < _pointers.length; i++) {
             _pointers[i] = null;
         }
+    }
+
+    public void setNode(C5LwrNode n) {
+        node = n;
     }
 
     public void setScreenMetrics(int width, int height, int dpi) {
@@ -180,5 +202,39 @@ public class DftmProxy implements View.OnTouchListener {
         );
 
         p.setWorldLocation(wl);
+    }
+
+    private void updateRobot() {
+        Map<String, PointInSpace> goals = new HashMap<String, PointInSpace>();
+
+        for(int i = 0; i < MAX_CONTROLLABLE_FINGERS; i++) {
+            if(_pointers[i] == null) {
+                continue;
+            }
+
+            FingertipPointer p = _pointers[i];
+
+            PointInSpace wloc = surfaceBase
+                    .add(surfaceXBaseVect.multiply(p.getWorldLocation().getX()))
+                    .add(surfaceYBaseVect.multiply(p.getWorldLocation().getY()));
+
+            goals.put(p.getEffectorName(), wloc);
+        }
+
+        if(goals.size() == 0) {
+            return;
+        }
+
+        node.GetIKJointsFingertips(axes.getRobotState(), goals, this);
+    }
+
+    @Override
+    public void onSuccess(GetIKResponse ikResponse) {
+        
+    }
+
+    @Override
+    public void onFailure(RemoteException e) {
+
     }
 }
