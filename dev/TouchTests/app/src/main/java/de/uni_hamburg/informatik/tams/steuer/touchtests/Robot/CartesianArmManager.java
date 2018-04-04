@@ -7,8 +7,10 @@ import org.ros.exception.RemoteException;
 import org.ros.node.service.ServiceResponseListener;
 import org.ros.rosjava_geometry.Quaternion;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import bio_ik_msgs.GetIKResponse;
 import bio_ik_msgs.IKResponse;
@@ -40,7 +42,7 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
         return instance;
     }
 
-    private List<String> lockedAxes = new LinkedList<String>();
+    private Set<String> lockedAxes = new HashSet<String>();
 
     C5LwrNode node = null;
     AxisManager mgr = AxisManager.getInstance();
@@ -53,6 +55,7 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
     long timeCounter = 0;
 
     private CartesianArmManager() {
+
         lockedAxes.add("THJ1");
         lockedAxes.add("THJ2");
         lockedAxes.add("THJ3");
@@ -107,7 +110,7 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
 
         waiting = true;
         timeCounter = SystemClock.elapsedRealtime();
-        node.GetIkJointsPalm(mgr.getRobotState(), lockedAxes, homePos.getX(), homePos.getY(), homePos.getZ(), 0.7071, 0.0, 0.0, 0.7071, this);
+        node.GetIkJointsPalm(mgr.getRobotState(), lockedAxes.toArray(new String[0]), homePos.getX(), homePos.getY(), homePos.getZ(), 0.7071, 0.0, 0.0, 0.7071, this);
 
         setPos(homePos.getX(), homePos.getY(), homePos.getZ());
 
@@ -129,7 +132,7 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
 
         waiting = true;
         timeCounter = SystemClock.elapsedRealtime();
-        node.GetIkJointsPalm(mgr.getRobotState(), lockedAxes, currentPos.getX(), currentPos.getY(), currentPos.getZ(), 0.7071, 0, 0, 0.7071, this);
+        node.GetIkJointsPalm(mgr.getRobotState(), lockedAxes.toArray(new String[0]), currentPos.getX(), currentPos.getY(), currentPos.getZ(), 0.7071, 0, 0, 0.7071, this);
 
         return true;
     }
@@ -143,6 +146,7 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
 
         if(ikResponse.getErrorCode().getVal() != MoveItErrorCodes.SUCCESS) {
             Log.w("IK", "IK Failed, Error: " + ikResponse.getErrorCode().getVal());
+            waiting = false;
             return;
         }
 
@@ -153,13 +157,13 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
         int notifyAt = count - 1;
 
 
-
-
         AngleRadianConverter c = new AngleRadianConverter();
 
         for(int i = 0; i < count; i++) {
             // notify on last value only
-            mgr.setTargetValue(name.get(i), c.toRawValue(val[i]), false, i == notifyAt);
+            if(!lockedAxes.contains(name.get(i))) {
+                mgr.setTargetValue(name.get(i), c.toRawValue(val[i]), false, i == notifyAt);
+            }
         }
 
 

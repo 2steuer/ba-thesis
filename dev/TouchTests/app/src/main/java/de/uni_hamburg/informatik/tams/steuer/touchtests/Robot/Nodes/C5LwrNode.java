@@ -194,7 +194,7 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
         }
     }
 
-    public void GetIkJointsPalm(Map<String, Double> currentState, List<String> lockedAxes, double x, double y, double z, double rotx, double roty, double rotz, double rotw, ServiceResponseListener<GetIKResponse> hdl)
+    public void GetIkJointsPalm(Map<String, Double> currentState, String[] lockedAxes, double x, double y, double z, double rotx, double roty, double rotz, double rotw, ServiceResponseListener<GetIKResponse> hdl)
     {
         if(ikService == null)
         {
@@ -210,8 +210,15 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
         req.setAttempts(1);
         req.setTimeout(Duration.fromMillis(1000));
         req.setApproximate(false);
-        req.setFixedJoints(lockedAxes);
 
+
+        LinkedList<String> la = new LinkedList<>();
+        for(int i = 0; i < lockedAxes.length; i++) {
+            la.add(lockedAxes[i]);
+        }
+
+        req.setFixedJoints(la);
+        req.setAvoidCollisions(true);
 
         MessageFactory fact = cNode.getTopicMessageFactory();
 
