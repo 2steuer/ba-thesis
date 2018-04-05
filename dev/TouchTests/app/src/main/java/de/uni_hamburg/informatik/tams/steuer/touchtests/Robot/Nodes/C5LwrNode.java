@@ -1,5 +1,7 @@
 package de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Nodes;
 
+import android.graphics.drawable.GradientDrawable;
+
 import org.ros.exception.RemoteException;
 import org.ros.exception.ServiceNotFoundException;
 import org.ros.internal.message.RawMessage;
@@ -273,7 +275,19 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
         req.setTimeout(Duration.fromMillis(1000));
         req.setApproximate(true);
 
+
+
         MessageFactory fact = cNode.getTopicMessageFactory();
+
+        OrientationGoal og = fact.newFromType(OrientationGoal._TYPE);
+        og.setLinkName("palm");
+        Quaternion q = og.getOrientation();
+        q.setX(0.7071);
+        q.setY(0);
+        q.setZ(0);
+        q.setW(0.7071);
+
+        req.getOrientationGoals().add(og);
 
         // Store current robot state...
         RobotState rs = fact.newFromType(RobotState._TYPE);

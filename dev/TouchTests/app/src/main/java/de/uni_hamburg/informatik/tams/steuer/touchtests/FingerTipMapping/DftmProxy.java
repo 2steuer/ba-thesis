@@ -1,5 +1,6 @@
 package de.uni_hamburg.informatik.tams.steuer.touchtests.FingerTipMapping;
 
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -7,6 +8,7 @@ import android.view.View;
 import org.ros.exception.RemoteException;
 import org.ros.node.service.ServiceResponseListener;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +34,8 @@ public class DftmProxy implements View.OnTouchListener, ServiceResponseListener<
     public static final int MAX_CONTROLLABLE_FINGERS = 3;
     public static final int CATCH_RADIUS = 200;
 
+    public static final int POS_ROUND_DIGITS = 3;
+
     private static final String[] effectorNames = {
         "thtip",
         "fftip",
@@ -41,12 +45,14 @@ public class DftmProxy implements View.OnTouchListener, ServiceResponseListener<
     private FingertipPointer[] _pointers = new FingertipPointer[MAX_CONTROLLABLE_FINGERS];
 
     PointInSpace surfaceBase = new PointInSpace(-0.1, -1.1, 1.2);
-    PointInSpace surfaceYBaseVect = new PointInSpace(0, -1, 0);
-    PointInSpace surfaceXBaseVect = new PointInSpace(1, 0, 0);
+    PointInSpace surfaceYBaseVect = new PointInSpace(0, 1, 0);
+    PointInSpace surfaceXBaseVect = new PointInSpace(-1, 0, 0);
 
     private int _dpi = 0;
     private int _width = 0;
     private int _height = 0;
+
+    long timeMeas = 0;
 
     private static DftmProxy instance = null;
     public static DftmProxy getInstance() {
@@ -253,8 +259,14 @@ public class DftmProxy implements View.OnTouchListener, ServiceResponseListener<
                     .add(surfaceXBaseVect.multiply(p.getWorldLocation().getX()))
                     .add(surfaceYBaseVect.multiply(p.getWorldLocation().getY()));
 
+            wloc.setX(roundToDecimals(wloc.getX(), POS_ROUND_DIGITS));
+            wloc.setY(roundToDecimals(wloc.getY(), POS_ROUND_DIGITS));
+            wloc.setZ(roundToDecimals(wloc.getZ(), POS_ROUND_DIGITS));
+
             goals.put(p.getEffectorName(), wloc);
         }
+
+
 
         runningLock.lock();
         if(goals.size() == 0) {
@@ -262,12 +274,23 @@ public class DftmProxy implements View.OnTouchListener, ServiceResponseListener<
             return;
         }
         running = true;
+        timeMeas = SystemClock.elapsedRealtime();
         node.GetIKJointsFingertips(axes.getRobotState(), goals, this);
         runningLock.unlock();
     }
 
+    private double roundToDecimals(double val, int decimals) {
+        BigDecimal dec = BigDecimal.valueOf(val);
+        dec.setScale(decimals, BigDecimal.ROUND_HALF_UP);
+        return dec.doubleValue();
+    }
+
     @Override
     public void onSuccess(GetIKResponse getikResponse) {
+
+        long diff = SystemClock.elapsedRealtime() - timeMeas;
+        Log.i("DFMT", diff + "ms elapsed");
+
         IKResponse ikResponse = getikResponse.getIkResponse();
 
         if(ikResponse.getErrorCode().getVal() != MoveItErrorCodes.SUCCESS) {
