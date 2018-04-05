@@ -212,7 +212,7 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
         req.setGroupName("lwr_with_c5hand");
         req.setAttempts(1);
         req.setTimeout(Duration.fromMillis(1000));
-        req.setApproximate(false);
+        req.setApproximate(true);
         req.setAvoidCollisions(true);
 
         LinkedList<String> la = new LinkedList<>();
@@ -273,8 +273,8 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
         req.setGroupName("lwr_with_c5hand");
         req.setAttempts(1);
         req.setTimeout(Duration.fromMillis(1000));
-        req.setApproximate(true);
-
+        req.setApproximate(false);
+        req.setAvoidCollisions(true);
 
 
         MessageFactory fact = cNode.getTopicMessageFactory();
