@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 
+import de.uni_hamburg.informatik.tams.steuer.touchtests.FingerTipMapping.DftmProxy;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.AxisControlFragment;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.AbsoluteSynergyTouchFragment;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Fragments.FingertipFragment;
@@ -72,6 +73,7 @@ public class MainActivity extends RosActivity {
         node.addJointDataListener(axisManager);
         axisManager.setRobotNode(node);
         CartesianArmManager.getInstance().setNode(node);
+        DftmProxy.getInstance().setNode(node);
         axisManager.setInitStateListener(new InitStateListener() {
             @Override
             public void onInitBegin() {

@@ -8,6 +8,7 @@ import org.ros.exception.RemoteException;
 import org.ros.node.service.ServiceResponseListener;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -17,8 +18,11 @@ import bio_ik_msgs.IKResponse;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.FingerTipMapping.Material.FingertipPointer;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.GestureParsing.Material.Location;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.AxisManager;
+import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Material.Interfaces.AngleRadianConverter;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Material.PointInSpace;
 import de.uni_hamburg.informatik.tams.steuer.touchtests.Robot.Nodes.C5LwrNode;
+import moveit_msgs.MoveItErrorCodes;
+import sensor_msgs.JointState;
 
 /**
  * Created by merlin on 04.04.18.
@@ -36,7 +40,7 @@ public class DftmProxy implements View.OnTouchListener, ServiceResponseListener<
 
     private FingertipPointer[] _pointers = new FingertipPointer[MAX_CONTROLLABLE_FINGERS];
 
-    PointInSpace surfaceBase = new PointInSpace(-1.0, 1.1, 1.2);
+    PointInSpace surfaceBase = new PointInSpace(-0.1, -1.1, 1.2);
     PointInSpace surfaceYBaseVect = new PointInSpace(0, -1, 0);
     PointInSpace surfaceXBaseVect = new PointInSpace(1, 0, 0);
 
@@ -60,6 +64,8 @@ public class DftmProxy implements View.OnTouchListener, ServiceResponseListener<
     boolean running = false;
     Lock runningLock = new ReentrantLock();
 
+    boolean enabled = false;
+
     private DftmProxy() {
         for(int i = 0; i < _pointers.length; i++) {
             _pointers[i] = null;
@@ -68,6 +74,16 @@ public class DftmProxy implements View.OnTouchListener, ServiceResponseListener<
 
     public void setNode(C5LwrNode n) {
         node = n;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+
+        axes.setLocked(!enabled);
+
+        if(!enabled) {
+            stopUpdateLoop();
+        }
     }
 
     public void setScreenMetrics(int width, int height, int dpi) {
@@ -185,8 +201,9 @@ public class DftmProxy implements View.OnTouchListener, ServiceResponseListener<
             }
         }
 
-
-
+        if(enabled) {
+            startUpdateLoop();
+        }
         return true;
     }
 
@@ -204,7 +221,25 @@ public class DftmProxy implements View.OnTouchListener, ServiceResponseListener<
         p.setWorldLocation(wl);
     }
 
+    private void startUpdateLoop() {
+        runningLock.lock();
+        if(!running) {
+            updateRobot();
+        }
+        runningLock.unlock();
+    }
+
+    private void stopUpdateLoop() {
+        runningLock.lock();
+        running = false;
+        runningLock.unlock();
+    }
+
     private void updateRobot() {
+        if(!enabled) {
+            return;
+        }
+
         Map<String, PointInSpace> goals = new HashMap<String, PointInSpace>();
 
         for(int i = 0; i < MAX_CONTROLLABLE_FINGERS; i++) {
@@ -221,20 +256,55 @@ public class DftmProxy implements View.OnTouchListener, ServiceResponseListener<
             goals.put(p.getEffectorName(), wloc);
         }
 
+        runningLock.lock();
         if(goals.size() == 0) {
+            running = false;
             return;
         }
-
+        running = true;
         node.GetIKJointsFingertips(axes.getRobotState(), goals, this);
+        runningLock.unlock();
     }
 
     @Override
-    public void onSuccess(GetIKResponse ikResponse) {
-        
+    public void onSuccess(GetIKResponse getikResponse) {
+        IKResponse ikResponse = getikResponse.getIkResponse();
+
+        if(ikResponse.getErrorCode().getVal() != MoveItErrorCodes.SUCCESS) {
+            Log.w("IK", "IK Failed, Error: " + ikResponse.getErrorCode().getVal());
+
+            runningLock.lock();
+            running = false;
+            runningLock.unlock();
+            return;
+        }
+
+        JointState st = ikResponse.getSolution().getJointState();
+        List<String> name = st.getName();
+        double[] val = st.getPosition();
+        int count = Math.min(name.size(), val.length);
+        int notifyAt = count - 1;
+
+
+        AngleRadianConverter c = new AngleRadianConverter();
+
+        for(int i = 0; i < count; i++) {
+            // notify on last value only
+            axes.setTargetValue(name.get(i), c.toRawValue(val[i]), false, i == notifyAt);
+        }
+
+        runningLock.lock();
+        if(running) {
+            updateRobot();
+        }
+        runningLock.unlock();
     }
 
     @Override
     public void onFailure(RemoteException e) {
-
+        runningLock.lock();
+        Log.e("Tip", e.toString());
+        running = false;
+        runningLock.unlock();
     }
 }
