@@ -69,6 +69,7 @@ public class DftmProxy implements View.OnTouchListener, ServiceResponseListener<
 
     boolean running = false;
     Lock runningLock = new ReentrantLock();
+    boolean newData = false;
 
     boolean enabled = false;
 
@@ -229,6 +230,7 @@ public class DftmProxy implements View.OnTouchListener, ServiceResponseListener<
 
     private void startUpdateLoop() {
         runningLock.lock();
+        newData = true;
         if(!running) {
             updateRobot();
         }
@@ -317,8 +319,11 @@ public class DftmProxy implements View.OnTouchListener, ServiceResponseListener<
         }
 
         runningLock.lock();
-        if(running) {
+        if(running && newData) {
             updateRobot();
+        }
+        else {
+            running = false;
         }
         runningLock.unlock();
     }
