@@ -21,12 +21,53 @@ Interaction with the application is done using the commonly known touch gestures
 	\item 3-Fingered gestures (Rotation, Movement)
 \end{itemize}
 
-\subsection{General Screens}
+\subsection{General Screen Layout}
 
 As a screen of a diagonal size of 10 inches (25.4cm) is very limited compared to the size of the robot's workspace good considerations have to made according to a well-designed user interface. Since we are mainly operating the robot with touch gestures, significant parts of the screen should be blank, as only few information can be displayed while the user poses his hands above or on the screen. Figure \ref{fig:firstmockup} gives a first overview of how the portions of the screen shall be distributed. The biggest part of the screen is reserved for touch interactions by the user. Since multiple approaches to control the robot shall be implemented, the method shall be selected and switched using a tabbed layout with the tabs on the top, as they then use the least space of the screen.
 
 \subsubsection{Interlock Button}
 On all screens where the robot can be remotely operated, a security interlock button shall be displayed. For the actions on the screen to have effect on the robot (i.e. to be sent to the controller) the button shall remain pressed. This implements the functionality of a dead-man-switch, stopping all robot action once released. Although this is only a software measure it should be a good solution against unwanted movements of the robot as the button can easily be released when pressed with a single finger of the left hand. \textbf{Of course, this software measure does not replace hardware safety measures like emergency switches, but only supports them.}
+
+\subsection{Grasp Synergy Screens}
+
+\begin{wrapfigure}{l}{0.6\textwidth}
+	\caption{\label{fig:screen:synergy}Synergy control screen}
+	\includegraphics[width=0.6\textwidth]{assets/chpt_concepts/grasp_synergy_page}
+\end{wrapfigure}
+
+As the control of grasp synergies allows multiple different types of synergies to be selected, a drop-down selection of the synergy shall be displayed to the left side of the screen. This keeps the right side of the screen clear for better operability by right-hand users. Additionally, a cross of lines shall be displayed on the screen so the user knows where the middle of the touch interaction area is. As described later, this mainly is important in the approach with absolute synergy control (See Chapter \ref{sec:synergies}). To give the user some information about the state of a synergy, the values of significant amplitudes applied to the synergy shall also be displayed on the left hand side of the screen. A button to set the hand into the synergy's idle state (i.e. all significant amplitudes set to $0$) is also sensible to be implemented. A sample of how this screen could look like is demonstrated in Figure \ref{fig:screen:synergy}.
+
+\subsection{Direct Fingertip Mapping Screen}
+
+As there are no additional controls required to control the direct fingertip mapping, the control screen looks mostly like the general touch interaction screen seen in Figure \ref{fig:firstmockup}.
+
+\subsection{Single Axis/Joint Control}
+
+\begin{wrapfigure}[11]{r}{0.4\textwidth}
+	\caption{\label{fig:axiscontrol}Axis control widget with different status indicators}
+	\includegraphics[width=0.4\textwidth]{assets/chpt_concepts/AxisControlGreen}
+	\includegraphics[width=0.4\textwidth]{assets/chpt_concepts/AxisControlYellow}
+	\includegraphics[width=0.4\textwidth]{assets/chpt_concepts/AxisControlRed}
+\end{wrapfigure}
+
+An interface shall be implemented to give users the ability to control each joint of the robot individually. This is sensible for a variety of reasons. Firstly, it might sometimes be required to move the robot out of a specific state by moving just one axis and not by applying multiple changes at once. Possible scenarios for this use case could be a state where the robot could harm users or the environment if uncontrolled or unpredictable movement happens. An interface to control joints individually is also very practical for testing purposes, for example if one part of the robot is suspiciously broken.
+
+Within this interface, the currently measured joint angle shall be displayed for each joint, next to the currently set target value (printed in bold). This gives the user a good insight of what state the robot should be in according to the program and what state it is actually in. This shall be supported by a coloured indicator, giving a quick visual feedback on the difference of the target and actual joint angles $\Delta \alpha = |\alpha_{actual} - \alpha_{target}|$. The colours of the visual feedback shall be:
+
+\begin{itemize}
+	\item Green for $\Delta\alpha \leq 0.5^\circ$
+	\item Yellow for $0.5^\circ < \Delta\alpha \leq 2.5^\circ$
+	\item Red for $\Delta\alpha > 2.5^\circ$ 
+\end{itemize}
+
+The buttons to move the axis shall be displayed right and left of the angle displays. The visual feedback shall be shown as the background of the angle values. All these requirements put together, an axis control widget for a single joint or axis could look like depicted in Figure \ref{fig:axiscontrol}. To each control widget, a heading will be added to unambiguously denote which axis or joint will be controlled when using the corresponding buttons.
+
+Multiple of these widgets shall be added to the axis control screen, one for each controllable joint or axis. This will result in a screen containing 29 of these (22 DOF of the hand, 7 if the robot arm). To get an idea of how the control screen for individual joint control will look like, refer to Figure \ref{fig:axiscontrol:screen}\footnote{Please note that the number of hinted joint control widgets does not resemble the actual number of controllable joints for each part of the robot.}. 
+
+\begin{figure}
+	\caption{\label{fig:axiscontrol:screen}Axis control screen draft}
+	\frame{\includegraphics[width=0.8\textwidth]{assets/chpt_concepts/AxisControlPage}}
+\end{figure}
 
 \section{LWR Robotic Arm Control}
 \label{sec:robotarm:ctrl}
@@ -38,6 +79,7 @@ On all screens where the robot can be remotely operated, a security interlock bu
 \section{Touch Parsing}
 
 \subsection{Grasp Synergies}
+\label{sec:synergies}
 
 \subsection{Direct Fingertip Positioning}
 
