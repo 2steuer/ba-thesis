@@ -62,25 +62,22 @@ Within this interface, the currently measured joint angle shall be displayed for
 
 The buttons to move the axis shall be displayed right and left of the angle displays. The visual feedback shall be shown as the background of the angle values. All these requirements put together, an axis control widget for a single joint or axis could look like depicted in Figure \ref{fig:axiscontrol}. To each control widget, a heading will be added to unambiguously denote which axis or joint will be controlled when using the corresponding buttons.
 
-Multiple of these widgets shall be added to the axis control screen, one for each controllable joint or axis. This will result in a screen containing 29 of these (22 DOF of the hand, 7 if the robot arm). To get an idea of how the control screen for individual joint control will look like, refer to Figure \ref{fig:axiscontrol:screen}\footnote{Please note that the number of hinted joint control widgets does not resemble the actual number of controllable joints for each part of the robot.}. 
+Multiple of these widgets shall be added to the axis control screen, one for each controllable joint or axis. This will result in a screen containing 29 of these (22 for the hand, 7 for the robot arm). To get an idea of how the control screen for individual joint control will look like, refer to Figure \ref{fig:axiscontrol:screen}\footnote{Please note that the number of hinted joint control widgets does not resemble the actual number of controllable joints for each part of the robot.}. 
 
 \begin{figure}
 	\caption{\label{fig:axiscontrol:screen}Axis control screen draft}
 	\frame{\includegraphics[width=0.8\textwidth]{assets/chpt_concepts/AxisControlPage}}
 \end{figure}
 
-\section{LWR Robotic Arm Control}
+\section{Using the BioIK Service}
 \label{sec:robotarm:ctrl}
 
 \section{Grasp Synergies}
 
-\section{Direct Fingertip Positioning}
+\subsection{Touch Gestures}
 
-\section{Touch Parsing}
+\subsection{Arm Control}
 
-\subsection{Grasp Synergies}
-\label{sec:synergies}
-
-\subsection{Direct Fingertip Positioning}
+\section{Direct Fingertip Mapping}
 
 \section{Software Architecture}
