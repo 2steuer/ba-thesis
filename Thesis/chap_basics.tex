@@ -27,8 +27,62 @@ The package \textit{rosandroid}\footnote{\url{https://github.com/rosjava/android
 
 \textit{rosandroid} is designed for the newest versions of Android, which leads to the fact that a small change has to be made in the code to make it compatible with older versions of Android, too. These changes are described in Chapter \ref{impl:compiling_rosandroid}.
 
+\subsection{Using services in rosjava}
+
+The implementation of how to consume (i.e. call) services is a little different in rosjava than it is in roscpp\footnote{roscpp is the C++ implementation of ROS}, which is why the main differences will be shortly elaborated here. To call services, special ROS messages are exchanged. These so-called \textit{service message types} consist of a request and a response part. While in C++ one object containing both the request and the response object is passed to the \textit{service client} and having the service client fill out the response part\cite{ros:serviceclient}, in other implementations like \textit{rospy} or \textit{rosjava} these messages are separated.
+
+To create a \textit{service client} in rosjava, an instance of 
+
+\begin{lstlisting}[numbers=none]
+org.ros.node.service.ServiceClient
+\end{lstlisting}
+
+is created within the node's \textit{onStart} callback, passing the name of the service node and the service message types. Listing \ref{lst:rosservice} demonstrates how such a start-up routine could look like.
+
+\begin{lstlisting}[caption={Example on how to connect to a ROS service in rosjava},label=lst:rosservice]
+@Override
+public void onStart(ConnectedNode connectedNode) {
+// ....
+	try {
+		ikService = connectedNode.newServiceClient("/bio_ik/get_bio_ik", bio_ik_msgs.GetIK._TYPE);
+	} catch (ServiceNotFoundException e) {
+		ikService = null;
+		e.printStackTrace();
+	}	
+// ....
+}
+\end{lstlisting}
+
+In \textit{rosjava} no such method like the \textit{Ros::waitForService()} method in C++ is present\footnote{Albeit requested by multiple users, like in \url{https://github.com/rosjava/rosjava_core/issues/105}}. As rosjava is designed in a way that one application can implement multiple ROS nodes a blocking call to the above method would cause the rest of the application to stop working, which is probably why the developers of rosjava have decided to not implement it. In rosandroid applications, a blocking wait-call would cast the user interface unresponsive and thus unusable. Developers have to make sure that, in the time a node starts, the service it wants to consume is already registered with the \textit{ROS Master}.
+
+Once the \textit{ServiceClient} is created it can be used by creating a new request message. Confusingly, request and response message types are separated in service calls, while the combined message type is passed to the \textit{newServiceClient} method. An example service call is presented in Listing \ref{lst:servicecall}.
+
+\begin{lstlisting}[caption={An example rosjava service call}, label=lst:servicecall]
+bio_ik_msgs.GetIKRequest greq = ikService.newMessage();
+IKRequest req = greq.getIkRequest();
+// ... fill in the request parameters into the req object ...
+
+ikService.call(greq, new ServiceResponseListener<GetIKResponse> {
+	@Override
+	public void onSuccess(GetIKResponse getikResponse) {
+		// Handle service response
+	}
+	
+	@Override
+	public void onFailure(RemoteException e) {
+		// Handle service error
+	}
+});
+\end{lstlisting}
+
+Two things are important to note here. Firstly, the messages exchanged are not \textit{IKRequest} and \textit{IKResponse} as the names would suggest, but \textit{GetIKResponse} and \textit{GetIKRequest}, which are created automatically by the rosjava message generator. The latter service messages then contain the corresponding former message types. This is one main difference in calling ROS services between Java and C++ implementations. Secondly, the service response is processed non-blocking, meaning it is asynchronously passed to the listener object implementing  the 
+\begin{lstlisting}[numbers=none]
+org.ros.node.service.ServiceResponseListener
+\end{lstlisting}
+interface. Busy-waiting service calls are not implemented in rosjava, most probably for the same reasons that busy-waiting for services to come up have not been implemented. This asynchrony is the second main difference developers used to \textit{roscpp} have to get used to when switching over to \textit{rosjava}.
+
 \section{The Shadow C5 Robotic Hand}
-% FOTO DER HAND
+% TODO FOTO DER HAND
 The \textit{Shadow C5 Robotic Hand} was developed by the \textit{Shadow Company}. It is designed to be as similar to a human hand as possible\cite{web:robothand:spec} in terms of force output, movement speed and movement sensitivity. It has 24 degrees-of-freedom, all controlled by 48 pneumatic muscles. These muscles, when pressurized, contract a little, applying force to the elements of the mechanical hand over imitated tendons. The developers tried to design the product as close to the average human forearm as they could. It weighs about 4kg and has a maximum movement speed of about half the speed at the joints a human could reach. The pneumatic muscles work with a pressure of 3.5 bar and having a maximum flow of 24 litres per minute, resulting in the need of a relatively powerful air compressor and air pipe system installed near the hand. Joint angles of all joints (controllable as well as non-controllable) are measured by hall-sensors at an accuracy of 0.2 degrees.
 A similar robotic hand powered by electrical motors instead of pneumatic muscles is also present at the TAMS group at the University of Hamburg. This thesis will, however, mainly work with the pneumatic powered hand. 
 
@@ -75,6 +129,9 @@ The two important topics used throughout this thesis are denoted in Table \ref{t
 	\end{tabularx}
 \end{table}
 
+\section{The Kuka Lightweight Robot Arm}
+% TODO Foto vom Arm und Beschreibung
+
 \section{Inverse Kinematics}
 
 Inverse kinematics is one of the challenging fields in many applications like robotics or computer animations\cite{Starke2017}. To understand what inverse kinematics is it is important to look at a robot (or e.g. animated figures in video games) from two different points of view. The normal viewer would describe the position and pose of a robot or effector in his own coordinate system, usually in Cartesian coordinates. This position can be described as an $n$-dimensional vector $X$. To describe movement of the robot, the viewer would then tell a difference between the new and the old position vectors $X_{new}-X=\Delta X$. A robot, however, often cannot move in Cartesian space, as it's kinematic chain (i.e. the parts of the robot connected by rotational or translational joints) can have $m$ degrees-of-freedom (DOF) with $m > n$. The position in the so-called \textit{joint-space} is referred to as $\theta$. To control such a robot with a high number of DOF, the controller has to be aware of the current position of the robot in Cartesian space $X$, the desired position change $\Delta X$ and the change in joint-space $\Delta \theta$ that has to be applied to the current position in joint space $\theta$. $\theta$ is known by the current state of the robot, finding $X$ is done by applying \textit{forward-kinematics} to $\theta$:
@@ -102,7 +159,7 @@ Many approaches to this problem have come up during the years. \citeauthor{andre
 BioIK is the name of a newly developed algorithm for inverse kinematics at the TAMS research group at the University of Hamburg\cite{Starke2017}. BioIK is a multi-goal evolutionary algorithm. This means in particular, that it accepts goals for multiple end-effectors in a kinematic chain whereas most other algorithms only accept one goal for one end-effector. This makes the algorithm especially suitable for highly articulated robots and models like humanoids\cite{Starkea2017}. Being an evolutionary algorithm means that solutions are created using predecessors and applying random mutation to a solution. Solutions of the algorithm are then classified by a fitness function, while good solutions remain within the so-called genom and bad solutions are not used for further evolutions\cite{Ruppel17} - similar to the so-called and name-giving real-world evolution. Within this thesis BioIK is used to calculate joint angles for given robot poses. The big advantage of BioIK is that it accepts multiple goals, i.e. one goal for every fingertip, and calculates corresponding joint positions based on the given goals.
 
 \subsubsection{Integration into ROS}
-Philipp Ruppel integrated BioIK into ROS during his Master Thesis. He integrated the BioIK solver into \textit{MoveIt!}, which is a motion planning framework integrated into ROS\cite{Coleman15}. Using \textit{MoveIt!} it is possible to plan motions and poses of robots from just calculating a pose of a robot to plan full motion trajectories from one pose to another while avoiding obstacles and collisions.
+Philipp Ruppel integrated BioIK into ROS during his Master Thesis\cite{Ruppel17}. He integrated the BioIK solver into \textit{MoveIt!}, which is a motion planning framework integrated into ROS\cite{Coleman15}. Using \textit{MoveIt!} it is possible to plan motions and poses of robots from just calculating a pose of a robot to plan full motion trajectories from one pose to another while avoiding obstacles and collisions.
 
 In addition to the functionality directly calling \textit{MoveIt!} interfaces from C++ a ROS service was implemented to get IK solutions from BioIK over a ROS service from arbitrary nodes - especially from non-C++ nodes like ones written in Java (rosjava, rosandroid) or Python (rospy)\footnote{The implementation of the ROS BioIK Service can be found at \url{https://gogs.crossmodal-learning.org/philipp.ruppel/bio_ik_service}}. 
 Having this BioIK ROS service available makes it relatively easy to get IK solutions within nodes separated from \textit{MoveIt!} which is why it will be used within this thesis to request joint positions for given robot poses within the developed Android application. The process of integrating the service into the application (i.e. requesting joint angles for given robot poses) is described in Chapter \ref{sec:robotarm:ctrl}.
