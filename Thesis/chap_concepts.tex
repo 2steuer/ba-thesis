@@ -81,7 +81,7 @@ The BioIK serivce (see Section \ref{sec:bioik}) is used according to the descrip
 	\item \textbf{IKResponse} The actual response data
 \end{itemize}
 
-In the process of getting joint data from the BioIK service, the message types \textit{IKRequest} and \textit{IKResponse} are most important, as they contain the data needed on both sides. Both of them are message types containing a big number of members, only those significant for this thesis will be discussed within this section.
+In the process of getting joint data from the BioIK service, the message types \textit{IKRequest} and \textit{IKResponse} are most important, as they contain the data needed on both sides. As the used message types contain a large number of members, only those significant for this thesis will be discussed within this section.
 
 \begin{table}
 	\caption{Important contents of the IKRequest message type\label{tab:msg:ikrequest}}
@@ -99,20 +99,32 @@ In the process of getting joint data from the BioIK service, the message types \
 		\hline
 		string[] fixed\_joints & Names of the joints the IK solver shall not move while looking for solutions. \\
 		\hline
+		bool avoid\_collisions & If true, the BioIK solver tries to find solutions that to not collide with the environment (and the robot itself). \\
+		\hline
+		RobotState robot\_state & The current state of the robot. Contains a JointState message containing the current joint angles of all joints. These values are taken as a starting point while searching for solutions. \\
+		\hline
+		PositionGoal[] position\_goals & The positions of multiple end-effectors that shall be reached with the IK solution. \\
+		\hline
+		PoseGoal[] pose\_goals & The poses of multiple end-effectors that shall be reached with the IK solution. A pose goal is similar to a position goal, but extends it by a desired orientation. \\
+		\hline
+		OrientationGoal orientation\_goals & The orientations multiple end-effectors shall have within the IK solution. \\
+		\hline
 	\end{tabularx}
 \end{table}
 
 \begin{table}
 	\caption{Important contents of the IKResponse message type\label{tab:msg:ikresponse}}
+	\begin{tabularx}{\linewidth}{|l|X|}
+		\hline
+		\textbf{field} & \textbf{Description} \\
+		\hline
+		MoveItErrorCodes error\_code & An error code stating if a solution was found or not. 0 indicates success, whereas all other values indicate that no solution was found. \\
+		\hline
+		RobotState solution & If error\_code is 0, this field contains the found solution encoded in a JointState field with an angle for every joint. \\
+		\hline
+	\end{tabularx}
 \end{table}
 
-\begin{table}
-	\caption{Contents of the PoseGoal message type\label{tab:msg:posegoal}}
-\end{table}
-
-\begin{table}
-	\caption{Contents contents of the PositionGoal message type\label{tab:msg:positiongoal}}
-\end{table}
 
 \section{Grasp Synergies}
 
