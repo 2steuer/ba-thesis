@@ -28,8 +28,8 @@ The package \textit{rosandroid}\footnote{\url{https://github.com/rosjava/android
 \textit{rosandroid} is designed for the newest versions of Android, which leads to the fact that a small change has to be made in the code to make it compatible with older versions of Android, too. These changes are described in Chapter \ref{impl:compiling_rosandroid}.
 
 \subsection{Using services in rosjava}
-
-The implementation of how to consume (i.e. call) services is a little different in rosjava than it is in roscpp\footnote{roscpp is the C++ implementation of ROS}, which is why the main differences will be shortly elaborated here. To call services, special ROS messages are exchanged. These so-called \textit{service message types} consist of a request and a response part. While in C++ one object containing both the request and the response object is passed to the \textit{service client} and having the service client fill out the response part\cite{ros:serviceclient}, in other implementations like \textit{rospy} or \textit{rosjava} these messages are separated.
+\label{sec:using_services}
+The implementation of how to consume (i.e. call) services is a little different in rosjava than it is in roscpp\footnote{roscpp is the C++ implementation of ROS}, which is why the main differences will be briefly be elaborated here. To call services, special ROS messages are exchanged. These so-called \textit{service message types} consist of a request and a response part. While in C++ one object containing both the request and the response is passed to the \textit{service client} which then fills out the response part\cite{ros:serviceclient}, in other implementations like \textit{rospy} or \textit{rosjava} these messages are separated.
 
 To create a \textit{service client} in rosjava, an instance of 
 
@@ -53,7 +53,7 @@ public void onStart(ConnectedNode connectedNode) {
 }
 \end{lstlisting}
 
-In \textit{rosjava} no such method like the \textit{Ros::waitForService()} method in C++ is present\footnote{Albeit requested by multiple users, like in \url{https://github.com/rosjava/rosjava_core/issues/105}}. As rosjava is designed in a way that one application can implement multiple ROS nodes a blocking call to the above method would cause the rest of the application to stop working, which is probably why the developers of rosjava have decided to not implement it. In rosandroid applications, a blocking wait-call would cast the user interface unresponsive and thus unusable. Developers have to make sure that, in the time a node starts, the service it wants to consume is already registered with the \textit{ROS Master}.
+In \textit{rosjava} no such method like \textit{Ros::waitForService()} (in C++) is present\footnote{Albeit requested by multiple users, like in \url{https://github.com/rosjava/rosjava_core/issues/105}}. As rosjava is designed in a way that one application can implement multiple ROS nodes, a blocking call to the above method would cause the rest of the application to stop working, which is probably the reason why the developers of rosjava have decided not to implement it. In rosandroid applications, a blocking wait-call would cast the user interface unresponsive and thus unusable. Developers have to make sure that, in the time a node starts, the service it wants to consume is already registered with the \textit{ROS Master}.
 
 Once the \textit{ServiceClient} is created it can be used by creating a new request message. Confusingly, request and response message types are separated in service calls, while the combined message type is passed to the \textit{newServiceClient} method. An example service call is presented in Listing \ref{lst:servicecall}.
 
@@ -79,7 +79,7 @@ Two things are important to note here. Firstly, the messages exchanged are not \
 \begin{lstlisting}[numbers=none]
 org.ros.node.service.ServiceResponseListener
 \end{lstlisting}
-interface. Busy-waiting service calls are not implemented in rosjava, most probably for the same reasons that busy-waiting for services to come up have not been implemented. This asynchrony is the second main difference developers used to \textit{roscpp} have to get used to when switching over to \textit{rosjava}.
+interface. Busy-waiting service calls are not implemented in rosjava, most probably for the same reasons that busy-waiting for services to come up have not been implemented. This asynchrony is the second main difference developers accustomed to \textit{roscpp} have to get used to when switching over to \textit{rosjava}.
 
 \section{The Shadow C5 Robotic Hand}
 % TODO FOTO DER HAND
@@ -155,7 +155,7 @@ Many approaches to this problem have come up during the years. \citeauthor{andre
 \end{figure}
 
 \subsection{BioIK}
-
+\label{sec:bioik}
 BioIK is the name of a newly developed algorithm for inverse kinematics at the TAMS research group at the University of Hamburg\cite{Starke2017}. BioIK is a multi-goal evolutionary algorithm. This means in particular, that it accepts goals for multiple end-effectors in a kinematic chain whereas most other algorithms only accept one goal for one end-effector. This makes the algorithm especially suitable for highly articulated robots and models like humanoids\cite{Starkea2017}. Being an evolutionary algorithm means that solutions are created using predecessors and applying random mutation to a solution. Solutions of the algorithm are then classified by a fitness function, while good solutions remain within the so-called genom and bad solutions are not used for further evolutions\cite{Ruppel17} - similar to the so-called and name-giving real-world evolution. Within this thesis BioIK is used to calculate joint angles for given robot poses. The big advantage of BioIK is that it accepts multiple goals, i.e. one goal for every fingertip, and calculates corresponding joint positions based on the given goals.
 
 \subsubsection{Integration into ROS}

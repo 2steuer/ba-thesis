@@ -30,12 +30,12 @@ On all screens where the robot can be remotely operated, a security interlock bu
 
 \subsection{Grasp Synergy Screens}
 
-\begin{wrapfigure}{l}{0.6\textwidth}
+\begin{wrapfigure}[12]{l}{0.6\textwidth}
 	\caption{\label{fig:screen:synergy}Synergy control screen}
 	\includegraphics[width=0.6\textwidth]{assets/chpt_concepts/grasp_synergy_page}
 \end{wrapfigure}
 
-As the control of grasp synergies allows multiple different types of synergies to be selected, a drop-down selection of the synergy shall be displayed to the left side of the screen. This keeps the right side of the screen clear for better operability by right-hand users. Additionally, a cross of lines shall be displayed on the screen so the user knows where the middle of the touch interaction area is. As described later, this mainly is important in the approach with absolute synergy control (See Chapter \ref{sec:synergies}). To give the user some information about the state of a synergy, the values of significant amplitudes applied to the synergy shall also be displayed on the left hand side of the screen. A button to set the hand into the synergy's idle state (i.e. all significant amplitudes set to $0$) is also sensible to be implemented. A sample of how this screen could look like is demonstrated in Figure \ref{fig:screen:synergy}.
+As the control of grasp synergies allows multiple different types of synergies to be selected, a drop-down selection of the synergy shall be displayed to the left side of the screen. This keeps the right side of the screen clear for better operability by right-hand users. Additionally, a cross of lines shall be displayed on the screen so the user knows where the middle of the touch interaction area is. As described later, this is particularly important in the approach with absolute synergy control (See Chapter \ref{sec:synergies:absolute}). To give the user some information about the state of a synergy, the values of significant amplitudes applied to the synergy shall also be displayed on the left hand side of the screen. A button to set the hand into the synergy's idle state (i.e. all significant amplitudes set to $0$) is also sensible to be implemented. A sample of how this screen could look like is demonstrated in Figure \ref{fig:screen:synergy}.
 
 \subsection{Direct Fingertip Mapping Screen}
 
@@ -50,7 +50,7 @@ As there are no additional controls required to control the direct fingertip map
 	\includegraphics[width=0.4\textwidth]{assets/chpt_concepts/AxisControlRed}
 \end{wrapfigure}
 
-An interface shall be implemented to give users the ability to control each joint of the robot individually. This is sensible for a variety of reasons. Firstly, it might sometimes be required to move the robot out of a specific state by moving just one axis and not by applying multiple changes at once. Possible scenarios for this use case could be a state where the robot could harm users or the environment if uncontrolled or unpredictable movement happens. An interface to control joints individually is also very practical for testing purposes, for example if one part of the robot is suspiciously broken.
+An interface shall be implemented to give users the ability to control each joint of the robot individually. This is sensible for a variety of reasons. Firstly, it might sometimes be required to move the robot out of a specific state by moving just one axis and not by applying multiple changes at once. Possible scenarios for this use case could be a state where the robot could harm users or the environment if uncontrolled or unpredictable movements occur. An interface to control joints individually is also very practical for testing purposes, for example if one part of the robot is suspected to be broken.
 
 Within this interface, the currently measured joint angle shall be displayed for each joint, next to the currently set target value (printed in bold). This gives the user a good insight of what state the robot should be in according to the program and what state it is actually in. This shall be supported by a coloured indicator, giving a quick visual feedback on the difference of the target and actual joint angles $\Delta \alpha = |\alpha_{actual} - \alpha_{target}|$. The colours of the visual feedback shall be:
 
@@ -72,13 +72,58 @@ Multiple of these widgets shall be added to the axis control screen, one for eac
 \section{Using the BioIK Service}
 \label{sec:robotarm:ctrl}
 
+The BioIK serivce (see Section \ref{sec:bioik}) is used according to the description in Section \ref{sec:using_services}. The important messages types are:
+\begin{itemize}
+	\item \textbf{GetIK} The combined Request/Response service message type
+	\item \textbf{GetIKRequest} The message type containing the request to the service
+	\item \textbf{GetIKResponse} The message type containing the response of the service
+	\item \textbf{IKRequest} The actual request data
+	\item \textbf{IKResponse} The actual response data
+\end{itemize}
 
+In the process of getting joint data from the BioIK service, the message types \textit{IKRequest} and \textit{IKResponse} are most important, as they contain the data needed on both sides. Both of them are message types containing a big number of members, only those significant for this thesis will be discussed within this section.
+
+\begin{table}
+	\caption{Important contents of the IKRequest message type\label{tab:msg:ikrequest}}
+	\begin{tabularx}{\linewidth}{|l|X|}
+		\hline
+		\textbf{Field} & \textbf{Description} \\
+		\hline
+		string group\_name & The MoveGroup name of the robot. Fixed to \textit{lwr\_with\_c5hand} here \\
+		\hline
+		bool approximate & If true, an approximate solution is returned when no exact solution could be found by the IK solver \\
+		\hline
+		duration timeout & The timeout after which the solver stops looking for solutions. If no solution was found by then, an approximate solution is returned if approximate is true, otherwise no solution is returned. Fixed to one second here. \\
+		\hline
+		int32 attempts & Number of attempts the solver shall take. Fixed to 1 here. \\
+		\hline
+		string[] fixed\_joints & Names of the joints the IK solver shall not move while looking for solutions. \\
+		\hline
+	\end{tabularx}
+\end{table}
+
+\begin{table}
+	\caption{Important contents of the IKResponse message type\label{tab:msg:ikresponse}}
+\end{table}
+
+\begin{table}
+	\caption{Contents of the PoseGoal message type\label{tab:msg:posegoal}}
+\end{table}
+
+\begin{table}
+	\caption{Contents contents of the PositionGoal message type\label{tab:msg:positiongoal}}
+\end{table}
 
 \section{Grasp Synergies}
 
 \subsection{Touch Gestures}
 
 \subsection{Arm Control}
+
+\subsection{Absolute Approach}
+\label{sec:synergies:absolute}
+
+\subsection{Relative Approach}
 
 \section{Direct Fingertip Mapping}
 
