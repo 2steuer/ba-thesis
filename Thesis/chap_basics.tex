@@ -82,6 +82,7 @@ org.ros.node.service.ServiceResponseListener
 interface. Busy-waiting service calls are not implemented in rosjava, most probably for the same reasons that busy-waiting for services to come up have not been implemented. This asynchrony is the second main difference developers accustomed to \textit{roscpp} have to get used to when switching over to \textit{rosjava}.
 
 \section{The Shadow C5 Robotic Hand}
+\label{sec:shadowhand}
 % TODO FOTO DER HAND
 The \textit{Shadow C5 Robotic Hand} was developed by the \textit{Shadow Company}. It is designed to be as similar to a human hand as possible\cite{web:robothand:spec} in terms of force output, movement speed and movement sensitivity. It has 24 degrees-of-freedom, all controlled by 48 pneumatic muscles. These muscles, when pressurized, contract a little, applying force to the elements of the mechanical hand over imitated tendons. The developers tried to design the product as close to the average human forearm as they could. It weighs about 4kg and has a maximum movement speed of about half the speed at the joints a human could reach. The pneumatic muscles work with a pressure of 3.5 bar and having a maximum flow of 24 litres per minute, resulting in the need of a relatively powerful air compressor and air pipe system installed near the hand. Joint angles of all joints (controllable as well as non-controllable) are measured by hall-sensors at an accuracy of 0.2 degrees.
 A similar robotic hand powered by electrical motors instead of pneumatic muscles is also present at the TAMS group at the University of Hamburg. This thesis will, however, mainly work with the pneumatic powered hand. 
@@ -131,6 +132,35 @@ The two important topics used throughout this thesis are denoted in Table \ref{t
 
 \section{The Kuka Lightweight Robot Arm}
 % TODO Foto vom Arm und Beschreibung
+
+The robotic arm used in the set-up is a \textit{Lightweight Robot 4+} by the German company \textit{KUKA Roboter Gmbh}. It has 7 degrees-of-freedom, allowing it to operate in a space as big as approximately $1.8m^3$\cite{Lwr2010}. All joints can be used in ranges of $\pm 170$ or $\pm 120$ degrees. The robot is controlled by a dedicated computer supplied with it. Connected to the computer is an external control interface, which allows basic operations of the robot.
+
+\subsection{Integration into ROS}
+
+To control the robot using ROS a special application has to be launched on the control computer of the robot. This application is called \textit{FRI} (\textit{Fast Research Interface}) and is supplied by the KUKA company\cite{Fri2010}. When this was successful, a special ROS node has to be started on another computer within the same network. This node is called \textit{ros\_fri}. Then messages can be sent to the robot by publishing messages of the type \textit{ros\_fri\_msgs/RMLPositionInputParameters} to the topic:
+\begin{lstlisting}[numbers=none]
+/lwr/jointPositionGoal
+\end{lstlisting}
+
+The contents of the message type are described in Table \ref{tab:frimsg}. When such a message is received by the FRI application the robot will immediately start to move to the given position. The arrays in the message all have to have the correct number of entries (i.e. 7, one for each joint). If no value shall be set, a zero value has to be inserted anyway.
+
+
+\begin{table}
+	\caption{\label{tab:frimsg}Contents of the RMLPositionInputParameters message type}
+	\begin{tabularx}{\linewidth}{|l|X|}
+		\hline
+		\textbf{Field} & \textbf{Description} \\
+		\hline
+		double[] target\_position\_vector & Desired target positions of all joints in radians. \\
+		\hline
+		double[] target\_velocity\_vector & Desired movement velocities of all joints. \\
+		\hline
+		double[] max\_acceleration\_vector & Maximum allowed acceleration for all joints. \\
+		\hline
+		double[] max\_velocity\_vector & Maximum movement velocity allowed for each joint. \\
+		\hline
+	\end{tabularx}
+\end{table}
 
 \section{Inverse Kinematics}
 
