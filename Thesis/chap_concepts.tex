@@ -197,6 +197,36 @@ o(G) = acos\left(\frac{(c(G) - th(G)) \cdot b_y}{|c(G) - th(G)| \cdot |b_y|}\rig
 
 In other words the orientation of a gesture is the angle between the vector from the thumb pointer to the position of a gesture and $b_y$, which is pointing upwards in screen coordinates as, again $y$ is growing downwards.
 
+\subsubsection{Example}
+
+\begin{figure}
+	\caption{\label{fig:touch:expl}Example gesture with 3 pointers}
+	\includegraphics{assets/chpt_concepts/gestures/3pointers_blank.pdf}
+\end{figure}
+
+The above definitions will be briefly elaborated with an example of a gesture with 3 pointers. Figure \ref{fig:touch:expl} shows the example gesture. First, the position of the gesture is calculated:
+
+\begin{equation*}
+c(G) = \frac{1}{3}\left( \vectwo{400}{800} + \vectwo{440}{200} + \vectwo{520}{300} \right) \approx \vectwo{453.3}{433.2}
+\end{equation*}
+
+The size of the gesture is
+
+\begin{align*}
+s(G) &= \frac{2}{3}\left( d(c(G), p_1) + d(c(G), p_2) + d(c(G), p_3) \right) \\
+&= \frac{2}{3}\left( \left|c(G) - p_1\right| + \left| c(G) - p_2 \right| + \left| c(G) - p_3 \right| \right) \\
+&= \frac{2}{3}\left( \left| \vectwo{53.3}{-376.8} \right| + \left| \vectwo{13.3}{233.2} \right| + \left| \vectwo{-66.7}{133.2} \right| \right)	\\
+&\approx \frac{2}{3}\left( 380.6 + 233.6 + 147 \right)\\
+&\approx 508.8
+\end{align*}
+
+From the above calculation it can be seen that $p_1$ has the biggest distance to the position of the gesture, that implicates $th(G) = p_1$ as $G$ has more than 2 pointers. Figure \ref{fig:touch:expl_res} shows the example gesture extended with the position of the gesture and a circle with the diameter of the gesture size around the position of the gesture.
+
+\begin{figure}
+	\caption{\label{fig:touch:expl_res}Example gesture with center and size}
+	\includegraphics{assets/chpt_concepts/gestures/3pointers_center.pdf}
+\end{figure}
+
 \subsection{Absolute Approach}
 \label{sec:synergies:absolute}
 
