@@ -220,12 +220,22 @@ s(G) &= \frac{2}{3}\left( d(c(G), p_1) + d(c(G), p_2) + d(c(G), p_3) \right) \\
 &\approx 508.8
 \end{align*}
 
-From the above calculation it can be seen that $p_1$ has the biggest distance to the position of the gesture, that implicates $th(G) = p_1$ as $G$ has more than 2 pointers. Figure \ref{fig:touch:expl_res} shows the example gesture extended with the position of the gesture and a circle with the diameter of the gesture size around the position of the gesture.
+Figure \ref{fig:touch:expl_res} shows the example gesture extended with the position of the gesture and a circle with the diameter of the gesture size around the position of the gesture. From the above calculation it can be seen that $p_1$ has the biggest distance to the position of the gesture, that implicates $th(G) = p_1$ as $G$ has more than 2 pointers. With this we can calculate the orientation of the gesture as follows.
+
+\begin{align*}
+o(G) &= acos\left( \frac{\vectwo{53.3}{-376.8} \cdot \vectwo{0}{-1}}{380.6 \cdot 1} \right) = acos\left( \frac{376.8}{380.6} \right) \\
+&\approx acos\left( 0.99002 \right) \\
+&\approx 0.141398 \widehat{\approx} 8.101 ^\circ
+\end{align*}
+
+$G$ has an orientation relativ to the $y$ axis from about $8.1^\circ$.
 
 \begin{figure}
 	\caption{\label{fig:touch:expl_res}Example gesture with center and size}
 	\includegraphics{assets/chpt_concepts/gestures/3pointers_center.pdf}
 \end{figure}
+
+
 
 \subsection{Absolute Approach}
 \label{sec:synergies:absolute}
