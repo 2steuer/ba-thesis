@@ -129,17 +129,80 @@ When the BioIK service has finished it returns a \textit{IKResponse} (Table \ref
 	\end{tabularx}
 \end{table}
 
-
 \section{Grasp Synergies}
+
+In their work, \citeauthor{Bernardino2013} describe a way to record hand postures using a data glove and the Shadow C5 robotic hand. The result of their research are data recorded for 8 different grasp postures of the human hand \cite{Bernardino2013}. Using \textit{Principal Component Analysis (PCA)} the datasets for each posture were parametrized. This process resulted in a matrix $S = (s_1 \dots s_M)$ for each grasp posture with $s_m$ being the eigenvectors of the parametrized grasp postures. For each posture $s_0$ is the mean value of all recorded posture data sets, defining the rest position of the hand within this posture. To get joint angles from these synergy matrices, they have to be multiplied by a vector $\alpha = (\alpha_1 \dots \alpha_M)$ containing the so-called amplitudes for each parameter. For a given synergy matrix and amplitude vector $\alpha \in \mathbb{R}^N$, the joint angles $\theta$ are described as
+\begin{equation*}
+\theta = s_0 + S\alpha
+\end{equation*}
+
+$S$ is sorted in a way that changes to $\alpha_1, \alpha_2$ and $\alpha_3$ already cover approx. 80-90\% of the variance in the grasp postures recorded, which is why we will only look onto these three amplitudes when implementing the approach to grasping objects in this thesis.
+
+$s_0$ and $S$ are provided by the above research, $\theta_n \in \theta$ is given in degrees, $\alpha_n \in \alpha$ are $-50 \leq \alpha_n \leq 50$. A good way has to be found to map touch gestures in a way that the three most significant amplitudes can be intuitively controlled. 
 
 \subsection{Touch Gestures}
 
-\subsection{Arm Control}
+To find solutions to map touch gestures to synergy amplitudes, we first generalize the understanding of touch gestures.
+
+\begin{defn}
+Let $p = (p_x, p_y) \in \mathbb{R}^2$ be a pointer on a touch screen, i.e. the coordinates of a registered finger the user has laid onto the touch surface. Then a set of pointers $G = \{p_1\dots p_n\}$ with $|G| \geq 1$ is called a \textbf{gesture}.
+\end{defn}
+
+Although pointer positions on a touch screen are usually given in integer numbers, pointers are defined in real space to make the following definitions possible. After having defined gestures, we have a look at different properties of them. Firstly, the two most basic properties of a gesture are defined, being the \textbf{position} and the \textbf{size}.
+
+\begin{defn}
+	Let $G$ be a gesture.
+	
+\begin{itemize}
+	\item The \textbf{position} $c(G)$ of G is defined as
+	\begin{equation}
+	c(G) = \frac{1}{|G|}\sum_{i=1}^{|G|}p_i, p_i \in G
+	\end{equation}
+	
+	\item The \textbf{size} $s(G)$ of G is
+	\begin{equation}
+	s(G) = \frac{2}{|G|}\sum_{i=1}^{|G|} d(c(G), p_i)
+	\end{equation}
+	with $p_i \in G$ and $d(x, y) = \sqrt{(y_1 - x_1)^2 + (y_2 - x_2)^2}$ for $x, y \in \mathbb{R}^2$ the euclidian distance between two pointers.
+\end{itemize}
+\end{defn}
+
+In other words: The position of a gesture is the \textit{center of mass} of all pointers of a gesture. The size is the doubled mean distance of all pointers to the position of a gesture. Accordingly, the diameter of a circle having the radius of the mean distance of the pointers to the position of a gesture is the size. Before defining the last property of a gesture, the \textbf{orientation} we first have to define what the \textbf{thumb pointer} of a gesture is.
+
+\begin{defn}
+	The \textbf{thumb pointer} $th(G)$ of a gesture $G$ is defined as
+	\begin{equation}
+	th(G) = \left\{
+	\begin{array}{ll}
+	p_1 & |G| = 1 \\
+	p_n \text{ with } p_{ny} = max\{p_{iy} : p_i \in G\} & |G| = 2 \\
+	p_n \text{ with } d(c(G), p_n) = max\{ d(c(G), p_i) : p_i \in G \}& |G| > 2
+	\end{array}
+	\right.
+	\end{equation}
+	
+The thumb pointer shall be evaluated and memorized whenever $|G|$ changes, i.e. a pointer is added or removed from a gesture.
+\end{defn}
+
+Note that the $y$ coordinate is rising to the bottom, as it is usual on digital screens. Having this in mind the thumb pointer is the lowest pointer in a 2-pointer gesture or the one furthest away from the position of a gesture with 3 or more pointers. The last part of the definition is important, as the lowest pointer does not necessarily remain the lowest when the gesture is rotated on the screen, so to have a consistent definition of the orientation, the thumb pointer may only be evaluated when pointers are added or removed from a gesture.
+
+\begin{defn}
+	Let $G$ be a gesture, $b_y = (0, -1) \in \mathbb{R}^2$. The orientation $o(G)$ of $G$ is defined as
+	
+\begin{equation}
+o(G) = acos\left(\frac{(c(G) - th(G)) \cdot b_y}{|c(G) - th(G)| \cdot |b_y|}\right)
+\end{equation}	
+	
+\end{defn}
+
+In other words the orientation of a gesture is the angle between the vector from the thumb pointer to the position of a gesture and $b_y$, which is pointing upwards in screen coordinates as, again $y$ is growing downwards.
 
 \subsection{Absolute Approach}
 \label{sec:synergies:absolute}
 
 \subsection{Relative Approach}
+
+\subsection{Arm Control}
 
 \section{Direct Fingertip Mapping}
 
