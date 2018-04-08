@@ -228,17 +228,59 @@ o(G) &= acos\left( \frac{\vectwo{53.3}{-376.8} \cdot \vectwo{0}{-1}}{380.6 \cdot
 &\approx 0.141398 \widehat{\approx} 8.101 ^\circ
 \end{align*}
 
-$G$ has an orientation relativ to the $y$ axis from about $8.1^\circ$.
+$G$ has an angle relative to the $y$ axis from about $8.1^\circ$.
 
 \begin{figure}
 	\caption{\label{fig:touch:expl_res}Example gesture with center and size}
 	\includegraphics{assets/chpt_concepts/gestures/3pointers_center.pdf}
 \end{figure}
 
-
-
 \subsection{Absolute Approach}
 \label{sec:synergies:absolute}
+
+Within the absolute approach a solution shall be found to map the properties of one or more gestures to the different degrees of freedom of the hand synergy and the arm. To control the hand synergy, it is sensible to control all three significant amplitudes with just one gesture, so the user does not have to change the pointer count of the gesture while operating the hand. This is especially useful as it seems relatively difficult to position the fingers at the exact same place after hacing used another gesture. However, to reproduce a distinct position the pointers have to be placed at the exact same place on the screen.
+
+It is $c:G\rightarrow\mathbb{R}^2$, $s:G\rightarrow\mathbb{R}$ and $o:G\rightarrow\mathbb{R}$, which means if both components of the position are viewed separately it is possible to control as many as four DOF with just one gesture. As, for the hand posture synergies, we only want to control 3 DOF, considerations should be made which properties shall be taken into account for controlling the synergies. It seems best to choose those properties having the biggest range in value:
+\begin{itemize}
+	\item The $y$ component of the gesture position has a range of slightly less than the screen height
+	\item The $x$ component of the gesture position has a range of slightly less than the screen width
+	\item The orientation has a range of $2\pi$.
+	\item The gesture size has a range corresponding to the user's finger span, which should usually be around $\frac{2}{3}$ of the screen width
+\end{itemize}
+
+In first tests, it turned out complicated to have the position of a gesture remain at the same place in both axes while rotating it or changing its size, the $x$ component of the position is chosen as one DOF, since it is larger and thus it is possible to have more granular control on the amplitude's value.
+
+All mappings from gestures' properties to DOF values shall be done linearly. A general approach has to be found to create these linear functions for all DOF of the hand synergy as well as the arm.
+
+\subsubsection{Linear DOF mapping}
+
+There are multiple requirements for the function to find. Firstly, the linear equation shall be defined by two points $x, y \in \mathbb{R}^2$ with $x_1$ and $y_1$ being in gesture property's space and $x_2$, $y_2$ being in the corresponding DOF space (amplitude or arm position). Secondly, the output value shall be limited to the possible values of the DOF, for the synergies' amplitudes this will be $-50$ and $50$.
+
+It is to find a function $lm:(x \in \mathbb{R}^2, y \in \mathbb{R}^2, v_{min} \in \mathbb{R}, v_{max} \in \mathbb{R}, p \in \mathbb{R}) \rightarrow \mathbb{R}$ with the parameters being the two points the linear equation spans in between, the minimum and maximum output value and the value of the gesture property. It outputs the value that can then directly be passed into the DOF value.
+
+Finding the linear equation spanned between two points $x, y \in \mathbb{R}^2$ is relatively easy. Beginning from the general linear equation
+\begin{equation*}
+f(x) = m \cdot x + b
+\end{equation*}
+it is well known that
+
+\begin{align*}
+m &= \frac{y_2 - x_2}{y_1 - x_1} \\
+b &= x_2 - m \cdot x_1  \\
+&= x_2 - \frac{y_2 - x_2}{y_1 - x_1} \cdot x_1
+\end{align*}
+
+To clip a value $v$ to a minimum and maximum value $v_{min}$ and $v_{max}$ (with $v_{min} \leq v_{max}$) one $min$ and a $max$ operation have to be performed\footnote{If it's unknown which limiting value is greater, two $min$ and $max$ operations have to be performed: $clip(v_1, v_2, v) = max(min(v_1, v_2), min(v, max(v_1, v_2)))$}:
+
+\begin{equation*}
+clip(v_{min}, v_{max}, v) = max(v_{min}, min(v, v_{max}))
+\end{equation*}
+
+Combination of the linear equation and the $clip$ function results in\footnote{\textbf{lm} stands for linear mapping}:
+\begin{equation}
+\label{eq:lm}
+lm(x, y, v_{min}, v_{max}, p) = clip\left(v_{min}, v_{max}, \left( p \cdot \frac{y_2 - x_2}{y_1 - x_1} + x_2 - \frac{y_2 - x_2}{y_1 - x_1} \cdot x_1 \right)\right)
+\end{equation}
 
 \subsection{Relative Approach}
 
