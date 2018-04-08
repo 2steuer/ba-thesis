@@ -304,6 +304,38 @@ $\alpha_{1,2,3}$ are evaluated whenever a pointer's position within the gesture 
 
 \subsection{Relative Approach}
 
+Within the relative approach, the values of the significant amplitudes shall not depend on the actual properties of a gesture but on the change each property experiences. This makes it necessary to store the current value of the amplitudes and initialize them, e.g. with 0. Whenever a gesture changes, the difference of the properties is evaluated and mapped to a difference of the amplitude which is then applied.
+
+When a gesture's property changes, the last value of the property is stored into a temporary storage, for example for the position of the gesture:
+\begin{equation*}
+last(c(G)) = c(G)
+\end{equation*}
+
+When $c(G)$ changes the difference $\Delta c(G)$ then is
+
+\begin{equation*}
+\Delta c(G) = c(G) - last(c(G))
+\end{equation*}
+
+This applies for $s(G)$ and $o(G)$ accordingly. Now needed is a rate of change in the output value. This rate is given in $\frac{\text{value change}}{\text{property change}}$. If, for example, the value of an amplitude shall change by $c_v = 25$ every $c_p = 1000$ pixels the gesture is moved in one direction, the value would be $\frac{c_v}{c_p} = \frac{25}{1000} = 0.025$. For reasons of simplicity, $c_v$ and $c_p$ shall be passed to the relative change function\footnote{\textbf{rm} stands for relative mapping} $rm:(c_v \in \mathbb{R}, c_p \in \mathbb{R}, v_{min} \in \mathbb{R}, v_{max} \in \mathbb{R}, v_{old} \in \mathbb{R}, \Delta p \in \mathbb{R}) \rightarrow \mathbb{R}$. with $v_{old}$ being the previous value of the output and $\Delta p$ the change in the property that shall be applied. The output shall again be clipped to $v_{min}$ and $v_{max}$ with $v_{min} \leq v_{max}$.
+\begin{equation}
+rm(c_v, c_p, v_{min}, v_{max}, v_{old}, \Delta p) = max(v_{min}, min(v_{old} + \frac{c_v}{c_p} \cdot \Delta p, v_{max}))
+\end{equation}
+
+Updating the output value upon a changing gesture takes two steps, for example with amplitude $\alpha_1$:
+\begin{align*}
+\alpha_{1,new} &= rm(50, 1200, -50, 50, \alpha_1, \Delta s(G)) \\
+\alpha_1 &= \alpha_{1,new}
+\end{align*}
+
+For $\alpha_2$ and $\alpha_3$ the calls to $rm$ are accordingly:
+\begin{align*}
+\alpha_{2,new} &= rm(50, 1200, -50, 50, \alpha_2, (\Delta c(G))_1) \\
+\alpha_{3,new} &= rm(40, \pi, -50, 50, \alpha_3, \Delta o(G))
+\end{align*}
+
+Whether these values are well chosen and usable has to be evaluated during tests. When all amplitudes have been calculated the process of calculating the joint angles and publishing them is the same as in Section \ref{sec:synergies:absolute}.
+
 \subsection{Arm Control}
 
 \section{Direct Fingertip Mapping}
