@@ -338,6 +338,9 @@ Whether these values are well chosen and usable has to be evaluated during tests
 
 \subsection{Arm Control}
 
+Controlling the arm with touch gestures is not as easy as controlling the grasp synergies since the arm's joint angles have to be calculated using the BioIK service. The aim is to be able to move the arm in Cartesian coordinates using touch gestures, while the IK service calculates the corresponding joint angles in the background. Therefore, borders of movement for the arm have to be defined. As the arm's coordinate system has its origin on the ground below the arm's base (see Figure XY) % TODO Bild mit Koordinatensystem einfügen
+a set of minimum and maximum values for each axis have to be defined in which the arm may move. Using IK, the Shadow C5 hand's palm will be positioned. The palm's position will be influenced by touch gestures, the arm will then try to reach the desired position.
+
 \section{Direct Fingertip Mapping}
 
 \section{Software Architecture}
