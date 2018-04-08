@@ -132,9 +132,10 @@ When the BioIK service has finished it returns a \textit{IKResponse} (Table \ref
 \section{Grasp Synergies}
 
 In their work, \citeauthor{Bernardino2013} describe a way to record hand postures using a data glove and the Shadow C5 robotic hand. The result of their research are data recorded for 8 different grasp postures of the human hand \cite{Bernardino2013}. Using \textit{Principal Component Analysis (PCA)} the datasets for each posture were parametrized. This process resulted in a matrix $S = (s_1 \dots s_M)$ for each grasp posture with $s_m$ being the eigenvectors of the parametrized grasp postures. For each posture $s_0$ is the mean value of all recorded posture data sets, defining the rest position of the hand within this posture. To get joint angles from these synergy matrices, they have to be multiplied by a vector $\alpha = (\alpha_1 \dots \alpha_M)$ containing the so-called amplitudes for each parameter. For a given synergy matrix and amplitude vector $\alpha \in \mathbb{R}^N$, the joint angles $\theta$ are described as
-\begin{equation*}
+\begin{equation}
+\label{eq:syn}
 \theta = s_0 + S\alpha
-\end{equation*}
+\end{equation}
 
 $S$ is sorted in a way that changes to $\alpha_1, \alpha_2$ and $\alpha_3$ already cover approx. 80-90\% of the variance in the grasp postures recorded, which is why we will only look onto these three amplitudes when implementing the approach to grasping objects in this thesis.
 
@@ -281,6 +282,25 @@ Combination of the linear equation and the $clip$ function results in\footnote{\
 \label{eq:lm}
 lm(x, y, v_{min}, v_{max}, p) = clip\left(v_{min}, v_{max}, \left( p \cdot \frac{y_2 - x_2}{y_1 - x_1} + x_2 - \frac{y_2 - x_2}{y_1 - x_1} \cdot x_1 \right)\right)
 \end{equation}
+
+\subsubsection{Mappings}
+
+Let $w_{screen}$ be the width of the screen in pixels, $\alpha \in \mathbb{R}^N$ the vector of amplitudes for a selected synergy $S$, $G$ a gesture with $|G| = 2$. The proposed mappings for later implementation are:
+\begin{itemize}
+	\item $\alpha_1 = lm\left((1200, 50), (300, -50), -50, 50, s(G)\right)$
+	
+	As the size of a gesture is the property easiest to manipulate (with 2 pointers by the so-called pinch-zoom-movement) the amplitude with the biggest effect is assigned to it. The values of 1200 and 300 are chosen as 1200 is the size of a gesture with normally spanned fingers, 300 is the size of a gesture when the pointers are already relatively close. Values lower than 300 render the amplitude value of $-50$ of being unreachable, as pointers are perhaps not be able to be placed that close.
+	
+	\item $\alpha_2 = lm\left((w_{screen} \cdot 0.25, 50), (w_{screen} \cdot 0.75, -50), -50, 50, (c(G))_1\right)$
+	
+	For the second significant amplitude the $x$ component of the gesture position is chosen. It is mapped between $\frac{1}{4}$ and $\frac{3}{4}$ of the screen's width as the actual limits cannot be reached with gesture positions due to all pointers having to be at this border then.
+	
+	\item $\alpha_3 = lm\left( \left( -\frac{\pi}{2}, 50 \right), \left( \frac{\pi}{2}, -50 \right), -50, 50, o(G) \right)$
+	
+	For the third significant amplitude the orientation is mapped from $-90^\circ \widehat{=} -\frac{\pi}{2}$ to $90^\circ \widehat{=} \frac{\pi}{2}$. Rotations to values greater or less than these have shown to be only possible when moving the tablet or changing the gesture's size and position.
+\end{itemize}
+
+$\alpha_{1,2,3}$ are evaluated whenever a pointer's position within the gesture changes. Joint angle values are then calculated using (\ref{eq:syn}) with $S$ being the currently selected synergy. Once the joint values are calculated they can be published to the ROS nodes of the Shadow C5 hand.
 
 \subsection{Relative Approach}
 
