@@ -366,8 +366,24 @@ Controlling the arm with touch gestures is not as easy as controlling the grasp 
 
 In order to prevent damages to the robot or its environment, a \textit{bounding box} has to be found where the robot's movements do not cause any unwanted movements. Unwanted movements can occur since the shortest way from position $x$ to position $y$ may be very short in cartesian space, but still very long in joint coordinates. It is important to keep in mind, that for very close points, the BioIK service might output very different joint positions, as it assumes the new solution more fitting than the old one. This, however, results in a quite small work space for the robot compared to the overall table size. For the first approach, the limits for all 3 axes assumed \textit{safe} are denoted in Table \ref{tab:safeaxes}.
 
-To map touch interactions to positions of the hand's palm the same functions as in Sections \ref{sec:synergies:absolute} and \ref{sec:app:rel} are used with the clipping borders set to the safe axes' limits. As a starting point, the x axis is mapped to the x position of a three-pointer gesture, the z axis to the y position of a three-pointer gesture. As before, only half of each screen dimension will be mapped, leaving out a quarter on each end to make it easier to reach all limits. The y axis will later be mapped to another property of the three-pointer gesture or the position of a four-pointer gesture.
+To map touch interactions to positions of the hand's palm the same functions as in Sections \ref{sec:synergies:absolute} and \ref{sec:app:rel} are used with the clipping borders set to the safe axes' limits. As a starting point, the x axis is mapped to the x position of a three-pointer gesture, the z axis to the y position of a three-pointer gesture. As before, only half of each screen dimension will be mapped, leaving out a quarter on each end to make it easier to reach all limits. The y axis will later be mapped to another property of the three-pointer gesture or the position of a four-pointer gesture. Once the desired palm position was calculated it is passed to the BioIK service first, the resulting joint angles returned by the service are then passed to the robot.
 
 \section{Direct Fingertip Mapping}
+
+As \citeauthor{conf:humanoids:TohHLBZP12} state in their work, dexterous grasping and telemanipulation tasks frequently focus on precise control of fingertips in a plane surface\cite{conf:humanoids:TohHLBZP12}. They directly map fingertip positions from the touchscreen to a plane in the working space. As this approach seems interesting it shall also be implemented within this thesis as a third approach.
+
+In this approach heavy use of the BioIK service is made, as not only the position of the hand's palm will be given to the service as a goal, but potentially up to 5 positions for each fingertip will be passed. For the first approach only 3 fingertips shall be usable by the functionality. To find out which positions in three-dimensional space shall be passed for the fingertips, we first have to define a plane the fingertips shall be placed on in three-dimensional space. This is done using the parametrized form to represent a plane 
+
+\begin{equation*}
+\vec{E} = \vec{b} + t\cdot \vec{e_1} + s \cdot \vec{e_2}
+\end{equation*}
+
+with $\vec{b}$ being the base vector of the plane and $\vec{e_1}$, $\vec{e_2}$ determining the orientation of the plane from the base. It is $|\vec{e_1}| = |\vec{e_2}| = 1$ and $\vec{e_1} \cdot \vec{e_2} = 0$, which means that on the surface a new two-dimensional coordinate system is \textit{created} with its origin in $\vec{b}$. By assigning the $x$ and $y$ coordinates of a point to $t$ and $s$, points from a two-dimensional coordinate system can then easily be mapped into three dimensions.
+
+As one unit in the robot's coordinate system represents one meter in the real world, the coordinates of pointers on the screen shall be calculated in meters of distance to the screen's origin (which usually is the top-left corner). The position of a pointer is known in pixels and the screen resolution is known in dots per inch (DPI). To transform a pixel value $p$ into meters on a screen with a resolution of $r$ DPI, the calculation
+\begin{equation*}
+p_m = \frac{p}{r} \cdot \frac{2.54}{100}
+\end{equation*}
+has to be made, as an inch ($in$) is $2.54cm$. The resulting values can then be passed into the equation for the surface to get the corresponding points in the higher dimensional space. These points have to be calculated for each fingertip on the screen, the resulting positions shall then be sent to the BioIK service, resulting in joint angles for every joint on the robot to reach these positions.
 
 \section{Software Architecture}
