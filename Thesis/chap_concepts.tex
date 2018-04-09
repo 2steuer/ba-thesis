@@ -386,4 +386,6 @@ p_m = \frac{p}{r} \cdot \frac{2.54}{100}
 \end{equation*}
 has to be made, as an inch ($in$) is $2.54cm$. The resulting values can then be passed into the equation for the surface to get the corresponding points in the higher dimensional space. These points have to be calculated for each fingertip on the screen, the resulting positions shall then be sent to the BioIK service, resulting in joint angles for every joint on the robot to reach these positions.
 
+To tilt the plane the fingertips are placed on the only things that have to be changes are the vectors $\vec{e_1}$ and $\vec{e_2}$ to span a surface which has another orientation. Also, to move the fingertips in space (e.g. to drag an object in one place and put it to another) no more work has to be done than changing $\vec{b}$. 
+
 \section{Software Architecture}
