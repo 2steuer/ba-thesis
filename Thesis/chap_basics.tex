@@ -83,7 +83,12 @@ interface. Busy-waiting service calls are not implemented in rosjava, most proba
 
 \section{The Shadow C5 Robotic Hand}
 \label{sec:shadowhand}
-% TODO FOTO DER HAND
+
+\begin{wrapfigure}{R}{0.35\linewidth}
+	\caption{The Shadow C5 hand}
+	\includegraphics[width=\linewidth]{assets/chpt_basics/hand.png}
+\end{wrapfigure}
+
 The \textit{Shadow C5 Robotic Hand} was developed by the \textit{Shadow Company}. It is designed to be as similar to a human hand as possible\cite{web:robothand:spec} in terms of force output, movement speed and movement sensitivity. It has 24 degrees-of-freedom, all controlled by 48 pneumatic muscles. These muscles, when pressurized, contract a little, applying force to the elements of the mechanical hand over imitated tendons. The developers tried to design the product as close to the average human forearm as they could. It weighs about 4kg and has a maximum movement speed of about half the speed at the joints a human could reach. The pneumatic muscles work with a pressure of 3.5 bar and having a maximum flow of 24 litres per minute, resulting in the need of a relatively powerful air compressor and air pipe system installed near the hand. Joint angles of all joints (controllable as well as non-controllable) are measured by hall-sensors at an accuracy of 0.2 degrees.
 A similar robotic hand powered by electrical motors instead of pneumatic muscles is also present at the TAMS group at the University of Hamburg. This thesis will, however, mainly work with the pneumatic powered hand. 
 
@@ -94,7 +99,7 @@ A similar robotic hand powered by electrical motors instead of pneumatic muscles
 	\includegraphics[width=0.4\textwidth]{assets/chpt_basics/hand/ros_integration.eps}
 \end{wrapfigure}
 
-The Shadow Robotic Hand possesses by default a CAN\footnote{Controller Area Network}-Bus interface over which it is controlled\cite{web:robothand:spec}. The CAN protocol has been implemented using a parallel port on a distinct machine next to the robotic hand. To have the ability to communicate with the hand over network, a server application has been implemented by members of the TAMS group at University of Hamburg. The line-based protocol implemented by this server is described in % TODO HIER REFERENZ EINFÜGEN
+The Shadow Robotic Hand possesses by default a CAN\footnote{Controller Area Network}-Bus interface over which it is controlled\cite{web:robothand:spec}. The CAN protocol has been implemented using a parallel port on a distinct machine next to the robotic hand. To have the ability to communicate with the hand over network, a server application has been implemented by members of the TAMS group at University of Hamburg. 
 . Multiple applications have been developed to control the robotic hand without the integration of ROS. To make use of the features and advantages of a ROS environment, a ROS proxy was implemented. It basically listens to a ROS topic where it receives joint target states and publishes to another ROS topic where it sends the current measured joint angles to. The ROS hand proxy node communicates with the hand server over the line-based protocol and converts all data it receives for the corresponding other side. This set-up makes it easy to integrate the Shadow C6 hand into a ROS environment. See Figure \ref{fig:hand:ros_integration} for a schematic overview of how the robotic hand is integrated into ROS.
 
 \begin{table}
@@ -131,7 +136,11 @@ The two important topics used throughout this thesis are denoted in Table \ref{t
 \end{table}
 
 \section{The Kuka Lightweight Robot Arm}
-% TODO Foto vom Arm und Beschreibung
+
+\begin{wrapfigure}[9]{L}{0.35\linewidth}
+	\caption{The Kuka LWR robot arm}
+	\includegraphics[width=\linewidth]{assets/chpt_basics/arm.png}
+\end{wrapfigure}
 
 The robotic arm used in the set-up is a \textit{Lightweight Robot 4+} by the German company \textit{KUKA Roboter Gmbh}. It has 7 degrees-of-freedom, allowing it to operate in a space as big as approximately $1.8m^3$\cite{Lwr2010}. All joints can be used in ranges of $\pm 170$ or $\pm 120$ degrees. The robot is controlled by a dedicated computer supplied with it. Connected to the computer is an external control interface, which allows basic operations of the robot.
 
