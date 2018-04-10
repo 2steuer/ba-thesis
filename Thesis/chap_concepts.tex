@@ -388,4 +388,17 @@ has to be made, as an inch ($in$) is $2.54cm$. The resulting values can then be 
 
 To tilt the plane the fingertips are placed on the only things that have to be changes are the vectors $\vec{e_1}$ and $\vec{e_2}$ to span a surface which has another orientation. Also, to move the fingertips in space (e.g. to drag an object in one place and put it to another) no more work has to be done than changing $\vec{b}$. 
 
+For first tests, the vectors defining the plane are chosen as follows:
+\begin{itemize}
+	\item $\vec{b} = \vecthr{0.1}{-1.1}{1.2}$
+	
+	This value is relatively straight ahead of the arm and about 15-20cm above the table. This point represents the top-left corner of the touchscreen. Fingertips are mapped using this point as a base in the coordinate system where one unit is one meter. This following two spanning vectors are chosen accordingly.
+	\item $\vec{e_1} = \vecthr{-1}{0}{0}$
+	\item $\vec{e_2} = \vecthr{0}{1}{0}$
+\end{itemize}
+
+The x value rises to the left for the robot's coordinate system, but to the right for the tablet'S screen, which is why the first component of $\vec{e_1}$ is negative. The robot's coordinate system's $y$ coordinate rises to the bottom, so does the $y$ coordinate of the touch screen, the corresponding component in $\vec{e_2}$ is therefore positive.
+
+% TODO figure with photo of the tablet + coordinate system / screenshot of the arm rviz + coordinate system
+
 \section{Software Architecture}
