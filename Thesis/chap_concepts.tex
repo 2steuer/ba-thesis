@@ -397,8 +397,13 @@ For first tests, the vectors defining the plane are chosen as follows:
 	\item $\vec{e_2} = \vecthr{0}{1}{0}$
 \end{itemize}
 
-The x value rises to the left for the robot's coordinate system, but to the right for the tablet'S screen, which is why the first component of $\vec{e_1}$ is negative. The robot's coordinate system's $y$ coordinate rises to the bottom, so does the $y$ coordinate of the touch screen, the corresponding component in $\vec{e_2}$ is therefore positive.
+The x value rises to the left for the robot's coordinate system, but to the right for the tablet'S screen, which is why the first component of $\vec{e_1}$ is negative. The robot's coordinate system's $y$ coordinate rises to the bottom, so does the $y$ coordinate of the touch screen, the corresponding component in $\vec{e_2}$ is therefore positive (See Figure \ref{fig:dfmt:coords} for a visual comparison of the coordinate systems).
 
-% TODO figure with photo of the tablet + coordinate system / screenshot of the arm rviz + coordinate system
+\begin{figure}
+	\caption{\label{fig:dfmt:coords}Comparison of the coordinate systems between which shall be mapped. Left: Tablet, Right: Arm coordinate system}
+	\includegraphics[width=0.6\linewidth]{assets/chpt_concepts/dfmt_coord_screen.png}
+	\includegraphics[width=0.4\linewidth]{assets/chpt_concepts/dfmt_coord_arm.png}
+\end{figure}
 
 \section{Software Architecture}
+
