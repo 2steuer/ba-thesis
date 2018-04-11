@@ -454,5 +454,25 @@ For the direct fingertip mapping approach, the number of classes is small compar
 
 \subsection{Observer}
 
+\begin{wrapfigure}[13]{L}{0.5\linewidth}
+	\caption{\label{fig:conc:obs1}Observer-Pattern for GestureParser}
+	\includegraphics[width=\linewidth]{assets/chpt_concepts/sw/gesture_observer.png}
+\end{wrapfigure}
+
+Multiple classes have to exchange data between each other and have to be able to report data changes at arbitrary times. To prevent the occurrence of circular dependencies between classes a variation of the \textit{Observer-Pattern} is used within the application. The Observer-Pattern is used to give loosely coupled classes the ability to unidirectionally give notifications to each other about data changes\cite{Eilebrecht2013}.
+
+There are two main uses of the \textit{Observer-Pattern}: 
+
+\textit{SynergyProxyBase} (The base class for the absolute and relative synergy proxies) implements the \textit{GestureObserver} interface to get notified about gesture changes from the \textit{GestureParser}. Figure \ref{fig:conc:obs1} shows the dependencies between the different classes and interfaces within this pattern as used here.
+
+\begin{wrapfigure}{R}{0.55\linewidth}
+	\caption{Observer-Pattern for AxisManager and C5LwrNode\label{fig:conc:obs2}}
+	\includegraphics[width=\linewidth]{assets/chpt_concepts/sw/node_axismanager.png}
+\end{wrapfigure}
+
+\textit{AxisManager} and \textit{C5LwrNode} have to exchange joint data between each other in both directions. To accomplish this, both implement the \textit{RobotJointDataReceiver} interface (see Figure \ref{fig:conc:obs2}. The design here is relatively far away from the original observer pattern, as both classes do not know of each other. However, the common interface is used to notify each other about changes in the joint angles (either to send them to the robot or as they are received from it). The connection between both classes is made in the entry point of the Android application, \textit{MainActivity}. As \textit{MainActivity} manages the overall application set-up, it is the most suitable point to do so. If one or both of the classes were exchanged in later development, the only place that had to be changed to alter the connection would also be \textit{MainActivity}.
+
+Aside from the original \textit{Observer} pattern described in \cite{Eilebrecht2013} multiple interfaces are described for observers to directly pass data to them. Following the conservative approach, observers would just be notified about changes, giving them the necessity to fetch them from the observed object on their own.
+
 \subsection{Singleton}
 
