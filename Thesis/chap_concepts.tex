@@ -26,7 +26,7 @@ Interaction with the application is done using the commonly known touch gestures
 \end{itemize}
 
 \subsection{General Screen Layout}
-
+\label{sec:ui:layout}
 As a screen of a diagonal size of 10 inches (25.4cm) is very limited compared to the size of the robot's workspace good considerations have to made according to a well-designed user interface. Since we are mainly operating the robot with touch gestures, significant parts of the screen should be blank, as only few information can be displayed while the user poses his hands above or on the screen. Figure \ref{fig:firstmockup} gives a first overview of how the portions of the screen shall be distributed. The biggest part of the screen is reserved for touch interactions by the user. Since multiple approaches to control the robot shall be implemented, the method shall be selected and switched using a tabbed layout with the tabs on the top, as they then use the least space of the screen.
 
 \subsubsection{Interlock Button}
@@ -406,4 +406,53 @@ The x value rises to the left for the robot's coordinate system, but to the righ
 \end{figure}
 
 \section{Software Architecture}
+
+Within this section the software architectural design will be discussed. The goal is to create a software design which is easily extensible by further work, making the software a basis for future research. To accomplish this, use of well-known design patterns is made. The three most commonly used patterns in the software are:
+\begin{itemize}
+	\item Model-View-Controller (MVC)
+	\item Observer
+	\item Singleton
+\end{itemize}
+
+The use of all three is described by examples from the overall software design. \citeauthor{Eilebrecht2013} give a good overview over existing patterns and their use-cases and implementation in \citetitle{Eilebrecht2013}\cite{Eilebrecht2013}, which is where the information about patterns used in the following sections was mainly taken from.
+
+\subsection{Model-View-Controller (MVC)}
+
+\begin{figure}
+	\caption{\label{fig:conc:mvc}General Model-View-Controller separation}
+	\includegraphics[width=\linewidth]{assets/chpt_concepts/sw/mvc.png}
+\end{figure}
+
+Model-View-Controller is a pattern widely used in applications where a set of data (e.g. data from a database) shall be displayed and modified from within multiple interfaces (so-called views)\cite{Eilebrecht2013}. To accomplish this, a \textit{Controller} is set in between the data (\textit{Model}) and the interface implementation (\textit{View}). This \textit{separation of concerns} makes it easy to extend or replace one of the three modules without directly affecting the others. A controller gets data from the \textit{Model}, prepares it for display and passes it on to the \textit{View}, where the concrete display of the data is then defined. The Controller gets feedback from the view, which may then be converted into actions affecting the Model again. Within the developed app design, all three modules can be found, although not always a single class can be assigned for one module. Figure \ref{fig:conc:mvc} gives a rough overview of how the different functionalities are distributed between classes.
+
+\subsubsection{Model}
+
+The Model, which in this case is the data about the robot and its joints, is accessed using the \textit{AxisManager}. The actual communication is done within the \textit{C5LwrNode} class, encapsulating all ROS-specific calls and hiding away the actual communication layer from the rest of the application. Having chosen this design it is relatively easy to replace either the joint data management or the communication layer to the robot.
+
+The \textit{AxisManager} offers functionality to get or set information for each axis of the robot. It gives interface methods to
+\begin{itemize}
+	\item Get or set the current angle
+	\item Enable or disable continuous movement
+\end{itemize}
+of each joint. It is lockable, meaning that - when locked - no axis updates are accepted by callers, stopping all movements of the robot independent from other controllers. This functionality is important for the safety interlock button described in Section \ref{sec:ui:layout}.
+
+Angle representation within the \textit{AxisManager} is in degrees, whereas the communication with ROS takes place in radians. Conversion between those two has to be made in all actions. To make this conversion functionality exchangable, an interface is declared called \textit{ValueConverter}, allowing to define and assign each joint a different converter. The only implementation used in this application, however, is the \textit{AngleRadianConverter}, converting angles from degrees to radians and vice versa.
+
+The \textit{C5LwrNode} class is a \textit{rosjava} node offering all ROS-specific interfaces to the application. Joint angles are received by the node and passed to the \textit{AxisManager} over an implementation of the \textit{Observer-Pattern} (see Section XY). It also receives joint angles over the observer pattern (by \textit{AxisManager}), passing them on to the robot over ROS. Additionally the BioIK service calls are implemented within the node. This on the one hand creates the need for controller classes to call more than only the \textit{AxisManager}, but encapsulates all ROS specific calls to one class, which was assumed as the smaller drawback here. The conglomerate of \textit{AxisManager}, \textit{C5LwrNode} and all helper classes represents the \textit{Model} within the software design.
+
+\subsubsection{View}
+
+The \textit{View} modules are represented by classes implementing the \textit{View} class from android. They display data either directly from the \textit{AxisManager}, like the axis control page (\textit{AxisControlFragment}) or states of e.g. touch gestures, like \textit{GestureView}, which is used in the pages implementing the grasp synergy control functionality. The type of display is very different, specific implementations are described in section \ref{sec:impl:ui} in a more detailed manner.
+
+As the most important feedback to the user should be the action of the operated robot itself, the view modules are not as elaborated and specifically designed as the other two. As seen in Figure \ref{fig:conc:mvc}, the view usually consists of a single class, whereas \textit{Model} and \textit{Controller} are deeper partitioned and described.
+
+\subsubsection{Controller}
+
+Multiple types of controllers exist in the application. There are controllers that take gestures as an input and provide joint angles as an output (\textit{SynergyProxies}, \textit{AbsoluteSynergyProxy} and \textit{RelativeSynergyProxy} for absolute and relative synergy control) and ones that take gestures as an input and output joint angles for the arm, but by using the ROS functionality offered by the \textit{C5LwrNode} (\textit{CartesianArmManager}). As these classes are coupled relatively strong, they can be seen as one controller divided into multiple sub-controllers. Also, the touch parsing functionality used by both synergy approaches is encapsulated into its own class (\textit{GestureParsing}), taking touch input data from the \textit{View} and outputting gesture information.
+
+For the direct fingertip mapping approach, the number of classes is small compared to the other approaches. The \textit{DfmtProxy} takes care of parsing the touch data provided by its corresponding View (\textit{FingertipView}), requesting joint angles from the \textit{C5LwrNode} and passing them on to the \textit{AxisManager}.
+
+\subsection{Observer}
+
+\subsection{Singleton}
 
