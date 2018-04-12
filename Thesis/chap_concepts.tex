@@ -364,12 +364,14 @@ Whether these values are well chosen and usable has to be evaluated during tests
 
 \subsection{Arm Control}
 
-\begin{wrapfigure}{R}{0.5\linewidth}
-\caption{\label{fig:arm:coord}The coordinate system relative to the arm}
-\includegraphics[width=\linewidth]{assets/chpt_concepts/coordinates.png}
+\begin{wrapfigure}[14]{R}{0.4\linewidth}
+	\caption{\label{fig:arm:coord}The coordinate system relative to the arm}
+	\includegraphics[width=\linewidth]{assets/chpt_concepts/coordinates.png}
 \end{wrapfigure}
 
 Controlling the arm with touch gestures is not as easy as controlling the grasp synergies since the arm's joint angles have to be calculated using the BioIK service. The objective is to give the user the opportunity to control the position of the robot hand's palm in Cartesian coordinates. To achieve this, it is important to know the orientation of the coordinate system around the arm as well as \textit{safe} coordinates, where the robot arm can move without causing any danger to its environment. Having a look at Figure \ref{fig:arm:coord} gives a good insight in the coordinate system used. Potentially, an arbitrary coordinate system could be used, but the BioIK service at the point of writing only accepts coordinates in the so-called \textit{world} coordinate system. It has its origin on the floor below the robot arm's base. Each square in the illustration represents one meter in the real set-up. The shown model is assumed to be sufficiently exact to use it as a simulation for the real robot with its surroundings. It is important to keep in mind that the y coordinate is counter-intuitively rising to the back, which means it is falling in the direction to the front. Also, from the robot's perspective, the x axis is oriented to the left.
+
+In order to prevent damages to the robot or its environment, a \textit{bounding box} has to be found where the robot's movements do not cause any unwanted movements. Unwanted movements can occur since the shortest way from position $x$ to position $y$ may be very short in cartesian space, but still very long in joint coordinates. It is important to keep in mind, that for very close points, the BioIK service might output very different joint positions, as it assumes the new solution more fitting than the old one. This, however, results in a quite small work space for the robot compared to the overall table size. For the first approach, the limits for all 3 axes assumed \textit{safe} are denoted in Table \ref{tab:safeaxes}.
 
 \begin{wraptable}{L}{0.3\linewidth}
 	\caption{\label{tab:safeaxes}Position limits for the robot's hand's palm}
@@ -385,8 +387,6 @@ Controlling the arm with touch gestures is not as easy as controlling the grasp 
 		\hline
 	\end{tabular}
 \end{wraptable}
-
-In order to prevent damages to the robot or its environment, a \textit{bounding box} has to be found where the robot's movements do not cause any unwanted movements. Unwanted movements can occur since the shortest way from position $x$ to position $y$ may be very short in cartesian space, but still very long in joint coordinates. It is important to keep in mind, that for very close points, the BioIK service might output very different joint positions, as it assumes the new solution more fitting than the old one. This, however, results in a quite small work space for the robot compared to the overall table size. For the first approach, the limits for all 3 axes assumed \textit{safe} are denoted in Table \ref{tab:safeaxes}.
 
 To map touch interactions to positions of the hand's palm the same functions as in Sections \ref{sec:synergies:absolute} and \ref{sec:app:rel} are used with the clipping borders set to the safe axes' limits. As a starting point, the x axis is mapped to the x position of a three-pointer gesture, the z axis to the y position of a three-pointer gesture. As before, only half of each screen dimension will be mapped, leaving out a quarter on each end to make it easier to reach all limits. The y axis will later be mapped to another property of the three-pointer gesture or the position of a four-pointer gesture. Once the desired palm position was calculated it is passed to the BioIK service first, the resulting joint angles returned by the service are then passed to the robot.
 
