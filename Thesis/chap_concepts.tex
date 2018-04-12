@@ -293,18 +293,18 @@ Let $w_{screen}$ be the width of the screen in pixels, $\alpha \in \mathbb{R}^N$
 \begin{itemize}
 	\item $\alpha_1 = lm\left((1200, 50), (300, -50), -50, 50, s(G)\right)$
 	
-	As the size of a gesture is the property easiest to manipulate (with 2 pointers by the so-called pinch-zoom-movement) the amplitude with the biggest effect is assigned to it. The values of 1200 and 300 are chosen as 1200 is the size of a gesture with normally spanned fingers, 300 is the size of a gesture when the pointers are already relatively close. Values lower than 300 render the amplitude value of $-50$ of being unreachable, as pointers are perhaps not be able to be placed that close.
+	As the size of a gesture is the property easiest to manipulate (with 2 pointers by the so-called pinch-zoom-movement) the amplitude with the biggest effect is assigned to it. The values of 1200 and 300 are chosen as 1200 is the size of a gesture with normally spanned fingers, 300 is the size of a gesture when the pointers are already relatively close. Values lower than 300 render the amplitude value of $-50$ unreachable, as pointers are perhaps not be able to be placed that close.
 	
 	\item $\alpha_2 = lm\left((w_{screen} \cdot 0.25, 50), (w_{screen} \cdot 0.75, -50), -50, 50, (c(G))_1\right)$
 	
-	For the second significant amplitude the $x$ component of the gesture position is chosen. It is mapped between $\frac{1}{4}$ and $\frac{3}{4}$ of the screen's width as the actual limits cannot be reached with gesture positions due to all pointers having to be at this border then.
+	For the second significant amplitude the $x$ component of the gesture position is chosen. It is mapped between $\frac{1}{4}$ and $\frac{3}{4}$ of the screen's width as the actual limits cannot be reached with gesture positions due to all pointers having to be at (or beyond) screen borders.
 	
 	\item $\alpha_3 = lm\left( \left( -\frac{\pi}{2}, 50 \right), \left( \frac{\pi}{2}, -50 \right), -50, 50, o(G) \right)$
 	
 	For the third significant amplitude the orientation is mapped from $-90^\circ \widehat{=} -\frac{\pi}{2}$ to $90^\circ \widehat{=} \frac{\pi}{2}$. Rotations to values greater or less than these have shown to be only possible when moving the tablet or changing the gesture's size and position.
 \end{itemize}
 
-$\alpha_{1,2,3}$ are evaluated whenever a pointer's position within the gesture changes. Joint angle values are then calculated using (\ref{eq:syn}) with $S$ being the currently selected synergy. Once the joint values are calculated they can be published to the ROS nodes of the Shadow C5 hand.
+$\alpha_{1,2,3}$ are evaluated simultaneously whenever a pointer's position within the gesture changes. Joint angle values are then calculated using (\ref{eq:syn}) with $S$ being the currently selected synergy. Once the joint values are calculated they can be published to the ROS nodes of the Shadow C5 hand.
 
 \subsection{Relative Approach}
 \label{sec:app:rel}
@@ -347,7 +347,7 @@ Whether these values are well chosen and usable has to be evaluated during tests
 \includegraphics[width=\linewidth]{assets/chpt_concepts/coordinates.png}
 \end{wrapfigure}
 
-Controlling the arm with touch gestures is not as easy as controlling the grasp synergies since the arm's joint angles have to be calculated using the BioIK service. The objective is to give the user the opportunity to control the position of the robot hand's palm in Cartesian coordinates. To achieve this, it is important to know the orientation of the coordinate system around the arm as well as \textit{safe} coordinates, where the robot arm can move without causing any danger to its environment. Having a look at Figure \ref{fig:arm:coord} gives a good insight in the coordinate system used. Potentially, an arbitrary coordinate system could be used, but the BioIK service at the point of writing only accepts coordinates in the so-called \textit{world} coordinate system. It has its origin on the floor below the robot arm's base. Each square in the illustration represents one meter in the real set-up. The shown model is assumed to be sufficiently exact to use it as a simulation for the real robot with its surroundings. It is important to keep in mind that the y coordinate is counter-intuitively rising to the back, which means it is falling in the direction to the front. Also, from the robot's perspective, the x axis is oriented to the left.
+Controlling the arm with touch gestures is not as easy as controlling the grasp synergies since the arm's joint angles have to be calculated using the BioIK service. The objective is to give the user the opportunity to control the position of the robot's hand-palm in Cartesian coordinates. To achieve this, it is important to know the orientation of the coordinate system around the arm as well as \textit{safe} coordinates, where the robot arm can move without causing any danger to its environment. Figure \ref{fig:arm:coord} gives a good insight in the coordinate system used. Potentially, an arbitrary coordinate system could be used, but the BioIK service at the point of writing only accepts coordinates in the so-called \textit{world} coordinate system. It has its origin on the floor below the robot arm's base. Each square in the illustration represents one meter in the real set-up. The shown model is assumed to be sufficiently exact to use it as a simulation for the real robot with its surroundings. It is important to keep in mind that the y-coordinate is counter-intuitively rising to the back, which means it is falling in the direction to the front. Also, from the robot's perspective, the x axis is oriented to the left.
 
 \begin{wraptable}{L}{0.3\linewidth}
 	\caption{\label{tab:safeaxes}Position limits for the robot's hand's palm}
@@ -364,15 +364,15 @@ Controlling the arm with touch gestures is not as easy as controlling the grasp 
 	\end{tabular}
 \end{wraptable}
 
-In order to prevent damages to the robot or its environment, a \textit{bounding box} has to be found where the robot's movements do not cause any unwanted movements. Unwanted movements can occur since the shortest way from position $x$ to position $y$ may be very short in cartesian space, but still very long in joint coordinates. It is important to keep in mind, that for very close points, the BioIK service might output very different joint positions, as it assumes the new solution more fitting than the old one. This, however, results in a quite small work space for the robot compared to the overall table size. For the first approach, the limits for all 3 axes assumed \textit{safe} are denoted in Table \ref{tab:safeaxes}.
+In order to prevent damages to the robot or its environment, a \textit{bounding box} has to be found where the robot's actions do not cause any unwanted movements which can occur since the shortest way from position $x$ to position $y$ may be short in cartesian space, but still long in joint coordinates. It is important to keep in mind that for close points, the BioIK service might output extremely different joint positions, as it assumes the new solution more fitting than the old one. This, however, results in a quite small work space for the robot compared to the overall table size. For the first approach, the limits for all 3 axes assumed \textit{safe} are denoted in Table \ref{tab:safeaxes}.
 
-To map touch interactions to positions of the hand's palm the same functions as in Sections \ref{sec:synergies:absolute} and \ref{sec:app:rel} are used with the clipping borders set to the safe axes' limits. As a starting point, the x axis is mapped to the x position of a three-pointer gesture, the z axis to the y position of a three-pointer gesture. As before, only half of each screen dimension will be mapped, leaving out a quarter on each end to make it easier to reach all limits. The y axis will later be mapped to another property of the three-pointer gesture or the position of a four-pointer gesture. Once the desired palm position was calculated it is passed to the BioIK service first, the resulting joint angles returned by the service are then passed to the robot.
+To map touch interactions to positions of the hand's palm the same functions as in Sections \ref{sec:synergies:absolute} and \ref{sec:app:rel} are used with the clipping borders set to the safe axes' limits. As a starting point, the x-axis is mapped to the x-position of a three-pointer gesture, the z-axis to the y-position of a three-pointer gesture. As before, only half of each screen dimension will be mapped, leaving out a quarter on each end to make it easier to reach all limits. The y-axis will later be mapped to another property of the three-pointer gesture or the position of a four-pointer gesture. Once the desired palm position was calculated it is passed to the BioIK service first, the resulting joint angles returned by the service are then passed to the robot.
 
 \section{Direct Fingertip Mapping}
 
-As \citeauthor{conf:humanoids:TohHLBZP12} state in their work, dexterous grasping and telemanipulation tasks frequently focus on precise control of fingertips in a plane surface\cite{conf:humanoids:TohHLBZP12}. They directly map fingertip positions from the touchscreen to a plane in the working space. As this approach seems interesting it shall also be implemented within this thesis as a third approach.
+As \citeauthor{conf:humanoids:TohHLBZP12} state in their work, dexterous grasping and telemanipulation tasks frequently focus on precise control of fingertips in a plane surface\cite{conf:humanoids:TohHLBZP12}. They directly map fingertip positions from the touchscreen to a plane in the working space. As this approach seems interesting it shall also be implemented within this thesis.
 
-In this approach heavy use of the BioIK service is made, as not only the position of the hand's palm will be given to the service as a goal, but potentially up to 5 positions for each fingertip will be passed. For the first approach only 3 fingertips shall be usable by the functionality. To find out which positions in three-dimensional space shall be passed for the fingertips, we first have to define a plane the fingertips shall be placed on in three-dimensional space. This is done using the parametrized form to represent a plane 
+Heavy use of the BioIK service is made for this, as not only the position of the hand's palm will be given to the service as a goal, but potentially up to 5 positions for each fingertip will be passed. For the first approach only 3 fingertips shall be usable by the functionality. To find out which positions in three-dimensional space shall be passed for the fingertips, we first have to define a plane the fingertips shall be placed on in three-dimensional space. This is done using the parametrized form to represent a plane 
 
 \begin{equation*}
 \vec{E} = \vec{b} + t\cdot \vec{e_1} + s \cdot \vec{e_2}
@@ -386,18 +386,21 @@ p_m = \frac{p}{r} \cdot \frac{2.54}{100}
 \end{equation*}
 has to be made, as an inch ($in$) is $2.54cm$. The resulting values can then be passed into the equation for the surface to get the corresponding points in the higher dimensional space. These points have to be calculated for each fingertip on the screen, the resulting positions shall then be sent to the BioIK service, resulting in joint angles for every joint on the robot to reach these positions.
 
-To tilt the plane the fingertips are placed on the only things that have to be changes are the vectors $\vec{e_1}$ and $\vec{e_2}$ to span a surface which has another orientation. Also, to move the fingertips in space (e.g. to drag an object in one place and put it to another) no more work has to be done than changing $\vec{b}$. 
+If the plane on which the fingertips are mapped shall be changed, only $\vec{e_1}$ and $\vec{e_2}$ have to be changed in a way that they span another plane, e.g. a tilted one.  Also, to move the fingertips in space (e.g. to drag an object in one place and put it to another) no more work has to be done than changing $\vec{b}$. 
 
 For first tests, the vectors defining the plane are chosen as follows:
 \begin{itemize}
 	\item $\vec{b} = \vecthr{0.1}{-1.1}{1.2}$
 	
 	This value is relatively straight ahead of the arm and about 15-20cm above the table. This point represents the top-left corner of the touchscreen. Fingertips are mapped using this point as a base in the coordinate system where one unit is one meter. This following two spanning vectors are chosen accordingly.
-	\item $\vec{e_1} = \vecthr{-1}{0}{0}$
-	\item $\vec{e_2} = \vecthr{0}{1}{0}$
+	\begin{equation*}
+	 \vec{e_1} = \vecthr{-1}{0}{0} \qquad
+	\vec{e_2} = \vecthr{0}{1}{0}
+	\end{equation*}
+	
 \end{itemize}
 
-The x value rises to the left for the robot's coordinate system, but to the right for the tablet'S screen, which is why the first component of $\vec{e_1}$ is negative. The robot's coordinate system's $y$ coordinate rises to the bottom, so does the $y$ coordinate of the touch screen, the corresponding component in $\vec{e_2}$ is therefore positive (See Figure \ref{fig:dfmt:coords} for a visual comparison of the coordinate systems).
+The x value rises to the left for the robot's coordinate system, but to the right for the tablet's screen, which is why the first component of $\vec{e_1}$ is negative. The robot's coordinate system's $y$ coordinate rises to the bottom, so does the $y$ coordinate of the touch screen, the corresponding component in $\vec{e_2}$ is therefore positive (See Figure \ref{fig:dfmt:coords} for a visual comparison of the coordinate systems).
 
 \begin{figure}
 	\caption{\label{fig:dfmt:coords}Comparison of the coordinate systems between which shall be mapped. Left: Tablet, Right: Arm coordinate system}
