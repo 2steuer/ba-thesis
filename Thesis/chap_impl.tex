@@ -143,6 +143,62 @@ public void onStart() {
 
 \section{The AxisManager}
 
+The most important and most central functionality of the overall application is offered by the \textit{AxisManager} class. It is responsible for holding the current joint angles for all joints in memory, as well as the current target values along multiple other bits of information about each axis or joint. Joints are more generically called \textit{axis} within the \textit{AxisManager}, so this wording will be adopted in the rest of this section.
+
+\subsection{AxisInformation}
+
+All information about an axis is stored in a \textit{AxisInformationImpl} object. This class implements the \textit{AxisInformation} interface, which is returned when axis information shall be given to callers in a read-only manner. The \textit{AxisInformation} interface is given in Listing \ref{lst:impl:axisinformation}. All the information stored about an axis is accessible here. In particular, this is: 
+\begin{itemize}
+	\item the identifier of an axis, i.e. a string literal containing the name at which the axis or joint is known to the ROS nodes.
+	\item the maximum speed the axis may move at.
+	\item the target value to which the axis shall be currently moved.
+	\item the value representing the axis' current position.
+	\item the value representing the axis' \textit{current target value} (see Section \ref{sec:impl:axismovements} for details).
+	\item the minimum and maximum values the axis may have as position value.
+	\item flags indicating whether the axis is enabled and moving.
+	\item an integer representing the type of an axis. Allowed types are \textit{JointType.ARM} and \textit{JointType.HAND}.
+\end{itemize}
+
+\begin{lstlisting}[caption={The AxisInformation interface}, label=lst:impl:axisinformation]
+public interface AxisInformation {
+	String getIdentifier();
+	
+	double getMaxSpeed();
+	double getTargetValue();
+	
+	double getMaxValue();
+	double getMinValue();
+	double getCurrentTargetValue();
+	double getCurrentValue();
+	boolean isMoving();
+	double getSpeed();
+	boolean isEnabled();
+	int getJointType();
+}
+\end{lstlisting}
+
+All the information is held within the \textit{AxisManager}, referenced by the axis identifier. Manipulation of the data is only done through calls to the \textit{AxisManager}, to give it full control about what happens with all axes. The difference between \textit{AxisInformation} and the concrete implementation \textit{AxisInformationImpl} is, that the implementation has a setter function for every property. All calculations are done within the \textit{AxisManager} itself.
+
+\subsection{AxisManager timer tick}
+
+The \textit{AxisManager} is designed to work fully asynchronous. All information about axes' target values is stored in the according \textit{AxisInformation} object, but only processed from within the main timer event used in \textit{AxisManager}. The timer is set to a frequency of $f_{am} = 10Hz$. This value can easily be changed by altering the static constant field \textit{UPDATE\_FREQ} in the \textit{AxisManager} task.
+
+All calculations regarding axis movements (Section \ref{sec:impl:axismovements}) are done within the timer tick only. After all calculations have been done the current joint angles are all sent to the \textit{C5LwrNode} to be published over ROS (see Section \ref{sec:impl:aximgrros}).
+
+\subsection{Axis movements}
+\label{sec:impl:axismovements}
+
+The main task of the \textit{AxisManager} is managing movement of all axes in a safe manner. To accomplish this, it restricts the movement for each axis to the maximum speed stored within the \textit{AxisInformation}. Two main modes are available for movement. The first one is by enabling a constant movement of an axis at a specified speed. The second is by setting target values, which the axis will then be moved to at a maximum speed defined on a per-axis basis in the \textit{AxisInformation} object.
+
+\subsubsection{Constant movement}
+
+\subsubsection{Setting target values}
+
+\subsection{Enabling and Disabling}
+
+\subsection{Passing axis data to ROS}
+\label{sec:impl:aximgrros}
+
 \section{Grasp Synergies}
 
 \subsection{Gesture Parsing}
