@@ -211,9 +211,11 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
 
         req.setGroupName("lwr_with_c5hand");
         req.setAttempts(1);
-        req.setTimeout(Duration.fromMillis(1000));
+        req.setTimeout(Duration.fromMillis(10));
         req.setApproximate(true);
         req.setAvoidCollisions(true);
+
+
 
         LinkedList<String> la = new LinkedList<>();
         for(int i = 0; i < lockedAxes.length; i++) {
@@ -225,7 +227,11 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
 
         MessageFactory fact = cNode.getTopicMessageFactory();
 
-        // Store current robot state...
+        MinimalDisplacementGoal mdg = fact.newFromType(MinimalDisplacementGoal._TYPE);
+        //mdg.setWeight(1.2);
+        req.getMinimalDisplacementGoals().add(mdg);
+
+                // Store current robot state...
         RobotState rs = fact.newFromType(RobotState._TYPE);
         List<String> names = rs.getJointState().getName();
         double[] angles = new double[currentState.size()];
@@ -279,6 +285,10 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
 
         MessageFactory fact = cNode.getTopicMessageFactory();
 
+        MinimalDisplacementGoal mdg = fact.newFromType(MinimalDisplacementGoal._TYPE);
+        //mdg.setWeight(1.2);
+        req.getMinimalDisplacementGoals().add(mdg);
+
         OrientationGoal og = fact.newFromType(OrientationGoal._TYPE);
         og.setLinkName("palm");
         Quaternion q = og.getOrientation();
@@ -299,7 +309,6 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
             // it will be an off-by-one error
             angles[names.size()] = currentState.get(n);
             names.add(n);
-
         }
         rs.getJointState().setPosition(angles);
         req.setRobotState(rs);

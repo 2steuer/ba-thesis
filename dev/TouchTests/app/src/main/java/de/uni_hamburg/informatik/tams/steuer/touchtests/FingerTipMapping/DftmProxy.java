@@ -44,7 +44,7 @@ public class DftmProxy implements View.OnTouchListener, ServiceResponseListener<
 
     private FingertipPointer[] _pointers = new FingertipPointer[MAX_CONTROLLABLE_FINGERS];
 
-    PointInSpace surfaceBase = new PointInSpace(-0.1, -1.1, 1.2);
+    PointInSpace surfaceBase = new PointInSpace(0.0, -1.25, 1.2);
     PointInSpace surfaceYBaseVect = new PointInSpace(0, 1, 0);
     PointInSpace surfaceXBaseVect = new PointInSpace(-1, 0, 0);
 
@@ -277,6 +277,17 @@ public class DftmProxy implements View.OnTouchListener, ServiceResponseListener<
         }
         running = true;
         timeMeas = SystemClock.elapsedRealtime();
+
+        StringBuilder sb = new StringBuilder();
+
+        for(String n : goals.keySet()) {
+            PointInSpace pis = goals.get(n);
+            sb.append(n + ": " + pis.getX() + "/"+pis.getY()+"/"+pis.getZ() + "  ");
+
+        }
+
+        Log.d("DFMT_POS", sb.toString());
+
         node.GetIKJointsFingertips(axes.getRobotState(), goals, this);
         runningLock.unlock();
     }

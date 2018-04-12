@@ -7,9 +7,11 @@ import org.ros.exception.RemoteException;
 import org.ros.node.service.ServiceResponseListener;
 import org.ros.rosjava_geometry.Quaternion;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -35,6 +37,8 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
     public static final double Z_MIN = 1.05;
     public static final double Z_MAX = 1.17;
 
+    public static final int MAX_AXIS_CHANGE = 15;
+
     private static CartesianArmManager instance = null;
     public static CartesianArmManager getInstance() {
         if(instance == null) {
@@ -59,6 +63,8 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
     Lock runningLock = new ReentrantLock();
     private boolean running = false;
     private boolean posChanged = false;
+
+    private boolean bigChangesAllowed = false;
 
     private CartesianArmManager() {
 
@@ -110,6 +116,7 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
     }
 
     public boolean goHome() {
+        bigChangesAllowed = true;
         return movePalmTo(homePos);
     }
 
@@ -133,6 +140,8 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
         runningLock.lock();
         posChanged = true;
         if(!running) {
+
+            timeCounter = SystemClock.elapsedRealtime();
             node.GetIkJointsPalm(mgr.getRobotState(), lockedAxes.toArray(new String[0]), currentPos.getX(), currentPos.getY(), currentPos.getZ(), 0.7071, 0.0, 0.0, 0.7071, this);
             running = true;
         }
@@ -156,8 +165,11 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
     public void onSuccess(GetIKResponse getikResponse) {
         IKResponse ikResponse = getikResponse.getIkResponse();
 
+        long diff = SystemClock.elapsedRealtime() - timeCounter;
+        Log.i("CART_IK", "After " + diff + " ms");
+
         if(ikResponse.getErrorCode().getVal() != MoveItErrorCodes.SUCCESS) {
-            Log.w("IK", "IK Failed, Error: " + ikResponse.getErrorCode().getVal());
+            Log.w("CART_IK", "IK Failed, Error: " + ikResponse.getErrorCode().getVal());
             waiting = false;
 
             runningLock.lock();
@@ -166,20 +178,48 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
             return;
         }
 
+        Map<String, Double> oldState = mgr.getRobotState();
+        Map<String, Double> newState = new HashMap<>();
+        boolean passToRobot = true;
+
+
+        AngleRadianConverter c = new AngleRadianConverter();
         JointState st = ikResponse.getSolution().getJointState();
         List<String> name = st.getName();
         double[] val = st.getPosition();
         int count = Math.min(name.size(), val.length);
-        int notifyAt = count - 1;
 
-
-        AngleRadianConverter c = new AngleRadianConverter();
-
-        for(int i = 0; i < count; i++) {
-            // notify on last value only
+        // check for maximum joint movements
+        for(int i = 0; i < count && passToRobot; i++) {
             if(!lockedAxes.contains(name.get(i))) {
-                mgr.setTargetValue(name.get(i), c.toRawValue(val[i]), false, i == notifyAt);
+                double dgVal = c.toRawValue(val[i]);
+                double rVal = c.toRawValue(oldState.get(name.get(i)));
+
+                if(bigChangesAllowed || Math.abs(dgVal - rVal) <  MAX_AXIS_CHANGE) {
+                    newState.put(name.get(i), dgVal);
+                }
+                else {
+                    passToRobot = false;
+                    posChanged = true; // retry to find a solution
+                    Log.w("CART_IK", "Too big value change for joint " + name.get(i) + " " + rVal + " > " + dgVal);
+                }
             }
+        }
+
+        bigChangesAllowed = false;
+
+        if(passToRobot) {
+            int notifyAt = count - 1;
+
+            for(int i = 0; i < count; i++) {
+                // notify on last value only
+                if(newState.containsKey(name.get(i))) {
+                    mgr.setTargetValue(name.get(i), newState.get(name.get(i)), false, i == notifyAt);
+
+                }
+
+            }
+
         }
 
 
@@ -189,6 +229,7 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
         // until running is set to false.
         if(running && posChanged) {
             posChanged = false;
+            timeCounter = SystemClock.elapsedRealtime();
             node.GetIkJointsPalm(mgr.getRobotState(), lockedAxes.toArray(new String[0]), currentPos.getX(), currentPos.getY(), currentPos.getZ(), 0.7071, 0.0, 0.0, 0.7071, this);
         }
         else {
