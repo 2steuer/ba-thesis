@@ -3,18 +3,19 @@
 
 \section{User Interface}
 
+\begin{wrapfigure}[12]{R}{0.5\linewidth}
+	\caption{\label{fig:ui:tablet}Example placement of the control device}
+	\includegraphics[width=\linewidth]{assets/chpt_concepts/tablet.png}
+\end{wrapfigure}
+
 \begin{figure}
 	\caption{\label{fig:firstmockup}A first overview of the screen space distribution}
 	\includegraphics[width=0.9\textwidth]{assets/chpt_concepts/main_touch_interface.png}
 \end{figure}
 
 \subsection{Desired position of the Android Tablet}
-The application (and thus the screens within it) will be designed for the tablet to be placed in front of the operating person on a table. The person should have clear sight on the controlled robot. It seems sensible to place the tablet on the table in front of the robot while looking at it. Most interactions with the application will be performed by touch gestures using the right hand. For better usability a housing or case can be used to position the tablet at a slight angle to the table. 
+The application (and thus the screens within it) will be designed for the tablet to be placed in front of the operator on a table. The person should have clear sight on the controlled robot. It seems sensible to place the tablet on the table in front of the robot while looking at it. Most interactions with the application will be performed by touch gestures using the right hand. For better usability a housing or case can be used to position the tablet at a slight angle to the table. 
 
-\begin{wrapfigure}[12]{R}{0.5\linewidth}
-	\caption{\label{fig:ui:tablet}How the tablet could be placed on the table}
-	\includegraphics[width=\linewidth]{assets/chpt_concepts/tablet.png}
-\end{wrapfigure}
 
 Interaction with the application is done using the commonly known touch gestures like
 \begin{itemize}
@@ -27,7 +28,7 @@ Interaction with the application is done using the commonly known touch gestures
 
 \subsection{General Screen Layout}
 \label{sec:ui:layout}
-As a screen of a diagonal size of 10 inches (25.4cm) is very limited compared to the size of the robot's workspace good considerations have to made according to a well-designed user interface. Since we are mainly operating the robot with touch gestures, significant parts of the screen should be blank, as only few information can be displayed while the user poses his hands above or on the screen. Figure \ref{fig:firstmockup} gives a first overview of how the portions of the screen shall be distributed. The biggest part of the screen is reserved for touch interactions by the user. Since multiple approaches to control the robot shall be implemented, the method shall be selected and switched using a tabbed layout with the tabs on the top, as they then use the least space of the screen.
+As a screen of a diagonal size of 10 inches (25.4cm) is very limited compared to the size of the robot's workspace good considerations have to be made according to a well-designed user interface. Since we are mainly operating the robot with touch gestures, significant parts of the screen should be blank, as only few information can be displayed while the user poses his hands above or on the screen. Figure \ref{fig:firstmockup} gives a first overview of how the portions of the screen shall be distributed. The biggest part of the screen is reserved for touch interactions by the user. Since multiple approaches to control the robot shall be implemented, the method shall be selected and switched using a tabbed layout with the tabs on the top, as they use the least space of the screen this way.
 
 \subsubsection{Interlock Button}
 On all screens where the robot can be remotely operated, a security interlock button shall be displayed. For the actions on the screen to have effect on the robot (i.e. to be sent to the controller) the button shall remain pressed. This implements the functionality of a dead-man-switch, stopping all robot action once released. Although this is only a software measure it should be a good solution against unwanted movements of the robot as the button can easily be released when pressed with a single finger of the left hand. \textbf{Of course, this software measure does not replace hardware safety measures like emergency switches, but only supports them.}
@@ -56,7 +57,7 @@ As there are no additional controls required to control the direct fingertip map
 
 An interface shall be implemented to give users the ability to control each joint of the robot individually. This is sensible for a variety of reasons. Firstly, it might sometimes be required to move the robot out of a specific state by moving just one axis and not by applying multiple changes at once. Possible scenarios for this use case could be a state where the robot could harm users or the environment if uncontrolled or unpredictable movements occur. An interface to control joints individually is also very practical for testing purposes, for example if one part of the robot is suspected to be broken.
 
-Within this interface, the currently measured joint angle shall be displayed for each joint, next to the currently set target value (printed in bold). This gives the user a good insight of what state the robot should be in according to the program and what state it is actually in. This shall be supported by a coloured indicator, giving a quick visual feedback on the difference of the target and actual joint angles $\Delta \alpha = |\alpha_{actual} - \alpha_{target}|$. The colours of the visual feedback shall be:
+Within this interface, the currently measured joint angle shall be displayed for each joint, next to the currently set target value (printed in bold). This gives the user a good insight of what state the robot should be in according to the program and what state it actually is in. This shall be supported by a coloured indicator, giving a quick visual feedback on the difference of the target and actual joint angles $\Delta \alpha = |\alpha_{actual} - \alpha_{target}|$. The colours of the visual feedback shall be:
 
 \begin{itemize}
 	\item Green for $\Delta\alpha \leq 0.5^\circ$
@@ -66,7 +67,7 @@ Within this interface, the currently measured joint angle shall be displayed for
 
 The buttons to move the axis shall be displayed right and left of the angle displays. The visual feedback shall be shown as the background of the angle values. All these requirements put together, an axis control widget for a single joint or axis could look like depicted in Figure \ref{fig:axiscontrol}. To each control widget, a heading will be added to unambiguously denote which axis or joint will be controlled when using the corresponding buttons.
 
-Multiple of these widgets shall be added to the axis control screen, one for each controllable joint or axis. This will result in a screen containing 29 of these (22 for the hand, 7 for the robot arm). To get an idea of how the control screen for individual joint control will look like, refer to Figure \ref{fig:axiscontrol:screen}\footnote{Please note, however, that the number of hinted joint control widgets does not resemble the actual number of controllable joints for each part of the robot.}. 
+Multiple of these widgets shall be added to the axis control screen, one for each controllable joint or axis. This will result in a screen containing 29 of these (22 for the hand, 7 for the robot arm). To get an idea of how the control screen for individual joint control will look like, the reader is referred to Figure \ref{fig:axiscontrol:screen}\footnote{Please note, however, that the number of hinted joint control widgets does not resemble the actual number of controllable joints for each part of the robot.}. 
 
 \begin{figure}
 	\caption{\label{fig:axiscontrol:screen}Axis control screen draft}
@@ -76,7 +77,7 @@ Multiple of these widgets shall be added to the axis control screen, one for eac
 \section{Using the BioIK Service}
 \label{sec:robotarm:ctrl}
 
-The BioIK serivce (see Section \ref{sec:bioik}) is used according to the description in Section \ref{sec:using_services}. The important messages types are:
+The BioIK serivce (see Section \ref{sec:bioik}) is used according Section \ref{sec:using_services}. The important messages types are:
 \begin{itemize}
 	\item \textbf{GetIK} The combined Request/Response service message type
 	\item \textbf{GetIKRequest} The message type containing the request to the service
@@ -85,7 +86,7 @@ The BioIK serivce (see Section \ref{sec:bioik}) is used according to the descrip
 	\item \textbf{IKResponse} The actual response data
 \end{itemize}
 
-In the process of getting joint data from the BioIK service, the message types \textit{IKRequest} and \textit{IKResponse} are most important, as they contain the data needed on both sides. As the used message types contain a large number of members, only those significant for this thesis will be discussed within this section.
+In the process of getting joint data from the BioIK service, the message types \textit{IKRequest} and \textit{IKResponse} are most important, because they contain the data needed on both sides. As the used message types contain a large number of members, only those significant for this thesis will be discussed within this section.
 
 The \textit{IKRequest} message contains information about the current robot state and about the desired robot pose (see Table \ref{tab:msg:ikrequest}). The so-called \textit{goals} used here are \textit{PositionGoal}, \textit{OrientationGoal} and \textit{PoseGoal}, which is basically a combination of the first two. All goals contain a link name, which describes the end-effector that shall be brought to the given position or orientation. A \textit{PoseGoal} contains a \textit{Point} message type, which is a vector in 3D space. The \textit{OrientationGoal} consists of a \textit{Quaternion} which encodes the desired orientation of the end-effector in space. Lastly, the \textit{PoseGoal} contains both, a \textit{Point} and a \textit{Quaternion}, defining a distinct position and orientation in space. When provided with the current state of the robot, the IK algorithm begins looking for solutions at this state, possibly speeding up the overall solving process. Different goals for multiple end-effectors (called \textit{links}) can be passed to the BioIK service which will then try to find a solution fulfilling all of the given goals.
 
@@ -107,7 +108,7 @@ When the BioIK service has finished it returns a \textit{IKResponse} (Table \ref
 		\hline
 		string[] fixed\_joints & Names of the joints the IK solver shall not move while looking for solutions. \\
 		\hline
-		bool avoid\_collisions & If true, the BioIK solver tries to find solutions that to not collide with the environment (and the robot itself). \\
+		bool avoid\_collisions & If true, the BioIK solver tries to find solutions that do not collide with the environment (and the robot itself). \\
 		\hline
 		RobotState robot\_state & The current state of the robot. Contains a JointState message containing the current joint angles of all joints. These values are taken as a starting point while searching for solutions. \\
 		\hline
@@ -135,22 +136,26 @@ When the BioIK service has finished it returns a \textit{IKResponse} (Table \ref
 
 \section{Grasp Synergies}
 
-In their work, \citeauthor{Bernardino2013} describe a way to record hand postures using a data glove and the Shadow C5 robotic hand. The result of their research are data recorded for 8 different grasp postures of the human hand \cite{Bernardino2013}. Using \textit{Principal Component Analysis (PCA)} the datasets for each posture were parametrized. This process resulted in a matrix $S = (s_1 \dots s_M)$ for each grasp posture with $s_m$ being the eigenvectors of the parametrized grasp postures. For each posture $s_0$ is the mean value of all recorded posture data sets, defining the rest position of the hand within this posture. To get joint angles from these synergy matrices, they have to be multiplied by a vector $\alpha = (\alpha_1 \dots \alpha_M)$ containing the so-called amplitudes for each parameter. For a given synergy matrix and amplitude vector $\alpha \in \mathbb{R}^N$, the joint angles $\theta$ are described as
+In their work \citeauthor{Bernardino2013} describe a way to record hand postures using a data glove and the Shadow C5 robotic hand. The result of their research are data recorded for 8 different grasp postures of the human hand \cite{Bernardino2013}. Using \textit{Principal Component Analysis (PCA)} the datasets for each posture were parametrized. This process resulted in a matrix $S = (s_1, \dots , s_M)$ for each grasp posture with $s_m$ being the eigenvectors of the parametrized grasp postures. For each posture $s_0$ is the mean value of all recorded posture data sets, defining the rest position of the hand within this posture. To get joint angles from these synergy matrices, they have to be multiplied by a vector $\alpha = (\alpha_1, \dots , \alpha_N)$ containing the so-called amplitudes for each parameter. For a given synergy matrix $S$, a synergy offset $s_0$ and amplitude vector $\alpha \in \mathbb{R}^N$, the joint angles $\theta = (\theta_1, \dots , \theta_N)$ are described as
 \begin{equation}
 \label{eq:syn}
 \theta = s_0 + S\alpha
 \end{equation}
 
-$S$ is sorted in a way that changes to $\alpha_1, \alpha_2$ and $\alpha_3$ already cover approx. 80-90\% of the variance in the grasp postures recorded, which is why we will only look onto these three amplitudes when implementing the approach to grasping objects in this thesis.
+Since $S$ is sorted in such a way that changes to $\alpha_1, \alpha_2$ and $\alpha_3$ already cover approx. 80-90\% of the variance in the grasp postures recorded\cite{Bernardino2013}, we will only look onto these three amplitudes when implementing the approach to grasping objects in this thesis.
 
-$s_0$ and $S$ are provided by the above research, $\theta_n \in \theta$ is given in degrees, $\alpha_n \in \alpha$ are $-50 \leq \alpha_n \leq 50$. A good way has to be found to map touch gestures in a way that the three most significant amplitudes can be intuitively controlled. 
+$s_0$ and $S$ are provided by the above research and $\theta_n$ is given in degrees, $\alpha_n$ is $-50 \leq \alpha_n \leq 50$. The goal is to find a good mapping between touch gestures and $\alpha_n$, so that the grasp can be controlled intuitively.
 
 \subsection{Touch Gestures}
 
 To find solutions to map touch gestures to synergy amplitudes, we first generalize the understanding of touch gestures.
 
 \begin{defn}
-Let $p = (p_x, p_y) \in \mathbb{R}^2$ be a pointer on a touch screen, i.e. the coordinates of a registered finger the user has laid onto the touch surface. Then a set of pointers $G = \{p_1\dots p_n\}$ with $|G| \geq 1$ is called a \textbf{gesture}.
+$p = (p_x, p_y) \in \mathbb{R}^2$ is called a pointer on a touch screen, i.e. the coordinates of a registered finger the user has laid onto the touch surface.
+\end{defn}
+
+\begin{defn}
+ A set of pointers $G = \{p_1,\dots , p_n\}$ with $|G| \geq 1$ is called a \textbf{gesture}.
 \end{defn}
 
 Although pointer positions on a touch screen are usually given in integer numbers, pointers are defined in real space to make the following definitions possible. After having defined gestures, we have a look at different properties of them. Firstly, the two most basic properties of a gesture are defined, being the \textbf{position} and the \textbf{size}.
@@ -161,18 +166,18 @@ Although pointer positions on a touch screen are usually given in integer number
 \begin{itemize}
 	\item The \textbf{position} $c(G)$ of G is defined as
 	\begin{equation}
-	c(G) = \frac{1}{|G|}\sum_{i=1}^{|G|}p_i, p_i \in G
+	c(G) = \frac{1}{|G|}\sum_{i=1}^{|G|}p_i \qquad  p_i \in G\text{.}
 	\end{equation}
 	
 	\item The \textbf{size} $s(G)$ of G is
 	\begin{equation}
-	s(G) = \frac{2}{|G|}\sum_{i=1}^{|G|} d(c(G), p_i)
+	s(G) = \frac{2}{|G|}\sum_{i=1}^{|G|} d(c(G), \quad p_i)
 	\end{equation}
-	with $p_i \in G$ and $d(x, y) = \sqrt{(y_1 - x_1)^2 + (y_2 - x_2)^2}$ for $x, y \in \mathbb{R}^2$ the euclidian distance between two pointers.
+	with $p_i \in G$ and $d(x, y) = \sqrt{(y_1 - x_1)^2 + (y_2 - x_2)^2}\quad$ for $x, y \in \mathbb{R}^2$ the euclidean distance between two pointers.
 \end{itemize}
 \end{defn}
 
-In other words: The position of a gesture is the \textit{center of mass} of all pointers of a gesture. The size is the doubled mean distance of all pointers to the position of a gesture. Accordingly, the diameter of a circle having the radius of the mean distance of the pointers to the position of a gesture is the size. Before defining the last property of a gesture, the \textbf{orientation} we first have to define what the \textbf{thumb pointer} of a gesture is.
+In other words: The position of a gesture is the \textit{center of mass} of all pointers of a gesture. The size is the doubled mean distance of all pointers to the position of a gesture. Before defining the last property of a gesture, the \textbf{orientation} we first have to define what the \textbf{thumb pointer} of a gesture is.
 
 \begin{defn}
 	The \textbf{thumb pointer} $th(G)$ of a gesture $G$ is defined as
@@ -180,7 +185,7 @@ In other words: The position of a gesture is the \textit{center of mass} of all 
 	th(G) = \left\{
 	\begin{array}{ll}
 	p_1 & |G| = 1 \\
-	p_n \text{ with } p_{ny} = max\{p_{iy} : p_i \in G\} & |G| = 2 \\
+	p_n \text{ with } p_{n,y} = max\{p_{i,y} : p_i \in G\} & |G| = 2 \\
 	p_n \text{ with } d(c(G), p_n) = max\{ d(c(G), p_i) : p_i \in G \}& |G| > 2
 	\end{array}
 	\right.
@@ -261,7 +266,7 @@ All mappings from gestures' properties to DOF values shall be done linearly. A g
 
 There are multiple requirements for the function to find. Firstly, the linear equation shall be defined by two points $x, y \in \mathbb{R}^2$ with $x_1$ and $y_1$ being in gesture property's space and $x_2$, $y_2$ being in the corresponding DOF space (amplitude or arm position). Secondly, the output value shall be limited to the possible values of the DOF, for the synergies' amplitudes this will be $-50$ and $50$.
 
-It is to find a function $lm:(x \in \mathbb{R}^2, y \in \mathbb{R}^2, v_{min} \in \mathbb{R}, v_{max} \in \mathbb{R}, p \in \mathbb{R}) \rightarrow \mathbb{R}$ with the parameters being the two points the linear equation spans in between, the minimum and maximum output value and the value of the gesture property. It outputs the value that can then directly be passed into the DOF value.
+A function $lm:(x \in \mathbb{R}^2, y \in \mathbb{R}^2, v_{min} \in \mathbb{R}, v_{max} \in \mathbb{R}, p \in \mathbb{R}) \rightarrow \mathbb{R}$ shall be found with the parameters being the two points the linear equation spans in between, the minimum and maximum output value and the value of the gesture property. It outputs the value that can then directly be passed into the DOF value.
 
 Finding the linear equation spanned between two points $x, y \in \mathbb{R}^2$ is relatively easy. Beginning from the general linear equation
 \begin{equation*}
@@ -281,11 +286,15 @@ To clip a value $v$ to a minimum and maximum value $v_{min}$ and $v_{max}$ (with
 clip(v_{min}, v_{max}, v) = max(v_{min}, min(v, v_{max}))
 \end{equation*}
 
-Combination of the linear equation and the $clip$ function results in\footnote{\textbf{lm} stands for linear mapping}:
+Combination of the linear equation and the $clip$ function results in the function defined below.
+
+\begin{defn} Let $lm : (\mathbb{R}^2, \mathbb{R}^2, \mathbb{R}, \mathbb{R}, \mathbb{R}) \rightarrow \mathbb{R}$ a function for \textbf{linearly mapping} a value $p$ onto a linear function between two points $x, y \in \mathbb{R}^2$ with the output limited between $v_{min}, v_{max} \in \mathbb{R}$. Then $lm$ is
 \begin{equation}
 \label{eq:lm}
-lm(x, y, v_{min}, v_{max}, p) = clip\left(v_{min}, v_{max}, \left( p \cdot \frac{y_2 - x_2}{y_1 - x_1} + x_2 - \frac{y_2 - x_2}{y_1 - x_1} \cdot x_1 \right)\right)
+lm(x, y, v_{min}, v_{max}, p) = clip\left(v_{min}, v_{max}, \left( p \cdot \frac{y_2 - x_2}{y_1 - x_1} + x_2 - \frac{y_2 - x_2}{y_1 - x_1} \cdot x_1 \right)\right) \, .
 \end{equation}
+\end{defn}
+
 
 \subsubsection{Mappings}
 
@@ -304,7 +313,7 @@ Let $w_{screen}$ be the width of the screen in pixels, $\alpha \in \mathbb{R}^N$
 	For the third significant amplitude the orientation is mapped from $-90^\circ \widehat{=} -\frac{\pi}{2}$ to $90^\circ \widehat{=} \frac{\pi}{2}$. Rotations to values greater or less than these have shown to be only possible when moving the tablet or changing the gesture's size and position.
 \end{itemize}
 
-$\alpha_{1,2,3}$ are evaluated whenever a pointer's position within the gesture changes. Joint angle values are then calculated using (\ref{eq:syn}) with $S$ being the currently selected synergy. Once the joint values are calculated they can be published to the ROS nodes of the Shadow C5 hand.
+$\alpha_{1,2,3}$ are evaluated simultaneously whenever a pointer's position within the gesture changes. Joint angle values are then calculated using (\ref{eq:syn}) with $S$ being the currently selected synergy. Once the joint values are calculated they can be published to the ROS nodes of the Shadow C5 hand.
 
 \subsection{Relative Approach}
 \label{sec:app:rel}
@@ -459,10 +468,9 @@ For the direct fingertip mapping approach, the number of classes is small compar
 	\includegraphics[width=\linewidth]{assets/chpt_concepts/sw/gesture_observer.png}
 \end{wrapfigure}
 
-Multiple classes have to exchange data between each other and have to be able to report data changes at arbitrary times. To prevent the occurrence of circular dependencies between classes a variation of the \textit{Observer-Pattern} is used within the application. The Observer-Pattern is used to give loosely coupled classes the ability to unidirectionally give notifications to each other about data changes\cite{Eilebrecht2013}.
+Multiple classes have to exchange data between each other and have to be able to report data changes at arbitrary times. To prevent the occurrence of circular dependencies between classes a variation of the \textit{Observer-Pattern} is used within the application. The \textit{Observer-Pattern} is used to give loosely coupled classes the ability to unidirectionally give notifications to each other about data changes\cite{Eilebrecht2013}.
 
 There are two main uses of the \textit{Observer-Pattern}: 
-
 \textit{SynergyProxyBase} (The base class for the absolute and relative synergy proxies) implements the \textit{GestureObserver} interface to get notified about gesture changes from the \textit{GestureParser}. Figure \ref{fig:conc:obs1} shows the dependencies between the different classes and interfaces within this pattern as used here.
 
 \begin{wrapfigure}{R}{0.55\linewidth}
@@ -476,15 +484,15 @@ Aside from the original \textit{Observer} pattern described in \cite{Eilebrecht2
 
 \subsection{Singleton}
 
-As several classes exist of which only one instance is needed (and sensible to be created) within all of the application's functionality, the \textit{Singleton-Pattern} is used to ensure that only one isntance really exists. The singleton pattern is implemented by creating a private constructor which is called from a static method on the desired class. The created instance is saved into a static field and then returned on all subsequent calls. An example implementation of the pattern (as taken from \cite{Eilebrecht2013}) can be found in Listing \ref{lst:conc:obs}.
+As several classes exist of which only one instance is needed (and sensible to be created) within all of the application's functionality, the \textit{Singleton-Pattern} is used to ensure that only one instance exists. The singleton pattern is implemented by creating a private constructor which is called from a static method on the desired class. The created instance is saved into a static field and then returned on all subsequent calls. An example implementation of the pattern (as taken from \cite{Eilebrecht2013}) can be found in Listing \ref{lst:conc:obs}.
 
 The \textit{Observer-Pattern} is implemented by the following classes:
 \begin{itemize}
 	\item \textit{AxisManager}, as it is important that all axis actions (and especially the safety interlock) are existent and performed just once over all of the application. Multiple instances of the \textit{AxisManager} may interfere with each other and thus cause unpredictable behaviour of the overall set-up.
-	\item \textit{CartesianArmManager}, as it holds the current position of the arm in Cartesian coordinates. For the same reasons as with \textit{AxisManager}, having multiple instances (and states) of this class available in the application would not be sensible - or even dangerous.
+	\item \textit{CartesianArmManager}, as it holds the current position of the arm in Cartesian coordinates. For the same reasons as with \textit{AxisManager}, having multiple instances (and states) of this class available in the application would not be sensible -- or even dangerous!
 \end{itemize}
 
-Of other classes, like the \textit{C5LwrNode}, only one instance exists during the runtime, too. As for the above classes, having multiple instances available could cause unexpected and unwanted behaviour and thus it has to be ensured only one instance is created. However, with the node implementation ensuring this is not as easy as using the \textit{Singleton-Pattern}, because multiple parameters have to be passed to the class on creation. In this case, \textit{MainActivity}, as the main entry point for the application, takes care of the node's instance, passing it to all classes that need access to it. The same applies for all the user interface specific classes (mainly the \textit{Fragment} classes, offering the different tabbed views). Here, no singleton pattern can be used by Android's restrictions, so \textit{MainActivity} takes care of these, too.
+Only one instance exists during the runtime of other classes, too, like the \textit{C5LwrNode}. As for the above classes, having multiple instances available could cause unexpected and unwanted behaviour and thus it has to be ensured only one instance is created. However, with the node implementation ensuring this is not as easy as using the \textit{Singleton-Pattern}, because multiple parameters have to be passed to the class on creation. In this case, \textit{MainActivity}, as the main entry point for the application, takes care of the node's instance, passing it to all classes that need access to it. The same applies for all the user interface specific classes (mainly the \textit{Fragment} classes, offering the different tabbed views). Here, no singleton pattern can be used by Android's restrictions, so \textit{MainActivity} takes care of these, too.
 
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[caption={Example implementation of the Observer-Pattern}, label=lst:conc:obs]

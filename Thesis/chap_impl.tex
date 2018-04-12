@@ -94,6 +94,44 @@ This gives us the ability to use the already-built features in rosandroid like t
 \section{User Interface}
 \label{sec:impl:ui}
 
+The user interface of the application was developed according to the considerations made in chapter \ref{chap:concepts}. Additionally it turned out during development, that a basic tele-operation screen for the robot arm would be useful, that enables the user to bring the arm into a defined home position as well as doing simple step-wise manipulation to the robotic arm by moving the desired position of the hand palm by single small steps per button-press. The screen's layout and functionality is described in Section \ref{sec:impl:armteleop}.
+
+The safety interlock button on all screens is immplemented using a \textit{FloatingActionButton}, a predefined conttrol by Android which is designed to float in one corner of the screen above the rest of the screen's contents. To have the \textit{FloatingActionButton} work in the expected way, all screen contents have to be embedded into a \textit{CoordinatorLayout} container. The icon of the button has a \textit{Play} symbol in idle state, in activated state is shows a \textit{Pause} symbol until the button is released. The code to make the interlock button is described in Listing \ref{lst:impl:interlock}. It has to be inserted into the overridden \textit{onStart()} method in every Fragment of the application, in which the functionality shall exist - i.e. every page with controls for the robot.
+
+\begin{lstlisting}[caption={Code for the interlock button}, label=lst:impl:interlock]
+@Override
+public void onStart() {
+	super.onStart();
+	
+	final FloatingActionButton lockButton = ((FloatingActionButton)getView().findViewById(R.id.lockButton));
+
+	lockButton.setOnTouchListener(new View.OnTouchListener() {
+		boolean locked = true;
+		
+		@Override
+		public boolean onTouch(View view, MotionEvent motionEvent) {
+			switch(motionEvent.getAction())
+			{
+				case MotionEvent.ACTION_DOWN:
+                        // Code to unlock robot operations
+						lockButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.posOk)));
+						lockButton.setImageResource(android.R.drawable.ic_media_pause);
+				break;
+				
+				case MotionEvent.ACTION_UP:
+					// Code to lock robot operations
+					lockButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.posNOk)));
+					lockButton.setImageResource(android.R.drawable.ic_media_play);
+				break;
+			}			
+			return true;
+		}
+	});
+	
+	// ... more code for onStart()
+}
+\end{lstlisting}
+
 \subsection{Synergy Pages}
 
 \subsection{Axis Control Page}
@@ -101,6 +139,9 @@ This gives us the ability to use the already-built features in rosandroid like t
 \subsection{Direct Fingertip Mapping Page}
 
 \subsection{Arm Tele-Operation Page}
+\label{sec:impl:armteleop}
+
+\section{The AxisManager}
 
 \section{Grasp Synergies}
 
@@ -110,4 +151,8 @@ This gives us the ability to use the already-built features in rosandroid like t
 
 \section{Direct Finger Positioning}
 
-\section{Performance of the BioIK Service}
+\section{Performance}
+
+\subsection{Application}
+
+\subsection{BioIK Service}
