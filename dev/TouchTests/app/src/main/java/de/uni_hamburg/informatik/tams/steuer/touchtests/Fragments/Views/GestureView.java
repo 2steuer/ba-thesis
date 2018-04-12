@@ -26,6 +26,7 @@ import de.uni_hamburg.informatik.tams.steuer.touchtests.Synergies.Interfaces.Syn
 
 public class GestureView extends View implements SynergyAmplitudeListener, GestureObserver {
     private static final int REMEMBER_POINTS_POINTERCOUNT = 2;
+    private static final int REMEMBER_THREE_POINTERCOUNT = 3;
 
     GestureParser gestures = new GestureParser();
 
@@ -40,9 +41,12 @@ public class GestureView extends View implements SynergyAmplitudeListener, Gestu
 
     private Gesture _currentControlGesture = null;
 
-    private List<Pointer> _rememberPointers = new LinkedList<>();
-    private boolean _drawRememberPointers = false;
+    private Gesture _currentThreeControlGesture = null;
 
+    private List<Pointer> _rememberPointers = new LinkedList<>();
+    private List<Pointer> _threeRememberPointers = new LinkedList<>();
+    private boolean _drawRememberPointers = false;
+    private boolean _drawThreeRememberPointers = false;
     public GestureView(Context context) {
         super(context);
         setPaints();
@@ -165,7 +169,6 @@ public class GestureView extends View implements SynergyAmplitudeListener, Gestu
             _rememberPointers.addAll(g.getPointers());
             _drawRememberPointers = false;
         }
-
     }
 
     @Override
