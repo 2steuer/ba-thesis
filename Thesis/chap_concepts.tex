@@ -197,15 +197,16 @@ The thumb pointer shall be evaluated and memorized whenever $|G|$ changes, i.e. 
 Note that the $y$ coordinate is rising to the bottom, as it is usual on digital screens. Having this in mind the thumb pointer is the lowest pointer in a 2-pointer gesture or the one furthest away from the position of a gesture with 3 or more pointers. The last part of the definition is important, as the lowest pointer does not necessarily remain the lowest when the gesture is rotated on the screen, so to have a consistent definition of the orientation, the thumb pointer may only be evaluated when pointers are added or removed from a gesture.
 
 \begin{defn}
-	Let $G$ be a gesture, $b_y = (0, -1) \in \mathbb{R}^2$. The orientation $o(G)$ of $G$ is defined as
+	Let $G$ be a gesture, $b_y = (0, -1) \in \mathbb{R}^2$. For $v = c(G) - th(G)$, the orientation $o(G)$ is defined as
 	
 \begin{equation}
-o(G) = acos\left(\frac{(c(G) - th(G)) \cdot b_y}{|c(G) - th(G)| \cdot |b_y|}\right)
+o(G) = \textnormal{sign}(\det(b_y\, v)) \cdot \arccos\left(\frac{v \cdot b_y}{|v| \cdot |b_y|}\right) \, .
 \end{equation}	
-	
+
 \end{defn}
 
-In other words the orientation of a gesture is the angle between the vector from the thumb pointer to the position of a gesture and $b_y$, which is pointing upwards in screen coordinates as, again $y$ is growing downwards.
+
+In other words the orientation of a gesture is the angle between the vector from the thumb pointer to the position of a gesture and $b_y$, which is pointing upwards in screen coordinates as, again, $y$ is growing downwards. If the determinant of $(v\,b_y)$ is negative, the angle between $b_y$ to $v$ is counter-clockwise\cite{Bronstein2012}. Using this, the values of $o(G)$ range from $-\pi$ (which is $180^\circ counterclockwise$) and $\pi$. 
 
 \subsubsection{Example}
 
@@ -319,21 +320,33 @@ $\alpha_{1,2,3}$ are evaluated simultaneously whenever a pointer's position with
 \label{sec:app:rel}
 Within the relative approach, the values of the significant amplitudes shall not depend on the actual properties of a gesture but on the change each property experiences. This makes it necessary to store the current value of the amplitudes and initialize them, e.g. with 0. Whenever a gesture changes, the difference of the properties is evaluated and mapped to a difference of the amplitude which is then applied.
 
-When a gesture's property changes, the last value of the property is stored into a temporary storage, for example for the position of the gesture:
-\begin{equation*}
-last(c(G)) = c(G)
-\end{equation*}
-
-When $c(G)$ changes the difference $\Delta c(G)$ then is
-
-\begin{equation*}
-\Delta c(G) = c(G) - last(c(G))
-\end{equation*}
-
-This applies for $s(G)$ and $o(G)$ accordingly. Now needed is a rate of change in the output value. This rate is given in $\frac{\text{value change}}{\text{property change}}$. If, for example, the value of an amplitude shall change by $c_v = 25$ every $c_p = 1000$ pixels the gesture is moved in one direction, the value would be $\frac{c_v}{c_p} = \frac{25}{1000} = 0.025$. For reasons of simplicity, $c_v$ and $c_p$ shall be passed to the relative change function\footnote{\textbf{rm} stands for relative mapping} $rm:(c_v \in \mathbb{R}, c_p \in \mathbb{R}, v_{min} \in \mathbb{R}, v_{max} \in \mathbb{R}, v_{old} \in \mathbb{R}, \Delta p \in \mathbb{R}) \rightarrow \mathbb{R}$. with $v_{old}$ being the previous value of the output and $\Delta p$ the change in the property that shall be applied. The output shall again be clipped to $v_{min}$ and $v_{max}$ with $v_{min} \leq v_{max}$.
+\begin{defn}
+Let $G$ be a gesture. $G(t)$ describes the state of the gesture (i.e. the position of the pointers within the gesture) at time $t$. Then
 \begin{equation}
-rm(c_v, c_p, v_{min}, v_{max}, v_{old}, \Delta p) = max(v_{min}, min(v_{old} + \frac{c_v}{c_p} \cdot \Delta p, v_{max}))
+c_i(G) = c(G(t_0 + i \cdot \Delta t)) \, .
 \end{equation}
+Accordingly, $s_i(G)$ and $o_i(G)$ are defined.
+\end{defn}
+
+\begin{defn}
+Let $G$ be a gesture. At the time $i$ it is
+\begin{equation}
+\Delta c(G) = c_i(G) - c_{i - 1}(G) \, .
+\end{equation}
+Again, $\Delta s(G)$ and $\Delta o(G)$ are defined accordingly.
+\end{defn}
+
+With the above definitions we can describe the change of $G$ between two time steps and the change of the gesture's properties between two time steps. The touch pointers are evaluated by the Android operating system periodically, so while a touch pointer is present on the screen, periodic updates are sent to the application. As we do not know the time steps, $\Delta t$ may be small, in particular it may be $0$ without affecting the following calculations.
+
+Next, a rate of change of the output value has to be declared. This rate is given in $\frac{\text{value change}}{\text{property change}}$. If, for example, the value of an amplitude shall change by $c_v = 25$ every $c_p = 1000$ pixels the gesture is moved in one direction, the value would be $\frac{c_v}{c_p} = \frac{25}{1000} = 0.025$. For reasons of simplicity, $c_v$ and $c_p$ shall be passed to the relative change function defined below.
+
+\begin{defn}
+Let $rm : (\mathbb{R}, \mathbb{R}, \mathbb{R}, \mathbb{R}, \mathbb{R}, \mathbb{R}) \rightarrow \mathbb{R}$ be the \textbf{relative mapping} function that alters the value $v_{old}$ by the changed parameter $\Delta p$ at the rate of change $\frac{c_v}{c_p}$ while clipping the output between $v_{min}$ and $v_{max}$ with $v_{min} \leq v_{max}$. Then
+
+\begin{equation}
+rm(c_v, c_p, v_{min}, v_{max}, v_{old}, \Delta p) = clip(v_{min}, v_{max}, v_{old} + \frac{c_v}{c_p} \cdot \Delta p) \, .
+\end{equation}
+\end{defn}
 
 Updating the output value upon a changing gesture takes two steps, for example with amplitude $\alpha_1$:
 \begin{align*}
@@ -351,12 +364,14 @@ Whether these values are well chosen and usable has to be evaluated during tests
 
 \subsection{Arm Control}
 
-\begin{wrapfigure}{R}{0.5\linewidth}
-\caption{\label{fig:arm:coord}The coordinate system relative to the arm}
-\includegraphics[width=\linewidth]{assets/chpt_concepts/coordinates.png}
+\begin{wrapfigure}[14]{R}{0.4\linewidth}
+	\caption{\label{fig:arm:coord}The coordinate system relative to the arm}
+	\includegraphics[width=\linewidth]{assets/chpt_concepts/coordinates.png}
 \end{wrapfigure}
 
 Controlling the arm with touch gestures is not as easy as controlling the grasp synergies since the arm's joint angles have to be calculated using the BioIK service. The objective is to give the user the opportunity to control the position of the robot's hand-palm in Cartesian coordinates. To achieve this, it is important to know the orientation of the coordinate system around the arm as well as \textit{safe} coordinates, where the robot arm can move without causing any danger to its environment. Figure \ref{fig:arm:coord} gives a good insight in the coordinate system used. Potentially, an arbitrary coordinate system could be used, but the BioIK service at the point of writing only accepts coordinates in the so-called \textit{world} coordinate system. It has its origin on the floor below the robot arm's base. Each square in the illustration represents one meter in the real set-up. The shown model is assumed to be sufficiently exact to use it as a simulation for the real robot with its surroundings. It is important to keep in mind that the y-coordinate is counter-intuitively rising to the back, which means it is falling in the direction to the front. Also, from the robot's perspective, the x axis is oriented to the left.
+
+In order to prevent damages to the robot or its environment, a \textit{bounding box} has to be found where the robot's movements do not cause any unwanted movements. Unwanted movements can occur since the shortest way from position $x$ to position $y$ may be very short in cartesian space, but still very long in joint coordinates. It is important to keep in mind, that for very close points, the BioIK service might output very different joint positions, as it assumes the new solution more fitting than the old one. This, however, results in a quite small work space for the robot compared to the overall table size. For the first approach, the limits for all 3 axes assumed \textit{safe} are denoted in Table \ref{tab:safeaxes}.
 
 \begin{wraptable}{L}{0.3\linewidth}
 	\caption{\label{tab:safeaxes}Position limits for the robot's hand's palm}
