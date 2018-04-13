@@ -394,9 +394,75 @@ The first two methods set and query the \textit{locked} state of a gesture, foll
 
 \subsection{Arm Control}
 
-\subsection{Absolute Mapping}
+\subsubsection{The PointInSpace class}
 
-\subsection{Relative Mapping}
+The \textit{PointInSpace} class implements functionality as a vector in three dimensions, offering basic operations like adding other \textit{PointInSpace} instances and multiplying with scalars. It is not as elaborated as the \textit{Location} class, but extending the functionality according to \textit{Location} if needed could easily be done.
+
+\begin{lstlisting}[caption={The public interface of PointInSpace}]
+public class PointInSpace {
+	public PointInSpace(double x, double y, double z);
+	
+	public double getX();
+	public double getY();
+	public double getZ();
+	
+	public PointInSpace add(PointInSpace pw);
+	public PointInSpace multiply(double v);
+}
+
+\end{lstlisting}
+
+\subsubsection{The CartesianArmManager class}
+
+The functionality to move the arm (or better: The palm of the robotic hand) in Cartesian space is provided by the \textit{CartesianArmManager}. It accepts positions for the palm and manages the querying of the BioIK service asynchronously in the background. Once it received a result from the IK service it forwards it to the \textit{AxisManager} instance. It holds a list of all joints that shall not be affected by the \textit{CartesianArmManager}, i.e. all joints of the Shadow C5 hand, thus placement of the palm only takes place by moving joints belonging to the Kuka robot arm. It also only updates joints in the \textit{AxisManager} that it shall affect, leaving control to all the other joints to different parts of the software.
+
+\begin{lstlisting}[caption={The public interface of CartesianArmManager}, label=lst:impl:cartarm]
+public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.GetIKResponse> {
+	public static final double Y_MIN = -1.2;
+	public static final double Y_MAX = -0.8;
+	public static final double X_MIN = -0.2;
+	public static final double X_MAX = 0.4;
+	public static final double Z_MIN = 1.05;
+	public static final double Z_MAX = 1.17;
+	
+	public static final int MAX_AXIS_CHANGE = 15;
+	
+	public static CartesianArmManager getInstance();
+	
+	public void setNode(C5LwrNode node);
+	
+	
+	public boolean goHome();
+	public boolean movePalm(PointInSpace offset);
+	public boolean movePalmTo(PointInSpace position);
+	
+	public PointInSpace getPosition();
+	
+	public void stop();
+}
+\end{lstlisting}
+
+\begin{wrapfigure}[20]{R}{0.5\linewidth}
+	\caption{\label{fig:impl:cartarmstate}State diagram for the CartesianArmManager update loop}
+	\includegraphics[width=\linewidth]{assets/chpt_impl/sw/CartesianArmManager_loop}
+\end{wrapfigure}
+
+Whenever a new target position for the palm is set using \textit{goHome()}, \textit{movePalm()} or \textit{movePalmTo()}, the IK-loop within the \textit{CartesianArmManager} is started. It tries to get solutions from as BioIK service as fast as it can, initiating a new request as soon as one result was received until either no new position was requested or \textit{stop()} was called. Once one of these two cases happen, the loop is stopped and restarted only when a new position is set. Whenever the loop starts a new request, it uses the last set value as target value, values set in between two requests are omitted. Figure \ref{fig:impl:cartarmstate} gives an overview about this process in form of a state diagram.
+
+When a result is returned by the BioIK service it has to go through multiple checks before it is sent to the robot. First, if the \textit{error\_code} field has another value than $0$, the BioIK solver could not find any solution for the queried robot pose, in this case, the \textit{CartesianArmManager} sends the same request to the BioIK service again so it tries to find another solution again. If the \textit{error\_code} field is $0$, the joint angles from the solution are compared to the currently measured state of the robot. When one joint is changed by more than 15 degrees, the solution is rejected as unsafe and a new solution for the same request is queried at the BioIK service. This is done to prevent big movements in joint space, possibly causing unwanted and uncontrollable movements of the robot, potentially causing damage to the robot or its environment. The check for high distances in joint space can be bypassed, which is used when letting the robot go into home position, as this specific position most probably has a bigger distance to the state before than allowed by the check. This means that \textbf{when going to the home position, the user has to watch the robot and has to use caution when using this functionality.} Whenever unwanted movement is observed the user can lift the finger off the safety interlock button to immediately stop any robot movement. As an additional precautionary measure, a hardware emergency switch should be within reach of the operator. When the above checks pass, the joint angled of the arm returned by the BioIK service are written to the \textit{AxisManager} which then sends them to the robot over ROS.
+
+The functionality of the three methods to set new target value is in particular:
+\begin{itemize}
+	\item \textit{goHome()} sets the target position of the palm to a fixed position which is known to be safely reachable. In this case, it's $p_{home} = \vecthr{0}{y_{min}}{z_{max}}$, which is a position located directly in front of the robot at the border of the table.
+	\item \textit{movePalm()} moves the current target position of the palm by \textit{offset} (by adding it to the position returned by \textit{getPosition()}).
+	\item \textit{movePalmTo()} overwrites the target position by \textit{position}.
+\end{itemize}
+
+
+
+\subsection{Absolute control}
+
+\subsection{Relative control}
 
 \section{Direct Finger Positioning}
 
