@@ -234,9 +234,13 @@ s(G) &= \frac{2}{3}\left( d(c(G), p_1) + d(c(G), p_2) + d(c(G), p_3) \right) \\
 Figure \ref{fig:touch:expl_res} shows the example gesture extended with the position of the gesture and a circle with the diameter of the gesture size around the position of the gesture. From the above calculation it can be seen that $p_1$ has the biggest distance to the position of the gesture, that implicates $th(G) = p_1$ as $G$ has more than 2 pointers. With this we can calculate the orientation of the gesture as follows.
 
 \begin{align*}
-o(G) &= acos\left( \frac{\vectwo{53.3}{-376.8} \cdot \vectwo{0}{-1}}{380.6 \cdot 1} \right) = acos\left( \frac{376.8}{380.6} \right) \\
-&\approx acos\left( 0.99002 \right) \\
-&\approx 0.141398 \widehat{\approx} 8.101 ^\circ
+o(G) &= \text{sign} \left( \det \left( \begin{matrix}
+0 & 53.3 \\
+-1 & -376.8
+\end{matrix} \right) \right) \cdot \arccos\left( \frac{\vectwo{53.3}{-376.8} \cdot \vectwo{0}{-1}}{380.6 \cdot 1} \right) \\
+&= 1 \cdot \arccos\left( \frac{376.8}{380.6} \right) 
+\approx \arccos\left( 0.99002 \right) \\
+&\approx 0.141398 \, \widehat{\approx} \, 8.101 ^\circ
 \end{align*}
 
 $G$ has an angle relative to the $y$ axis from about $8.1^\circ$.
