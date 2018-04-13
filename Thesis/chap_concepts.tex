@@ -135,7 +135,7 @@ When the BioIK service has finished it returns a \textit{IKResponse} (Table \ref
 \end{table}
 
 \section{Grasp Synergies}
-
+\label{sec:conc:synergy}
 In their work \citeauthor{Bernardino2013} describe a way to record hand postures using a data glove and the Shadow C5 robotic hand. The result of their research are data recorded for 8 different grasp postures of the human hand \cite{Bernardino2013}. Using \textit{Principal Component Analysis (PCA)} the datasets for each posture were parametrized. This process resulted in a matrix $S = (s_1, \dots , s_M)$ for each grasp posture with $s_m$ being the eigenvectors of the parametrized grasp postures. For each posture $s_0$ is the mean value of all recorded posture data sets, defining the rest position of the hand within this posture. To get joint angles from these synergy matrices, they have to be multiplied by a vector $\alpha = (\alpha_1, \dots , \alpha_N)$ containing the so-called amplitudes for each parameter. For a given synergy matrix $S$, a synergy offset $s_0$ and amplitude vector $\alpha \in \mathbb{R}^N$, the joint angles $\theta = (\theta_1, \dots , \theta_N)$ are described as
 \begin{equation}
 \label{eq:syn}
@@ -147,7 +147,7 @@ Since $S$ is sorted in such a way that changes to $\alpha_1, \alpha_2$ and $\alp
 $s_0$ and $S$ are provided by the above research and $\theta_n$ is given in degrees, $\alpha_n$ is $-50 \leq \alpha_n \leq 50$. The goal is to find a good mapping between touch gestures and $\alpha_n$, so that the grasp can be controlled intuitively.
 
 \subsection{Touch Gestures}
-
+\label{sec:conc:gestures}
 To find solutions to map touch gestures to synergy amplitudes, we first generalize the understanding of touch gestures.
 
 \begin{defn}
@@ -200,6 +200,7 @@ Note that the $y$ coordinate is rising to the bottom, as it is usual on digital 
 	Let $G$ be a gesture, $b_y = (0, -1) \in \mathbb{R}^2$. For $v = c(G) - th(G)$, the orientation $o(G)$ is defined as
 	
 \begin{equation}
+\label{eq:conc:orientation}
 o(G) = \textnormal{sign}(\det(b_y\, v)) \cdot \arccos\left(\frac{v \cdot b_y}{|v| \cdot |b_y|}\right) \, .
 \end{equation}	
 

@@ -276,10 +276,127 @@ This function is designed to be called upon touch actions on the safety interloc
 \end{figure}
 
 \section{Grasp Synergies}
+The grasp synergy approach is implemented according to the concepts described in Section \ref{sec:conc:synergy}. The approach are implemented using a gesture page and relative and absolute approach are differentiable by the title of the tabbed page selector, besides from that, the pages look the same.
 
 \subsection{Gesture Parsing}
 
+Gesture parsing is separated into multiple classes. The \textit{GestureParser} class accepts touch events redirected to it by the \textit{GestureView}s on the pages for gesture control. It has a method 
+\begin{lstlisting}
+public void handleTouchEvent(MotionEvent e);
+\end{lstlisting}
+which is called from within the \textit{onTouchEvent()} handler of the user interface element. The \textit{GestureParser} is otherwise independent from the user interface element it is invoked by. When a new pointer is encountered, it adds it to a gesture it fits to which is already present on the screen or -- if the pointer is too far away from any existent gesture -- creates a new gesture. If a pointer is removed from the screen, it is also deleted from the gesture it was assigned to. If no pointers are left within the gesture, it is also removed. If an event is received stating a pointer has moved, the pointer location is updated in memory. Upon all of the described actions, the observers of the \textit{GestureParser} are notified. These observers implement the \textit{GestureObserver} interface, which is shown in Listing \ref{lst:impl:gestobs}. It gives the \textit{GestureParser} to notify observers about the addition or removal of a gesture, as well as the case on which a pointer of the gesture has changed its position. 
+
+\begin{lstlisting}[caption={The GestureObserver interface}, label=lst:impl:gestobs]
+public interface GestureObserver {
+	void onGestureAdd(Gesture g);
+	void onGestureRemove(Gesture g);
+	void onGestureChanged(Gesture g);
+}
+\end{lstlisting}
+
+If the pointer count of a gesture changes, the \textit{GestureParser} calls the \textit{onGestureRemove()} method of observers, and then the \textit{onGestureAdd()} method. Both with the same \textit{Gesture} object.
+
+When a gesture is added or its pointer count changes, it is marked as \textit{locked} by the \textit{GestureParser} for the duration of one second. This indicates to dependent classes, that the gesture is new and the data should not yet be used for any control purposes, as the user might still adjust finger positions. This also takes care of the fact that, to add a multi-pointer gesture, the android system calls different events for each pointer subsequently, meaning that to the software it looks as if a one-pointer gesture was added, then a two-pointer gesture and then a three-pointer gesture, if 3 fingers were laid on the touchscreen. By ignoring gesture input for the first second of a new gesture, the user should have put all fingers onto the screen and can then control the application. Having input by an unwanted gesture may cause unexpected behaviour. In the following the functionality of the three main material classes \textit{Location}, \textit{Pointer} and \textit{Gesture} is explained.
+
+\subsubsection{The Location class}
+
+The \textit{Location} class represents a two-dimensional vector within the program. It has two coordinates, $x$ and $y$, which can be accessed by getter methods. It also offers basic functionality to work with vectors, including addition, subtraction, multiplication with scalars and the scalar-product. All functionality is implemented as expected by common sense. When a mathematical operation is performed using two \textit{Location} objects, the result is returned as a new one, as a \textit{Location} is immutable once it is created.
+
+\begin{lstlisting}[caption={The public interface of the Location class}, label=lst:impl:location]
+public class Location {
+	public Location(float x, float y);
+	
+	public float getX();
+	public float getY();
+	
+	public Location add(Location loc);
+	public Location substract(Location loc);
+	public Location multiply(float c);
+	public Location divide(float c);
+	
+	public double scalarProduct(Location loc);
+	
+	public double getVectorLength();
+	public double distanceTo(Location loc);
+	public double getAngleTo(Location loc);
+	public Location getTurned(double angleRad);
+	public boolean isSame(Location l2);
+}
+\end{lstlisting}
+
+As visible in Listing \ref{lst:impl:location} multiple advanced operations are also available on \textit{Locations}. \textit{getVectorLength()} returns the length of the vector calculated using the Pythagorean theorem. \textit{getDistanceTo()} is implemented very similar, as it basically calculates the length of the differential vector between the \textit{Location} it is invoked on and the passed second \textit{Location}. Although this could be done by one \textit{substract()} operation and then performing \textit{getVectorLength()} on the result the calculation is directly implemented here for performance reasons.
+
+\begin{lstlisting}[caption={Implementation of getVectorLength() and getDistanceTo()},label=lst:impl:location_length]
+public double getVectorLength() {
+	return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+}
+
+public double distanceTo(Location loc) {
+	return (float)Math.sqrt(Math.pow(loc.x - this.x, 2) + Math.pow(loc.y - this.y, 2));
+}
+\end{lstlisting}
+
+\textit{getAngleTo()} returns the angle between the \textit{Location} it is invoked on and the one passed as a parameter. Please note that this represents the calculation as defined in Equation \ref{eq:conc:orientation} implemented for arbitrary vectors. This means that the output of this method ranges from $-\pi$ to $\pi$, with positive angles meaning a clockwise rotation from the invoked \textit{Location} to the one passed as a parameter. The reader if referred to Listing \ref{lst:impl:angles} for the implementation of \textit{getAngleTo()}. In Line 4 the determinant of the two combined vectors is calculated and the result is multiplied with $-1$ if the determinant is negative. This could've been written shorter, but for better readability this format was chosen.
+
+\begin{lstlisting}[caption={Implementation of getAngleTo()},label=lst:impl:angles]
+public double getAngleTo(Location loc) {
+	double val = Math.acos(scalarProduct(loc) / (getVectorLength() * loc.getVectorLength()));
+	
+	if(x * loc.getY() - y * loc.getX() < 0) {
+		val *= -1;
+	}
+
+	return val;
+}
+\end{lstlisting}
+
+Lastly, \textit{getTurned()} returns the current \textit{Location} rotated by an angle of \textit{angleRad}. The angle may range from $-\pi$ to $\pi$, with positive angles meaning a clockwise rotation. \textit{isSame()} is a numerical comparison of the two vectors. Note that floating point numbers are compared here, on which equality comparisons are problematic. This function is used to check for exactly the same values, meaning probably the same location objects.
+
+\subsubsection{The Pointer class}
+
+Pointers are the contents of \textit{Gestures}. They contain of a \textit{Location}, representing their coordinates on the touch-screen and an id, which is their touch-pointer-id as assigned by the Android operating system. This class was basically introduced to semantically separate the pointer id from the location. The id is needed to identify a pointer within the motion event raised by the operating system. A method is provided to update the location of a pointer, in which a new \textit{Location} object is created.
+\begin{lstlisting}[caption={The Pointer class}]
+public class Pointer {
+	public Pointer(int id, float x, float y);
+
+	public int getId();
+
+	public Location getLocation();
+	public void setLocation(float x, float y);
+}
+\end{lstlisting}
+
+\subsubsection{The Gesture class}
+
+The \textit{Gesture} class represents a gesture as defined in Section \ref{sec:conc:gestures}. It is basically a set of \textit{Pointer}s with a set of properties. Its public interface is denoted in Listing \ref{lst:impl:gestureclass}.
+
+\begin{lstlisting}[caption={Public interface of the Gesture class},label=lst:impl:gestureclass]
+public class Gesture {
+	public boolean isLocked();
+	public void setLocked(boolean locked);
+	
+	public void addPointer(Pointer p);
+	public void removePointer(Pointer p);
+	public int getPointerCount();
+	
+	public boolean catchesPointer(Pointer p);
+	public float getCatchRadius();
+	public float getDistanceToCenter(Pointer p);
+	
+	public Location getCenter();
+	public float getSize();
+	public double getOrientation();
+}
+\end{lstlisting}
+
+The first two methods set and query the \textit{locked} state of a gesture, followed by three methods to add and remove pointers, as well as querying the number of currently available pointers in a gesture. Whenever a pointer is added or removed to or from a gesture, the \textit{thumb pointer} is evaluated according to the rules defined in Section \ref{sec:conc:gestures}.
+\textit{catchesPointer()} determines whether a new \textit{Pointer} can be added to the gesture. This is done by checking whether the \textit{Pointer}  is within a distance of $2.5$x the size of the gesture around its center. If only one pointer is present in a gesture no size is available. In that case, a size of 1200 is taken as the \textit{catch radius}. \textit{getCenter()}, \textit{getSize()} and \textit{getOrientation()} represent $c(G)$, $s(G)$ and $o(G)$ as defined in section \ref{sec:conc:gestures}.
+
 \subsection{Arm Control}
+
+\subsection{Absolute Mapping}
+
+\subsection{Relative Mapping}
 
 \section{Direct Finger Positioning}
 
