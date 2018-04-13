@@ -171,9 +171,9 @@ Although pointer positions on a touch screen are usually given in integer number
 	
 	\item The \textbf{size} $s(G)$ of G is
 	\begin{equation}
-	s(G) = \frac{2}{|G|}\sum_{i=1}^{|G|} d(c(G), \quad p_i)
+	s(G) = \frac{2}{|G|}\sum_{i=1}^{|G|} d(c(G), \, p_i)
 	\end{equation}
-	with $p_i \in G$ and $d(x, y) = \sqrt{(y_1 - x_1)^2 + (y_2 - x_2)^2}\quad$ for $x, y \in \mathbb{R}^2$ the euclidean distance between two pointers.
+	with $p_i \in G$ and $d(x, y) = \sqrt{(y_1 - x_1)^2 + (y_2 - x_2)^2}\,$ for $x, y \in \mathbb{R}^2$ the euclidean distance between two pointers.
 \end{itemize}
 \end{defn}
 
@@ -336,7 +336,7 @@ Let $G$ be a gesture. At the time $i$ it is
 Again, $\Delta s(G)$ and $\Delta o(G)$ are defined accordingly.
 \end{defn}
 
-With the above definitions we can describe the change of $G$ between two time steps and the change of the gesture's properties between two time steps. The touch pointers are evaluated by the Android operating system periodically, so while a touch pointer is present on the screen, periodic updates are sent to the application. As we do not know the time steps, $\Delta t$ may be small, in particular it may be $0$ without affecting the following calculations.
+With the above definitions we can describe the change of $G$ between two time steps and the change of the gesture's properties between two time steps. The touch pointers are evaluated by the Android operating system periodically, so while a touch pointer is present on the screen, periodic updates are sent to the application. As we do not know the time steps, $\Delta t$ may be small, in particular it may be $0$ without affecting the validity of following calculations.
 
 Next, a rate of change of the output value has to be declared. This rate is given in $\frac{\text{value change}}{\text{property change}}$. If, for example, the value of an amplitude shall change by $c_v = 25$ every $c_p = 1000$ pixels the gesture is moved in one direction, the value would be $\frac{c_v}{c_p} = \frac{25}{1000} = 0.025$. For reasons of simplicity, $c_v$ and $c_p$ shall be passed to the relative change function defined below.
 
