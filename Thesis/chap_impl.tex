@@ -239,11 +239,41 @@ The calculated value $p_{c,new}$ is then stored into the \textit{AxisInformation
 \subsection{Passing axis data to ROS}
 \label{sec:impl:aximgrros}
 
-After each execution of the movement processes described in Section \ref{sec:impl:axismovements}, the newly calculated values are published to the ROS nodes controlling the robot arm and hand.
+After each execution of the movement processes described in Section \ref{sec:impl:axismovements}, the newly calculated values are published to the ROS nodes controlling the robot arm and hand. As angles for arm joints and hand joints have to be published to different ROS topics, two calls have to be made. The interface \textit{RobotJointDataReceiver}, which is implemented by \textit{C5LwrNode} has a method
+\begin{lstlisting}
+void handleJointData(int type, HashMap<String, Double> data);
+\end{lstlisting}
+accepting the joint type as the first parameter. The ROS node implementation will choose the topic to publish the data to by the given type identifier.
+
+At the end of the timer event in \textit{AxisManager}, first all \textit{current target values} for arm joints are taken from the list of \textit{AxisInformation}. The angle values are converted to radians and put into a Map, which has the axis identifier as the key and the angle of the corresponding axis as value. \textit{handleJointData()} is then called with \textit{JointType.ARM} and the created map. The same procedure is then executed for all \textit{AxisInformation}s with the type \textit{JointType.HAND}.
+
+\subsection{Stopping movement and setting all axes to zero}
+
+Two extra functions are implemented in \textit{AxisManager}. The first,
+\begin{lstlisting}
+public void copyCurrentValuesToTarget();
+\end{lstlisting}
+takes all values currently stored as \textit{current value} in \textit{AxisInformation} and copies them into the \textit{target value} and \textit{current target value} fields. This mainly takes the current robot state and copies it into the target state, causing all movements to stop. This is especially useful when the robot cannot reach a position defined by the target position. This is for example the case when all joints of the hand shall be set to $0^\circ$, as some joints are not able to completely reach this value. Copying the currently measured value into the target value stops the robot from trying to reach the actual desired value and, by this, prevents the hardware from being damaged by trying to reach a non-reachable position for too long.
+
+The second special method is
+\begin{lstlisting}
+public boolean setAllZero(boolean force);
+\end{lstlisting}
+which sets all axis \textit{target values} to 0. If \textit{force} is \textit{true}, the \textit{current target value} is also set to 0. \textbf{Extreme caution has to be used when calling this function!} The robot will move all joints to a position of 0 degrees either immediately (\textit{force} is \textit{true}) or smoothly. The shortest way in joint space from the current state of the robot to $\vec{0}$ may cause damage to the robot or its environment. This function was implemented to bring the robot to a known state using the axis control page. If the corresponding button is pressed, it is called only after the user has stated that he is aware of the possible dangers.
 
 \subsection{Enabling and Disabling}
 
-\subsection{Stopping movement and setting all axes to zero}
+The \textit{AxisManager} can be enabled or disabled. In the disabled state, all calls to \textit{setTargetValue()} are discarded. Upon disabling the \textit{AxisManager}, all current measured values of all joints are copied to the \textit{current target value}, causing the robot to stop all movements (see Figure \ref{fig:impl:axisonoff}). The function used to enable and disable the \textit{AxisManager} is
+\begin{lstlisting}
+public void setLocked(boolean locked);
+\end{lstlisting}
+
+This function is designed to be called upon touch actions on the safety interlock button on the user interface pages (see Section \ref{sec:ui:layout}).
+
+\begin{figure}
+	\caption{\label{fig:impl:axisonoff}Enabling and disabling the AxisManager}
+	\includegraphics[width=0.75\linewidth]{assets/chpt_impl/sw/AxisManager_onoff}
+\end{figure}
 
 \section{Grasp Synergies}
 
