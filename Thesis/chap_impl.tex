@@ -181,7 +181,7 @@ All the information is held within the \textit{AxisManager}, referenced by the a
 
 \subsection{AxisManager timer tick}
 
-The \textit{AxisManager} is designed to work fully asynchronous. All information about axes' target values is stored in the according \textit{AxisInformation} object, but only processed from within the main timer event used in \textit{AxisManager}. The timer is set to a frequency of $f_{am} = 10Hz$. This value can easily be changed by altering the static constant field \textit{UPDATE\_FREQ} in the \textit{AxisManager} task.
+The \textit{AxisManager} is designed to work fully asynchronous. All information about axes' target values is stored in the according \textit{AxisInformation} object, but only processed from within the main timer event used in \textit{AxisManager}. The timer is set to a frequency of $f_{am} = 10Hz$. This value can easily be changed by altering the static constant field \textit{UPDATE\_FREQ} in the \textit{AxisManager} task. An implementation of a timer is used which gives the ability to schedule an event at a fixed rate. \textit{java.util.Timer} is able to ensure the desired frequency is reached in the long run by slightly alternating the delays between two executions\cite{AndroidTimer2018}. This is important to have axis movements and publishing done at the correct speed and frequency. To use with functionality, the method \textit{scheduleAtFixedRate()} on the timer has to be used. 
 
 All calculations regarding axis movements (Section \ref{sec:impl:axismovements}) are done within the timer tick only. After all calculations have been done the current joint angles are all sent to the \textit{C5LwrNode} to be published over ROS (see Section \ref{sec:impl:aximgrros}).
 
@@ -192,12 +192,58 @@ The main task of the \textit{AxisManager} is managing movement of all axes in a 
 
 \subsubsection{Constant movement}
 
+To set an axis to constant movement at a constant speed, the method
+\begin{lstlisting}
+public boolean startMoving(String identifier, double speed);
+\end{lstlisting}
+on \textit{AxisManager} can be called. The parameter \textit{identifier} is filled with the string literal identifying an axis, while \textit{speed} indicates the speed at which the axis shall move. Since only rotational joints are present it the used set-up, the speed (as well as the maximum speed defined in \textit{AxisInformation}) is denoted in $\frac{\text{degrees}}{s}$. The movement speed can be given either positive or negative, depending on the direction the axis shall move in. With this function call, only the information that the axis shall move is stored in \textit{AxisInformation}, actual movement takes place in the timer event, in which the movement speed in clipped to the maximum speed defined for an axis and then divided by the frequency of the timer tick $f_{am}$. In each timer tick event, the position of an axis moving at speed $v$ is altered by $\frac{v}{f_{am}}$. When a constantly moving axis reaches its limit value, the \textit{moving}-flag is not reset, but as the position for an axis is clipped to its maximum and minimum values, no actual movement is done any further. To cancel a constant movement of an axis, simply
+\begin{lstlisting}
+public boolean stopMoving(String identifier);
+\end{lstlisting}
+has to be called with the string literal identifying the axis which shall be stopped.
+
 \subsubsection{Setting target values}
 
-\subsection{Enabling and Disabling}
+The most common use-case in the application is that different parts of the program set values for each axis to be reached. Instead of simply sending the values received by other parts of the program to the robot over ROS, the axis manager implements a safety feature limiting the movement speeds of an axis at a maximum speed. To accomplish this another variable is introduced in \textit{AxisInformation}, the \textit{current target value}. While the \textit{target value} of an axis determines the desired position where the axis shall be at the end, the \textit{current target value} is the value which is actually sent to the robot. The \textit{current target value} is modified in the timer tick.
+
+To change the target value of an axis, \textit{setTargetValue()} has to be called. The signature of the method is
+\begin{lstlisting}[caption={Signature of setTargetValue()}, label=lst:impl:settargetval]
+public boolean setTargetValue(
+	String identifier, 
+	double value, 
+	boolean force,
+	boolean notifyObservers
+);
+\end{lstlisting}
+A call to this method sets the target value $p_t$ of the axis identified by \textit{identifier} to \textit{value}. If \textit{force} is \textit{true}, the smooth movement mechanism described below is overridden and the current target value $p_c$ is directly set to $p_t$ as well. Setting \textit{notifyObservers} to \textit{true} results in the observers of \textit{AxisManager} being notified about the new target value. As the notification often has UI updates as a consequence, it is sensible to notify observers on setting the last value only, not on changing of every value. For convenience, multiple overloads of this method exist, setting either \textit{notifyObservers} to a default of \textit{true}, or \textit{notifyObservers} to \textit{true} and \textit{force} to \textit{false}.
+
+With $p_t$ being the target value as set in \textit{AxisInformation}, $p_c$ the current target value, $v_{max}$ the maximum speed of an axis and $f_{am}$ the frequency of the main timer tick in \textit{AxisManager}, the procedure to move an axis within the main timer tick is as follows:
+
+First, $\Delta p$ is calculated, which is the maximum value change within one timer event, thus
+\begin{equation*}
+\Delta p = \frac{v_{max}}{f_{am}} \, .
+\end{equation*}
+Second, the \textit{current target value} is updated as follows:
+\begin{equation*}
+p_{c,new} = \left\{ 
+\begin{array}{ll}
+p_t & |p_t - p_c| < \Delta p \\
+p_c + \Delta p & |p_t - p_c| > \Delta p \land p_t > p_c \\
+p_c - \Delta p & |p_t - p_c| > \Delta p \land p_t < p_c
+\end{array}
+ \right.
+\end{equation*}
+
+The calculated value $p_{c,new}$ is then stored into the \textit{AxisInformation} for each axis.
 
 \subsection{Passing axis data to ROS}
 \label{sec:impl:aximgrros}
+
+After each execution of the movement processes described in Section \ref{sec:impl:axismovements}, the newly calculated values are published to the ROS nodes controlling the robot arm and hand.
+
+\subsection{Enabling and Disabling}
+
+\subsection{Stopping movement and setting all axes to zero}
 
 \section{Grasp Synergies}
 
