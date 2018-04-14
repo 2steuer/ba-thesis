@@ -91,6 +91,18 @@ public abstract class RosActivity extends android.support.v7.app.AppCompatActivi
 
 This gives us the ability to use the already-built features in rosandroid like the automatically displayed activity to connect to a ROS master and built-in node handling even in older Android versions. When changes are made, issue a \textit{catkin\_make} command in the catkin workspace's root directory. \textit{Rosjava} and \textit{rosandroid} will then be built from source and deployed to a \textit{Maven}\footnote{Maven is a dependency and package management system for Java libraries.} repository from where the binaries will be loaded by Android Studio on compile time.
 
+\subsection{Starting the environment}
+
+To start up the development environment with the ROS master, the BioIK service and the \textit{rviz!} simulation of the robot, first the \textit{tams\_cml}\footnote{\url{https://gogs.crossmodal-learning.org/norman.hendrich/tams_cml}} and \textit{bio\_ik\_service}\footnote{\url{https://gogs.crossmodal-learning.org/philipp.ruppel/bio_ik_service}} packages has to be cloned into the catkin workspace, as well as the \textit{tams\_multitouch} package, which has to be copied into the workspace. After \textit{catkin\_make} was executed successfully, the programs are ready to be started. The following commands have to be entered in this order, but within different terminal windows:
+\begin{lstlisting}[caption={Commands to start up the development environment}]
+roscore
+roslaunch tams_multitouch demo.launch
+roslaunch tams_f329 4_moveit.launch
+rosrun bio_ik_service bio_ik_service
+\end{lstlisting}
+
+If interaction with the robot hardware is wanted, the corresponding programs and nodes have to be started according to the file \textit{tam\_cms/tams\_f329/README.txt} within the catkin workspace.
+
 \section{User Interface}
 \label{sec:impl:ui}
 
