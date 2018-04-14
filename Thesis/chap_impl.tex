@@ -185,8 +185,24 @@ A pointer which is marked as \textit{not present} is displayed as an unfilled ci
 
 \subsection{Axis Control Page}
 
+The axis control page consists of many \textit{single axis controls} (one for each axis or joint available in the robot, see Figure \ref{fig:ui:axiscontrol}), which -- as defined earlier -- possess two buttons, one to increase and one to decrease the position of the axis or joint. Between those two buttons the target value is displayed (on the top in bold), as well as the currently measured value as received from the robot (in the bottom). The colour between the buttons indicates the magnitude of difference between the target value and the currently measured value as described in Section \ref{sec:conc:axiscontrol}. Axis control widgets for axes that are not controllable (i.e. the first one for every finger except the thumb) have their buttons greyed out and are thus only there to display the current value of the axis.
+
+Two extra buttons are placed on the screen, one labelled \textit{Stop} and one \textit{All Zero}. These buttons are mapped to functionality explained in Section \ref{sec:impl:axism:stop}. The former sets all target values to zero, while the latter copies all currently measured values into the target value, causing the robot to stop all movements.
+
+\begin{figure}
+	\caption{\label{fig:ui:axiscontrol}The axis control page}
+	\includegraphics[width=0.9\linewidth]{assets/chpt_impl/axis_control}
+\end{figure}
+
 \subsection{Arm Tele-Operation Page}
 \label{sec:impl:armteleop}
+
+\begin{figure}
+	\caption{\label{fig:ui:teleop}The arm tele-op page}
+	\includegraphics[width=0.9\linewidth]{assets/chpt_impl/teleop}
+\end{figure}
+
+As a last page, the arm tele-op page servers as a remote control to move the arm in Cartesian space. The functionality of the \textit{CartesianArmManager} described in Section \ref{sec:impl:armcontrol}. It is important to note that the wording \textit{left, right, forward, backward} are relative to the operators point of view, as standing in front of the robot. Each button press moves the robot's palm by one centimeter into the desired direction. A press on the \textit{Home} button brings the robot into a home position, which is located directly in front of the robot at the border of the table approximately 20cm above the table's plate. This page was implemented for testing reasons, but comes in handy when using the synergy approaches, as the arm should be moved into the \textit{Home} position first before using the gesture control. Doing this using this page is easier than moving every joint on its own using the axis control page. Figure \ref{fig:ui:teleop} gives an impression of the page.
 
 \section{ROS integration}
 
@@ -198,7 +214,7 @@ public class MainActivity &\textbf{extends RosActivity}& {
 }
 \end{lstlisting}
 
-\begin{wrapfigure}[13]{R}{0.55\linewidth}
+\begin{wrapfigure}[14]{R}{0.60\linewidth}
 \caption{\label{fig:impl:masterchooser}The rosandroid master chooser activity}
 \includegraphics[width=\linewidth]{assets/chpt_impl/masterchooser}	
 \end{wrapfigure}
@@ -387,7 +403,7 @@ accepting the joint type as the first parameter. The ROS node implementation wil
 At the end of the timer event in \textit{AxisManager}, first all \textit{current target values} for arm joints are taken from the list of \textit{AxisInformation}. The angle values are converted to radians and put into a Map, which has the axis identifier as the key and the angle of the corresponding axis as value. \textit{handleJointData()} is then called with \textit{JointType.ARM} and the created map. The same procedure is then executed for all \textit{AxisInformation}s with the type \textit{JointType.HAND}.
 
 \subsection{Stopping movement and setting all axes to zero}
-
+\label{sec:impl:axism:stop}
 Two extra functions are implemented in \textit{AxisManager}. The first,
 \begin{lstlisting}
 public void copyCurrentValuesToTarget();
@@ -532,7 +548,7 @@ The first two methods set and query the \textit{locked} state of a gesture, foll
 \textit{catchesPointer()} determines whether a new \textit{Pointer} can be added to the gesture. This is done by checking whether the \textit{Pointer}  is within a distance of $2.5$x the size of the gesture around its center. If only one pointer is present in a gesture no size is available. In that case, a size of 1200 is taken as the \textit{catch radius}. \textit{getCenter()}, \textit{getSize()} and \textit{getOrientation()} represent $c(G)$, $s(G)$ and $o(G)$ as defined in section \ref{sec:conc:gestures}.
 
 \subsection{Arm Control}
-
+\label{sec:impl:armcontrol}
 \subsubsection{The PointInSpace class}
 
 The \textit{PointInSpace} class implements functionality as a vector in three dimensions, offering basic operations like adding other \textit{PointInSpace} instances and multiplying with scalars. It is not as elaborated as the \textit{Location} class, but extending the functionality according to \textit{Location} if needed could easily be done.
