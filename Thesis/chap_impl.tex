@@ -162,9 +162,28 @@ The synergy pages are implemented as a mostly blank white page, with a small dro
 
 Figure \ref{fig:ui:syngest} shows how a two-pointer and a three-pointer gesture is displayed on the synergy pages. While each pointer is marked by a red circle, the center (i.e. the position) of a gesture is displayed as a small black circle, with all pointers being connected to the center by a black line. The orange circle gives an impression of the calculated size of a gesture while the yellow line within the orange circle points in the direction of the orientation which was calculated for a gesture. The calculated values are also displayed in clear text next to the center of a gesture. This is done mainly for debugging purpose, but may also give an interesting insight into the state of a gesture, for example for training purposes. Note that the orientation is not given in degrees, but in radians.
 
-\subsection{Axis Control Page}
-
 \subsection{Direct Fingertip Mapping Page}
+
+Figure \ref{fig:ui:dfmt} gives an overview of how the DFTM page looks like. It has even less contents than the synergy pages, as no selection has to be made for the current implementation of the DFTM approach. In later iterations it would be sensible to add controls to move the base of the currently workspace on which the fingertips are mapped. As this is not implemented within this thesis, no such controls are displayed. In the same figure an example of how touch pointers are displayed is given for three points. Next to each pointer the name of the link controlled by this pointer is displayed, as well as the coordinates in screen coordinates (i.e. pixels) and world coordinates (i.e. centimeters), both originating in the top-left corner of the white control area. As described more detailed in Section \ref{sec:impl:dfmt}, the pointers are assigned to the links they control in the order in which they are placed on the screen.
+If a finger is lifted from the screen (i.e. the touch pointer is de-registered by the Android operating system), one of the following two actions will be performed:
+\begin{itemize}
+	\item If a pointer of a finger laid down on the screen later than the pointer removed is still present, the pointer is marked as \textit{not present}. Its position does not change, but is still included in IK requests. 
+	\item If no such pointer exists, i.e. the lifted pointer was the last present pointer if order of occurrence, it is removed and all pointers laid down after the current one but marked as \textit{not present} are also removed and not included in IK requests anymore.
+\end{itemize}
+
+A pointer which is marked as \textit{not present} is displayed as an unfilled circle with a black border (refer to Figure \ref{fig:ui:dfmt_lift} for an example). Once the user places a finger within the black circle, it is registered as this pointer again and the pointer is marked as \textit{present}.
+
+\begin{figure}
+	\caption{\label{fig:ui:dfmt}The DFTM screen with three pointers}
+	\includegraphics[width=0.8\linewidth]{assets/chpt_impl/dftm}
+\end{figure}
+
+\begin{figure}
+	\caption{\label{fig:ui:dfmt_lift}The DFTM screen with three pointers, of which one is currently not laid on the screen}
+	\includegraphics[width=0.8\linewidth]{assets/chpt_impl/dftm_lifted}
+\end{figure}
+
+\subsection{Axis Control Page}
 
 \subsection{Arm Tele-Operation Page}
 \label{sec:impl:armteleop}
@@ -585,6 +604,7 @@ The functionality of the three methods to set new target value is in particular:
 \subsection{Relative control}
 
 \section{Direct Finger Positioning}
+\label{sec:impl:dfmt}
 
 \section{Performance}
 
