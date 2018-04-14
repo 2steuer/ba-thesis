@@ -141,6 +141,93 @@ public void onStart() {
 \subsection{Arm Tele-Operation Page}
 \label{sec:impl:armteleop}
 
+\section{ROS integration}
+
+Thanks to \textit{rosandroid} it is easy to integrate ROS into an Android application. When the libraries are included in the project the main thing to change is that the main activity has to inherit from \textit{RosActivity} instead of the plain Android \textit{Activity} class.
+
+\begin{lstlisting}[caption={Changes to MainActivity}, escapechar=&]
+public class MainActivity &\textbf{extends RosActivity}& {
+	//...
+}
+\end{lstlisting}
+
+\begin{wrapfigure}[13]{R}{0.55\linewidth}
+\caption{\label{fig:impl:masterchooser}The rosandroid master chooser activity}
+\includegraphics[width=\linewidth]{assets/chpt_impl/masterchooser}	
+\end{wrapfigure}
+
+After this change was made, the \textit{RosActivity} implementation takes care about multiple things, beginning with showing a \textit{master chooser}  activity, in which the user can connect to a ROS master node, to handling all connection lifetime events of ROS parts. The \textit{master chooser} activity (see Figure \ref{fig:impl:masterchooser}) lets the user connect to an existing ROS master node. Additionally, it gives the Android application the opportunity to create a dedicated master node on the device itself. As this could affect the overall performance of the application and a lot of functionality has to be run on a more powerful machine, the ROS master is started on a dedicated computer and the Android application connects to this existing master node.
+
+\textit{RosActivity} is an abstract class. To implement it, the \textit{init()} method has to be overriden by inheriting classes. This method is called once the connection to the ROS master node was established and custom nodes can be initialized and connected. All other initialization steps regarding the implemented ROS nodes should also be done here. As shown in Listing \ref{lst:impl:rosconn}\footnote{Information on how to initialize ROS applications was taken from an official rosandroid example found at \url{https://github.com/rosjava/android_core/blob/kinetic/android_tutorial_pubsub/src/org/ros/android/android_tutorial_pubsub/MainActivity.java}}, first an instance of the \textit{C5LwrNode} is created and then assigned to all instances that consume functionality of it (\textit{AxisManager}, \textit{CartesianArmManager}, \textit{DfmtProxy}). After all this is done, the node is registered with the ROS master node. Details on the initialization of the \textit{C5LwrNode} node can be found below in this section. In theory, multiple nodes can be started and registered with the master within one application.
+
+\begin{lstlisting}[caption={Initialization of the ROS connection}, label={lst:impl:rosconn}]
+@Override
+protected void init(NodeMainExecutor nodeMainExecutor) {
+	axisManager = AxisManager.getInstance();
+	
+	node = new C5LwrNode("/joint_states", "/hand/joint_goals", "/lwr/jointPositionGoal");
+	node.addJointDataListener(axisManager);
+	
+	axisManager.setRobotNode(node);
+	CartesianArmManager.getInstance().setNode(node);
+	DftmProxy.getInstance().setNode(node);
+
+	NodeConfiguration cfg = NodeConfiguration.newPublic(getRosHostname(), getMasterUri());
+	nodeMainExecutor.execute(node, cfg);
+}
+\end{lstlisting}
+
+\subsection{The C5LwrNode class}
+
+The class \textit{C5LwrNode} inherits from \textit{AbstractNodeMain}, which already offers the very basic lifetime functionality of a ROS node. Some methods have to be implemented by the developer, like \textit{getDefaultNodeName()}, which determines the name of the ROS node as it is registered with the ROS master. In the \textit{onStart()} method, all start-up procedures are implemented, like registering topic subscriptions as well as creating publishers and \textit{service clients}. Within the \textit{onShutdown()} method, all resources created before (subscribers, publishers, service clients) shall be closed and deleted to ensure a clean de-registration from the ROS master and a clean shut-down of the application. The start-up code for the ROS node can be seen in Listing \ref{lst:impl:c5lwrnode}.
+
+\begin{lstlisting}[caption={Startup of the C5LwrNode}, label=lst:impl:c5lwrnode]
+@Override
+public GraphName getDefaultNodeName() {
+	return GraphName.of("ba_android/c5lwrnode");
+}
+
+@Override
+public void onStart(ConnectedNode connectedNode) {
+	cNode = connectedNode;
+	handJointStatePub = connectedNode.newPublisher(handPublishTopic, JointState._TYPE);
+	armJointStatePub = connectedNode.newPublisher(armPublishTopic, RMLPositionInputParameters._TYPE);
+
+	jointStateSubsc = connectedNode.newSubscriber(subscribeTopic, JointState._TYPE);
+	jointStateSubsc.addMessageListener(/* ... */);
+
+	try {
+		ikService = connectedNode.newServiceClient("/bio_ik/get_bio_ik", bio_ik_msgs.GetIK._TYPE);
+	} catch (ServiceNotFoundException e) {
+		ikService = null;
+		e.printStackTrace();
+	}
+}
+\end{lstlisting}
+
+The methods that are used to offer the functionality of the \textit{C5LwrNode} are denoted in Listing \ref{lst:impl:c5lwrik}. Because arm and hand joints have to be published to different topics, the \textit{handleJointData()} method calls either \textit{publishHand()} oder \textit{publishArm()}, depending on the parameter \textit{jointType} which is passed by the caller indicating the type of the joint data given. The two methods to request IK solutions from the BioIK service are relatively similar, as both initialize the request with the current robot state passed as a parameter and add a \textit{MinimumDisplacementGoal} to hint the IK solver that a solution is desirable where the least possible movement in all axes is done. The number of attempts is set to $1$, the time-out to find a solution is set to $10ms$ for the palm position and $500ms$ for the fingertip positions. The main difference is that, while for the palm only one \textit{PoseGoal} is added, containing the desired pose of the palm constructed by the x, y, z position and \textit{Quaternion} rotation as passed by the caller, in the method to get a solution for multiple fingertips one \textit{PositionGoal} is added for each fingertip as well as an \textit{OrientationGoal} to have the palm of the robotic hand always point in the same direction. In \textit{GetIKJointsFingertips()}, the \textit{fingertips} parameter contains a map with the link names (e.g. \textit{fftip}, \textit{thtip}...) as key values and the desired 3-dimensional position of the link.
+
+\begin{lstlisting}[caption={C5LwrNode interface},label=lst:impl:c5lwrik]
+public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJointDataReceiver {
+	private void publishHand(HashMap<String, Double> data);
+	private void publishArm(HashMap<String, Double> data);
+	
+	@Override
+	public void handleJointData(int jointType, HashMap<String, Double> data);
+	
+	public void GetIkJointsPalm(Map<String, Double> currentState, 
+		String[] lockedAxes, 
+		double x, double y, double z, 
+		double rotx, double roty, double rotz, double rotw,
+		ServiceResponseListener<GetIKResponse> hdl);
+	
+	public void GetIKJointsFingertips(Map<String, Double> currentState,
+		Map<String, PointInSpace> fingertips, 
+		ServiceResponseListener<GetIKResponse> hdl);
+}
+
+\end{lstlisting}
+
 \section{The AxisManager}
 
 The most important and most central functionality of the overall application is offered by the \textit{AxisManager} class. It is responsible for holding the current joint angles for all joints in memory, as well as the current target values along multiple other bits of information about each axis or joint. Joints are more generically called \textit{axis} within the \textit{AxisManager}, so this wording will be adopted in the rest of this section.
@@ -184,6 +271,11 @@ All the information is held within the \textit{AxisManager}, referenced by the a
 The \textit{AxisManager} is designed to work fully asynchronous. All information about axes' target values is stored in the according \textit{AxisInformation} object, but only processed from within the main timer event used in \textit{AxisManager}. The timer is set to a frequency of $f_{am} = 10Hz$. This value can easily be changed by altering the static constant field \textit{UPDATE\_FREQ} in the \textit{AxisManager} task. An implementation of a timer is used which gives the ability to schedule an event at a fixed rate. \textit{java.util.Timer} is able to ensure the desired frequency is reached in the long run by slightly alternating the delays between two executions\cite{AndroidTimer2018}. This is important to have axis movements and publishing done at the correct speed and frequency. To use with functionality, the method \textit{scheduleAtFixedRate()} on the timer has to be used. 
 
 All calculations regarding axis movements (Section \ref{sec:impl:axismovements}) are done within the timer tick only. After all calculations have been done the current joint angles are all sent to the \textit{C5LwrNode} to be published over ROS (see Section \ref{sec:impl:aximgrros}).
+
+\subsection{Initialization}
+
+When the application starts or is resumed from a sleeping device (i.e. the screen went off), the \textit{AxisManager} is initialized. This means that it blocks all actions until it has received a specific number of joint states from the \textit{C5LwrNode}. This measure was implemented to prevent the application from sending joint data to a non-existent robot and to initialize the joint data within memory with the current state of the robot. After 20 samples (\textit{JointState}s) have been received, the values are copied into the target values for each axis.
+Initializing all joint target values with 0 is obviously not a good choice, as the robot would then go to this position out of any state it is currently in, causing unwanted movements and behaviour. During initialization a modal dialog is shown, blocking all user interaction with the graphical user interface.
 
 \subsection{Axis movements}
 \label{sec:impl:axismovements}
@@ -276,7 +368,7 @@ This function is designed to be called upon touch actions on the safety interloc
 \end{figure}
 
 \section{Grasp Synergies}
-The grasp synergy approach is implemented according to the concepts described in Section \ref{sec:conc:synergy}. The approach are implemented using a gesture page and relative and absolute approach are differentiable by the title of the tabbed page selector, besides from that, the pages look the same.
+The grasp synergy approach is implemented according to the concepts described in Section \ref{sec:conc:synergy}. The approach are implemented using a gesture page and relative and absolute approach are differentiable by the title of the tabbed page selector, apart from that, the pages look the same.
 
 \subsection{Gesture Parsing}
 
