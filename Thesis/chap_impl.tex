@@ -146,6 +146,22 @@ public void onStart() {
 
 \subsection{Synergy Pages}
 
+\begin{figure}
+	\caption{The synergy control screen\label{fig:ui:syn}}
+	\includegraphics[width=\linewidth]{assets/chpt_impl/syn_blank}
+\end{figure}
+
+\begin{figure}
+	\caption{display of a two-pointer and a three-pointer gesture on the synergy screen\label{fig:ui:syngest}}
+	
+	\includegraphics[width=0.5\linewidth]{assets/chpt_impl/syn_2touch}
+	\includegraphics[width=0.5\linewidth]{assets/chpt_impl/syn_3touch}
+\end{figure}
+
+The synergy pages are implemented as a mostly blank white page, with a small drop-down control on the left to select the synergy that shall be controlled, as well as a two buttons to set all amplitudes to a known state (i.e. either all zero or all 50). The values of all three controllable amplitudes are displayed in the upper left corner of the control area. The screens for absolute and relative control look the same, which mode is active can be seen in the upper bar with the tab controls. Two lines determine the middle of the control area, which is important for the absolute approach, as the absolute placement of a gesture is important. Figure \ref{fig:ui:syn} gives an impression of how the screen looks on the tablet computer.
+
+Figure \ref{fig:ui:syngest} shows how a two-pointer and a three-pointer gesture is displayed on the synergy pages. While each pointer is marked by a red circle, the center (i.e. the position) of a gesture is displayed as a small black circle, with all pointers being connected to the center by a black line. The orange circle gives an impression of the calculated size of a gesture while the yellow line within the orange circle points in the direction of the orientation which was calculated for a gesture. The calculated values are also displayed in clear text next to the center of a gesture. This is done mainly for debugging purpose, but may also give an interesting insight into the state of a gesture, for example for training purposes. Note that the orientation is not given in degrees, but in radians.
+
 \subsection{Axis Control Page}
 
 \subsection{Direct Fingertip Mapping Page}
