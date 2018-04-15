@@ -677,16 +677,141 @@ protected abstract void handleOrientationChanges(GestureState oldState, Gesture 
 All three methods take the current state of the gesture as well as the state of the gesture from the call before as parameters. The \textit{old state} of active gestures is maintained by the \textit{SynergyProxyBase} implementation. In fact, only \textit{RelativeSynergyProxy} will make use of it, as the absolute synergy control fully relies on the current state of a gesture.
 
 \subsection{Absolute control}
+\label{sec:impl:syn:absc}
+The \textit{AbsoluteSynergyProxy} is contained within the \textit{AbsoluteSynergyTouchFragment}, which passes touch events on to the \textit{GestureParser} and registers eht \textit{AbsoluteSynergyProxy} with the \textit{GestureParser} to receive events. It also maintains the list of loaded synergies and assigns the one currently selected to the \textit{AbsoluteSynergyProxy}. Within the three abstract methods of \textit{SynergyProxyBase} that are implemented here current states of gestures are handled. According to their pointer count different actions are made, as two-pointer gestures are used to control the hand synergies, while three-pointer-gestures are used to control the robotic arm. Only the X and Z position of the robot hand palm are used when controlling the arm at the time of writing. The \textit{CartesianArmManager} described in Section \ref{sec:impl:armcontrol} is used to control the position of the palm. 
 
+As values of properties of a gesture shall be mapped linearly to amplitude or position values, a new class is introduced, the \textit{LinearEquation} class. It offers functionality to initialize the parameters of the linear equation by passing it two points between which values shall be mapped as well as the minimum and maximum values that are allowed for the output. Another method available is \textit{calculateClipped()} which calculates the output of the linear equation and clips it to the previously passed minimum and maximum values. The public interface of the \textit{LinearEquation} class can be reviewed in Listing \ref{lst:impl:abs:eq}. Parameters of the linear equation can either be set directly from the constructor or calculated later. This is used when reacting to the screen size, as this value might change at runtime (by changing orientation), so the \textit{calculateParameters()} method is called when the screen size changes and new parameters are calculated.
 
+\begin{lstlisting}[caption={Public interface of the LinearEquation class},label=lst:impl:abs:eq]
+public class LinearEquation {
+	public LinearEquation(double x1, double y1, double x2, double y2, double min, double max);
+	
+	public void calculateParameters(double x1, double y1, double x2, double y2);
+	public void setLimits(double min, double max);
+	
+	public double calculateClipped(double x);
+}
+\end{lstlisting}
+
+To react to screen size changes, \textit{AbsoluteSynergyProxy} implements the method \textit{setCanvasSize()} which is called by the containing fragment class when the screen size changes. Listing \ref{lst:impl:abs:init} shows how the \textit{LinearEquation} objects are initialized first and updated from the \textit{setCanvasSize()} method. The parameters are chosen according to Section \ref{sec:conc:gestures}.
+
+\begin{lstlisting}[caption={Initizlization of LinearEquations for hand and arm}, label=lst:impl:abs:init]
+private LinearEquation[] _eqsHand = new LinearEquation[] {
+	new LinearEquation(1200, 50, 300, -50, -50, 50),
+	new LinearEquation(0, 50, 1000, -50, -50, 50),
+	new LinearEquation(-(Math.PI / 2.0), 50, Math.PI / 2.0, -50, -50, 50)
+};
+
+private LinearEquation[] _eqsArm = new LinearEquation[] {
+	new LinearEquation(300, CartesianArmManager.X_MIN, 1200, CartesianArmManager.X_MAX),
+	new LinearEquation(0, CartesianArmManager.Z_MIN, 1000, CartesianArmManager.Z_MAX)
+};
+
+public void setCanvasSize(float width, float height) {
+	LinearEquation leq = _eqsHand[XPOS_AMPLITUDE];
+	leq.calculateParameters(width * 0.25, 50, width * 0.75, -50);
+	
+	_eqsArm[ARM_X_EQ].calculateParameters(width * 0.25, CartesianArmManager.X_MIN, width * 0.75, CartesianArmManager.X_MAX);
+	_eqsArm[ARM_X_EQ].setLimits(CartesianArmManager.X_MIN, CartesianArmManager.X_MAX);
+	
+	_eqsArm[ARM_Z_EQ].calculateParameters(height * 0.75, CartesianArmManager.Z_MIN, height * 0.25, CartesianArmManager.Z_MAX);
+	_eqsArm[ARM_Z_EQ].setLimits(CartesianArmManager.Z_MIN, CartesianArmManager.Z_MAX);
+}
+\end{lstlisting}
+
+As an example, the usage of the above functionality is shown with the \textit{handleLocationChanged()} event for a gesture. First it is checked whether the pointer count corresponds to that of an arm or a hand control gesture. The coordinates of the gesture are then passed to the corresponding \textit{LinearEquation} objects and the results are written either to an amplitude or the \textit{CartesianArmManager} to update the position of the palm of the hand. The Y coordinate of the hand is maintained the same, as only X and Z coordinates are changed.
+
+\begin{lstlisting}[caption={Example usage of LinearEquation}]
+protected void handleLocationChanged(GestureState oldState, Gesture gesture) {
+	if(gesture.getPointerCount() == HAND_GEST_POINTER_COUNT) {
+		setAmplitude(XPOS_AMPLITUDE, _eqsHand[XPOS_AMPLITUDE].calculateClipped(gesture.getCenter().getX()));
+	}
+	else if(gesture.getPointerCount() == ARM_GEST_POINTER_COUNT) {
+		Location p = gesture.getCenter();
+		double x = _eqsArm[ARM_X_EQ].calculateClipped(p.getX());
+		double z = _eqsArm[ARM_Z_EQ].calculateClipped(p.getY());
+		
+		PointInSpace pos = arm.getPosition();
+		PointInSpace newPos = new PointInSpace(x, pos.getY(), z);
+		arm.movePalmTo(newPos);
+	}
+}
+\end{lstlisting}
 
 \subsection{Relative control}
+
+The implementation of \textit{RelativeSynergyProxy} is similarly embedded into the environment of \textit{RelativeSynergyTouchFragment}, \textit{GestureParser} and \textit{CartesianArmManager} as the \textit{AbsoluteSynergyProxy}. Within the methods that are called when a gesture changes, the \textit{RelativeChanger} class is used to change amplitudes or the position of the arm relatively to their current position. The parameter \textit{oldState} within all gesture events comes into action here, as only the difference between the old and the current state matters for the calculations. 
+
+The \textit{RelativeChanger} class is initialized with a rate of change and a maximum and minimum value, to which the output shall be clipped. The rate of change is given in two numbers, the one representing the change in the output value corresponding to the change in input value, which is given as a second parameter. This is implemented according to Definition \ref{def:conc:rm} on page \pageref{def:conc:rm}. Additionally it gives the opportunity to invert the changes made by \textit{RelativeChanger} using the \textit{invert} flag during the initialization. Listing \ref{lst:impl:syn:rel} depicts the public interface of the \textit{RelativeChanger} class while Listing \ref{lst:impl:syn:expl} gives an example of its usage according to the one given in Section \ref{sec:impl:syn:absc} to show the main differences between the two approaches. In this approach it's made use of the \textit{movePalm()} method of \textit{CartesianArmManager}, which already changes the position relatively and clips input to the allowed boundaries. Because of this, a \textit{LinearEquation} is used instead of \textit{RelativeChanger} to only get the desired change to the output value, which is then passed to the \textit{CartesianArmManager}.
+
+\begin{lstlisting}[caption={Public interface of the RelativeChanger class},label=lst:impl:syn:rel]
+public class RelativeChanger {
+	public RelativeChanger(double valueChange, double inputChange, boolean invert, double min, double max);
+	public void setRateBySpan(double valueChange, double inputChange, boolean invert, double min, double max);
+	public double getChangedClipped(double oldValue, double inputChange);
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Example usage of RelativeChanger in RelativeSynergyProxy},label=lst:impl:syn:expl]
+RelativeChanger[] _changers = new RelativeChanger[] {
+	new RelativeChanger(50, 1200, false, -50, 50),
+	new RelativeChanger(50, 1200, false, -50, 50),
+	new RelativeChanger(40, Math.PI, false, -50, 50)
+};
+
+LinearEquation armXEq = new LinearEquation(0, 0, 2200, CartesianArmManager.X_MAX - CartesianArmManager.X_MIN);
+LinearEquation armZEq = new LinearEquation(0, 0, -1000, CartesianArmManager.Z_MAX - CartesianArmManager.Z_MIN);
+
+protected void handleLocationChanged(GestureState oldState, Gesture gesture) {
+	if(gesture.getPointerCount() == HAND_GEST_POINTER_COUNT) {
+		double xChange = gesture.getCenter().getX() - oldState.getCenter().getX();
+		
+		setAmplitude(XPOS_AMPLITUDE, _changers[XPOS_AMPLITUDE].getChangedClipped(getAmplitude(XPOS_AMPLITUDE), xChange));
+	}
+	else if(gesture.getPointerCount() == ARM_GEST_POINTER_COUNT) {
+		Location old = oldState.getCenter();
+		Location newLoc = gesture.getCenter();
+		Location offset = newLoc.substract(old);
+		
+		PointInSpace armoffset = new PointInSpace(
+			armXEq.calculate(offset.getX()),
+			0,
+			armZEq.calculate(offset.getY())
+		);
+		
+		CartesianArmManager.getInstance().movePalm(armoffset);
+	}
+}
+\end{lstlisting}
+
 
 \section{Direct Finger Positioning}
 \label{sec:impl:dfmt}
 
-\section{Performance}
+The \textit{direct fingertip mapping} (DFTM) is mainly implemented using the \textit{DfmtProxy} and \textit{FingertipPointer} classes, in which most of the functionality is contained. The \textit{FingertipPointer} class stores information about one fingertip that is laid onto the touch screen, which is it's position in screen coordinates, the name of the effector (also called \textit{link}) which is controlled by this fingertip and the coordinates of the pointer in centimeters. The latter is stored within this class for convenience reasons and is calculated whenever the screen coordinates of the pointer change. Having the world coordinates available reduces the computational load when writing the information to the screen on the \textit{FingertipFragment}. Both coordinates originate in the top-left corner of the screen. In addition to the position of the pointer a flag is stored whether the pointer is currently available on the screen, i.e.~a finger is currently positioned on the screen controlling this pointer.
 
-\subsection{Application}
+For the calculation of the world coordinates in centimeters to be correct, the screen metrics, namely the width, height and number of dots per inch (DPI) have to be set once they are known to the user interface (\textit{FingertipFragment}). The coordinates are calculated using Equation \ref{eq:conc:dftm:world} from page \pageref{eq:conc:dftm:world} with $r$ being the dots per inch as set by the user interface class.
 
-\subsection{BioIK Service}
+The effector controlled by a \textit{FingertipPointer} is determined by the order in which the fingertips are laid down onto the screen. At the moment, at most three fingertips may be controlled using this approach. The first finger put down onto the screen controls the thumb (\textit{thtip}), the second controls the first finger (\textit{fftip}) and the third the second or middle finger \textit{mftip}. This should usually map the finger controlled to the actual finger of the controller's hand. Fingers can be lifted during operation. If the lifted finger was the last finger laid down onto the screen, the pointer is removed from the list of pointers sent to the BioIK service. If the finger was not the last one laid down onto the screen, the corresponding \textit{FingertipPointer} is markes as \textit{not present}, which means that no finger is currently controlling its position but it is still included in BioIK service calls. Once a finger is put onto the approximate position where it was lifted, the pointer is again marked as \textit{present} and its position is updated periodically. The public interface of the \textit{FingertipPointer} class is shown in Listing \ref{lst:impl:dftm:fingertip}.
+
+\begin{lstlisting}[caption={Public interface of the FingertipPointer class},label=lst:impl:dftm:fingertip]
+public class FingertipPointer {
+	public FingertipPointer(String effectorName, Location screenLoc, int id);
+	
+	public String getEffectorName():
+	
+	public int getPointerId();
+	public void setPointerId(int pointerId);
+	
+	
+	public Location getScreenLocation();
+	public void setScreenLocation(Location screenLocation);
+	
+	public Location getWorldLocation();
+	public void setWorldLocation(Location worldLocation);
+	
+	public boolean isPresent();
+	public void setPresent(boolean present);
+}
+
+\end{lstlisting}

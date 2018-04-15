@@ -346,6 +346,7 @@ With the above definitions we can describe the change of $G$ between two time st
 Next, a rate of change of the output value has to be declared. This rate is given in $\frac{\text{value change}}{\text{property change}}$. If, for example, the value of an amplitude shall change by $c_v = 25$ every $c_p = 1000$ pixels the gesture is moved in one direction, the value would be $\frac{c_v}{c_p} = \frac{25}{1000} = 0.025$. For reasons of simplicity, $c_v$ and $c_p$ shall be passed to the relative change function defined below.
 
 \begin{defn}
+	\label{def:conc:rm}
 Let $rm : (\mathbb{R}, \mathbb{R}, \mathbb{R}, \mathbb{R}, \mathbb{R}, \mathbb{R}) \rightarrow \mathbb{R}$ be the \textbf{relative mapping} function that alters the value $v_{old}$ by the changed parameter $\Delta p$ at the rate of change $\frac{c_v}{c_p}$ while clipping the output between $v_{min}$ and $v_{max}$ with $v_{min} \leq v_{max}$. Then
 
 \begin{equation}
@@ -410,9 +411,10 @@ Heavy use of the BioIK service is made for this, as not only the position of the
 with $\vec{b}$ being the base vector of the plane and $\vec{e_1}$, $\vec{e_2}$ determining the orientation of the plane from the base. It is $|\vec{e_1}| = |\vec{e_2}| = 1$ and $\vec{e_1} \cdot \vec{e_2} = 0$, which means that on the surface a new two-dimensional coordinate system is \textit{created} with its origin in $\vec{b}$. By assigning the $x$ and $y$ coordinates of a point to $t$ and $s$, points from a two-dimensional coordinate system can then easily be mapped into three dimensions.
 
 As one unit in the robot's coordinate system represents one meter in the real world, the coordinates of pointers on the screen shall be calculated in meters of distance to the screen's origin (which usually is the top-left corner). The position of a pointer is known in pixels and the screen resolution is known in dots per inch (DPI). To transform a pixel value $p$ into meters on a screen with a resolution of $r$ DPI, the calculation
-\begin{equation*}
+\begin{equation}
+\label{eq:conc:dftm:world}
 p_m = \frac{p}{r} \cdot \frac{2.54}{100}
-\end{equation*}
+\end{equation}
 has to be made, as an inch ($in$) is $2.54cm$. The resulting values can then be passed into the equation for the surface to get the corresponding points in the higher dimensional space. These points have to be calculated for each fingertip on the screen, the resulting positions shall then be sent to the BioIK service, resulting in joint angles for every joint on the robot to reach these positions.
 
 If the plane on which the fingertips are mapped shall be changed, only $\vec{e_1}$ and $\vec{e_2}$ have to be changed in a way that they span another plane, e.g. a tilted one.  Also, to move the fingertips in space (e.g. to drag an object in one place and put it to another) no more work has to be done than changing $\vec{b}$. 
