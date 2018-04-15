@@ -11,7 +11,7 @@ If the virtual machine shall run ROS nodes which have to be accessible by ROS no
 
 \subsubsection{Installing ROS}
 
-Setting up ROS \textit{Kinetic} within a fresh Ubuntu 16.04 installation is fairly simple. First, the ROS apt\footnote{Aptitude is the package management system for Debian-based Linux distributions like Ubuntu}-repository has to be added to the packages sources file and the corresponding key has to be added to the key storage to enable downloading the packages. Once this is done, the package \textit{ros-kinetic-desktop-full} can be installed which will download and install all available packages for ROS \textit{Kinetic}.
+Setting up ROS \textit{Kinetic} within a fresh Ubuntu 16.04 installation is fairly simple. First, the ROS Aptitude-repository has to be added to the packages sources file and the corresponding key has to be added to the key storage to enable downloading the packages. Aptitude is the package and dependency-manager used in Ubuntu. Once this is done, the package \textit{ros-kinetic-desktop-full} can be installed which will download and install all available packages for ROS \textit{Kinetic}.
 
 The commands to install ROS are denoted in Listing \ref{lst:ros:install}. After these commands have been executed in a terminal window ROS is readily installed.
 
@@ -39,9 +39,9 @@ source ~/.bashrc
 
 When this is done, ROS is completely set up on the development machine.
 
-\subsubsection[Setting up catkin]{Setting up a catkin workspace\cite{ros:install:catkin}} 
+\subsubsection[Setting up catkin]{Setting up a catkin workspace} 
 
-\textit{Catkin\footnote{\url{http://wiki.ros.org/catkin}}} is a build system and workspace management utility provided with ROS. It supports developers to create, develop and build packages for ROS applications. To create a catkin workspace within the current user's home directory, issue the commands from Listing \ref{lst:ros:catkin} after setting up ROS and sourcing the \textit{setup.bash}-file.
+\textit{Catkin} is a build system and workspace management utility provided with ROS. It supports developers to create, develop and build packages for ROS applications. To create a catkin workspace within the current user's home directory, issue the commands from Listing \ref{lst:ros:catkin} after setting up ROS and sourcing the \textit{setup.bash}-file. The instructions to set up catkin are taken from \cite{ros:install:catkin}.
 
 \begin{minipage}{\linewidth}
 	\begin{lstlisting}[caption={Setting up a catkin workspace},label=lst:ros:catkin]
@@ -93,7 +93,7 @@ This gives us the ability to use the already-built features in rosandroid like t
 
 \subsection{Starting the environment}
 
-To start up the development environment with the ROS master, the BioIK service and the \textit{rviz!} simulation of the robot, first the \textit{tams\_cml}\footnote{\url{https://gogs.crossmodal-learning.org/norman.hendrich/tams_cml}} and \textit{bio\_ik\_service}\footnote{\url{https://gogs.crossmodal-learning.org/philipp.ruppel/bio_ik_service}} packages has to be cloned into the catkin workspace, as well as the \textit{tams\_multitouch} package, which has to be copied into the workspace. After \textit{catkin\_make} was executed successfully, the programs are ready to be started. The following commands have to be entered in this order, but within different terminal windows:
+To start up the development environment with the ROS master, the BioIK service and the \textit{rviz!} simulation of the robot, first the \textit{tams\_cml}\footnote{\url{https://gogs.crossmodal-learning.org/norman.hendrich/tams_cml}} and \textit{bio\_ik\_service}\footnote{\url{https://gogs.crossmodal-learning.org/philipp.ruppel/bio_ik_service}} packages has to be cloned into the catkin workspace, as well as the \textit{tams\_multitouch} package, which has to be copied into the workspace. After \textit{catkin\_make} was executed successfully, the programs are ready to be started. The following commands have to be entered in this order, but within different terminal sessions:
 \begin{lstlisting}[caption={Commands to start up the development environment}]
 roscore
 roslaunch tams_multitouch demo.launch
@@ -106,9 +106,9 @@ If interaction with the robot hardware is wanted, the corresponding programs and
 \section{User Interface}
 \label{sec:impl:ui}
 
-The user interface of the application was developed according to the considerations made in chapter \ref{chap:concepts}. Additionally it turned out during development, that a basic tele-operation screen for the robot arm would be useful, that enables the user to bring the arm into a defined home position as well as doing simple step-wise manipulation to the robotic arm by moving the desired position of the hand palm by single small steps per button-press. The screen's layout and functionality is described in Section \ref{sec:impl:armteleop}.
+The user interface of the application was developed according to the considerations made in Chapter \ref{chap:concepts}. Additionally it turned out during development, that a basic tele-operation screen for the robot arm would be useful, that enables the user to bring the arm into a defined home position as well as doing simple step-wise manipulation to the robotic arm by moving the desired position of the hand palm by single small steps per button-press. The screen's layout and functionality is described in Section \ref{sec:impl:armteleop}.
 
-The safety interlock button on all screens is immplemented using a \textit{FloatingActionButton}, a predefined conttrol by Android which is designed to float in one corner of the screen above the rest of the screen's contents. To have the \textit{FloatingActionButton} work in the expected way, all screen contents have to be embedded into a \textit{CoordinatorLayout} container. The icon of the button has a \textit{Play} symbol in idle state, in activated state is shows a \textit{Pause} symbol until the button is released. The code to make the interlock button is described in Listing \ref{lst:impl:interlock}. It has to be inserted into the overridden \textit{onStart()} method in every Fragment of the application, in which the functionality shall exist - i.e. every page with controls for the robot.
+The safety interlock button on all screens is immplemented using a \textit{FloatingActionButton}, a predefined control by Android which is designed to float in one corner of the screen above the rest of the screen's contents. To have the \textit{FloatingActionButton} work in the expected way, all screen contents have to be embedded into a \textit{CoordinatorLayout} container. The icon of the button has a \textit{Play} symbol in idle state, in activated state is shows a \textit{Pause} symbol until the button is released. The code to make the interlock button is described in Listing \ref{lst:impl:interlock}. It has to be inserted into the overridden \textit{onStart()} method in every Fragment of the application, in which the functionality shall exist - i.e. every page with controls for the robot.
 
 \begin{lstlisting}[caption={Code for the interlock button}, label=lst:impl:interlock]
 @Override
@@ -162,7 +162,7 @@ The synergy pages are implemented as a mostly blank white page, with a small dro
 
 Figure \ref{fig:ui:syngest} shows how a two-pointer and a three-pointer gesture is displayed on the synergy pages. While each pointer is marked by a red circle, the center (i.e. the position) of a gesture is displayed as a small black circle, with all pointers being connected to the center by a black line. The orange circle gives an impression of the calculated size of a gesture while the yellow line within the orange circle points in the direction of the orientation which was calculated for a gesture. The calculated values are also displayed in clear text next to the center of a gesture. This is done mainly for debugging purpose, but may also give an interesting insight into the state of a gesture, for example for training purposes. Note that the orientation is not given in degrees, but in radians.
 
-\subsection{Direct Fingertip Mapping Page}
+\subsection{Direct Fingertip Mapping (DFTM) Page}
 
 Figure \ref{fig:ui:dfmt} gives an overview of how the DFTM page looks like. It has even less contents than the synergy pages, as no selection has to be made for the current implementation of the DFTM approach. In later iterations it would be sensible to add controls to move the base of the currently workspace on which the fingertips are mapped. As this is not implemented within this thesis, no such controls are displayed. In the same figure an example of how touch pointers are displayed is given for three points. Next to each pointer the name of the link controlled by this pointer is displayed, as well as the coordinates in screen coordinates (i.e. pixels) and world coordinates (i.e. centimeters), both originating in the top-left corner of the white control area. As described more detailed in Section \ref{sec:impl:dfmt}, the pointers are assigned to the links they control in the order in which they are placed on the screen.
 If a finger is lifted from the screen (i.e. the touch pointer is de-registered by the Android operating system), one of the following two actions will be performed:
@@ -202,7 +202,7 @@ Two extra buttons are placed on the screen, one labelled \textit{Stop} and one \
 	\includegraphics[width=0.9\linewidth]{assets/chpt_impl/teleop}
 \end{figure}
 
-As a last page, the arm tele-op page servers as a remote control to move the arm in Cartesian space. The functionality of the \textit{CartesianArmManager} described in Section \ref{sec:impl:armcontrol}. It is important to note that the wording \textit{left, right, forward, backward} are relative to the operators point of view, as standing in front of the robot. Each button press moves the robot's palm by one centimeter into the desired direction. A press on the \textit{Home} button brings the robot into a home position, which is located directly in front of the robot at the border of the table approximately 20cm above the table's plate. This page was implemented for testing reasons, but comes in handy when using the synergy approaches, as the arm should be moved into the \textit{Home} position first before using the gesture control. Doing this using this page is easier than moving every joint on its own using the axis control page. Figure \ref{fig:ui:teleop} gives an impression of the page.
+As a last page, the arm tele-op page servers as a remote control to move the arm in Cartesian space. The functionality of the \textit{CartesianArmManager} described in Section \ref{sec:impl:armcontrol}. It is important to note that the wording \textit{left, right, forward, backward} are relative to the operators point of view, as standing in front of the robot. Each button press moves the palm of the robot by one centimeter into the desired direction. A press on the \textit{Home} button brings the robot into a home position, which is located directly in front of the robot at the border of the table approximately 20cm above the plate. This page was implemented for testing reasons, but comes in handy when using the synergy approaches, as the arm should be moved into the \textit{Home} position first before using the gesture control. Doing this using this page is easier than moving every joint on its own using the axis control page. Figure \ref{fig:ui:teleop} gives an impression of the page.
 
 \section{ROS integration}
 
