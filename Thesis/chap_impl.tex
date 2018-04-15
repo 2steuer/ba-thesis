@@ -613,9 +613,72 @@ The functionality of the three methods to set new target value is in particular:
 	\item \textit{movePalmTo()} overwrites the target position by \textit{position}.
 \end{itemize}
 
+\subsection{Grasp Synergies}
 
+An implementation of the grasp synergies is provided by the work of \citeauthor{Bernardino2013} as well as the recorded data matrices representing the matrix of eigenvectors for each of the different grasp synergies. The functionality is bundled within the \textit{GraspSynergy} class. The data files which can be read by the class methods are included into the application as text file resources. A dataset for one grasp consists of two files, which is one file containing the \textit{mean} value or the offset of a grasp ($s_0$ in Section \ref{sec:conc:synergy}) and one file containing the matrix with the matrix data ($S$ in Section \ref{sec:conc:synergy}). Mean files are called \textit{g1mean.txt}, \textit{g2mean.txt} and so on, while the matrix files are called \textit{g1vecs.txt}, \textit{g2vecs.txt} up to \textit{g8vecs.txt}. Originally, these files were named differently when provided by Dr. Norman Hendrich, but due to restrictions of the Android operating system regarding names of resources, they hat to be renamed.
+\textit{GraspSynergy} objects are handled and maintained within the \textit{AbsoluteSynergyTouchFragment} and \textit{RelativeSynergyTouchFragment} classes, as they load all grasp synergies, make them selectable within the drop-down list and assign the currently selected synergy object to either the \textit{RelativeSynergyProxy} or the \textit{AbsoluteSynergyProxy}. Thanks to the implementation of \textit{GraspSynergy}, loading synergy data from application resources is done in very few lines as shown in Listing \ref{lst:impl:loadsyn}. The variables \textit{mean\_res} and \textit{vec\_res} are the Android resource IDs for the \textit{mean} and the \textit{vecs} resource file.
+\begin{lstlisting}[caption={Loading GraspSynergy data}, label=lst:impl:loadsyn]
+GraspSynergy synergy = new GraspSynergy(21);
+synergy.parseMatlabSynergyMean(getResources().openRawResource(mean_res));
+synergy.parseMatlabSynergyVecs(getResources().openRawResource(vec_res));
+\end{lstlisting}
+
+Within the above names fragment classes, loading of synergies is surrounded with error handling for the case loading fails. Additionally, a loaded grasp synergy is added to the drop-down list. All this is encapsulated in a method \textit{loadSynergy()} accepting the synergy name (as displayed) and the corresponding resource IDs. Loading of a synergy is then done in one line as shown in Listing \ref{lst:impl:loadsyncall}.
+\begin{lstlisting}[caption={Call to loadSynergy()}, label=lst:impl:loadsyncall]
+loadSynergy("Grasp 1", R.raw.g1mean_n, R.raw.g1vecs_n);
+\end{lstlisting}
+
+\begin{wraptable}[22]{R}{0.2\linewidth}
+	\caption{\label{tab:impl:indexjoints}The mapping from array index to joint name}
+	\begin{tabular}{|c|l|}
+		\hline
+		0 & FFJ1 \\
+		1 & FFJ2 \\
+		2 & FFJ3 \\
+		3 & FFJ4 \\
+		4 & MFJ1 \\
+		5 & MFJ2 \\
+		6 & MFJ3 \\
+		7 & MFJ4 \\
+		8 & RFJ1 \\
+		9 & RFJ2 \\
+		10 & RFJ3 \\
+		11 & RFJ4 \\
+		12 & LFJ1\\
+		13 & LFJ2\\
+		14 & LFJ3\\
+		15 & LFJ4\\
+		16 & THJ1\\
+		17 & THJ2\\
+		18 & THJ3\\
+		19 & THJ4\\
+		20 & THJ5 \\
+		\hline
+	\end{tabular}
+\end{wraptable}
+
+Once loaded a grasp synergy is used by passing an array of double values to the \textit{toJoints()} method on the \textit{GraspSynergy} object. As described in Section \ref{sec:conc:synergy}, the amplitude values have to be in a range from $-50$ to $50$. The return value of this method is again an array of double values, representing the calculated joint angles in degrees. The mapping of the index within the returned array to the joint name the angle shall be assigned to had to be extracted from code, so it is available in Table \ref{tab:impl:indexjoints} for reasons of completeness. 
+
+The output of \textit{toJoints()} is then passed to \textit{toSafeAbduction()}, which modifies the joint angles in a way that no collisions between fingers are present and returns the modified array of joint angles. These joint angles can then directly be passed to the \textit{AxisManager} which will forward it to the ROS nodes.
+
+\begin{lstlisting}[caption={Example call of toJoints() and toSafeAbduction()}]
+double[] jointData =
+	_currentSynergy.toSafeAbduction(
+		_currentSynergy.toJoints(_amplitudes)
+	);
+\end{lstlisting}
+
+As this functionality is the same for both the relative and the absolute synergy approach it is bundled within the abstract class \textit{SynergyProxyBase}, which handles the gesture events received by a \textit{GestureParser} and handles the calculation of joint angles using the synergy assigned by the containing fragment class. It analyses the gesture events for changes in size, orientation and position for each gesture and then calls specific calls to abstract methods which shall be implemented by the inheriting classes \textit{AbsoluteSynergyProxy} and \textit{RelativeSynergyProxy} as reactions to changes of a gesture are the only thing unique to the different approaches.
+\begin{lstlisting}
+protected abstract void handleSizeChange(GestureState oldState, Gesture gesture);
+protected abstract void handleLocationChanged(GestureState oldState, Gesture gesture);
+protected abstract void handleOrientationChanges(GestureState oldState, Gesture gesture);
+\end{lstlisting}
+All three methods take the current state of the gesture as well as the state of the gesture from the call before as parameters. The \textit{old state} of active gestures is maintained by the \textit{SynergyProxyBase} implementation. In fact, only \textit{RelativeSynergyProxy} will make use of it, as the absolute synergy control fully relies on the current state of a gesture.
 
 \subsection{Absolute control}
+
+
 
 \subsection{Relative control}
 
