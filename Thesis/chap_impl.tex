@@ -788,7 +788,9 @@ protected void handleLocationChanged(GestureState oldState, Gesture gesture) {
 \section{Direct Finger Positioning}
 \label{sec:impl:dfmt}
 
-The \textit{direct fingertip mapping} (DFTM) is mainly implemented using the \textit{DfmtProxy} and \textit{FingertipPointer} classes, in which most of the functionality is contained. The \textit{FingertipPointer} class stores information about one fingertip that is laid onto the touch screen, which is it's position in screen coordinates, the name of the effector (also called \textit{link}) which is controlled by this fingertip and the coordinates of the pointer in centimeters. The latter is stored within this class for convenience reasons and is calculated whenever the screen coordinates of the pointer change. Having the world coordinates available reduces the computational load when writing the information to the screen on the \textit{FingertipFragment}. Both coordinates originate in the top-left corner of the screen. In addition to the position of the pointer a flag is stored whether the pointer is currently available on the screen, i.e.~a finger is currently positioned on the screen controlling this pointer.
+The \textit{direct fingertip mapping} (DFTM) is mainly implemented using the \textit{DfmtProxy} and \textit{FingertipPointer} classes, in which most of the functionality is contained. The \textit{DftmProxy} class implements the \textit{Singleton} pattern. Its instance is used from the \textit{FingertipFragment} class which offers the user interface for this approach and forwards all touch events of the user interface to the \textit{DftmProxy}. For BioIK service interactions, the \textit{DftmProxy} class directly depends on the \textit{C5LwrNode} which offers the functionality needed to request joint angle solutions for a set of given fingertip positions.
+
+The \textit{FingertipPointer} class stores information about one fingertip that is laid onto the touch screen, which is it's position in screen coordinates, the name of the effector (also called \textit{link}) which is controlled by this fingertip and the coordinates of the pointer in meters. The latter is stored within this class for convenience reasons and is calculated whenever the screen coordinates of the pointer change. Having the world coordinates available reduces the computational load when writing the information to the screen on the \textit{FingertipFragment}. Both coordinates originate in the top-left corner of the screen. In addition to the position of the pointer a flag is stored whether the pointer is currently available on the screen, i.e.~a finger is currently positioned on the screen controlling this pointer.
 
 For the calculation of the world coordinates in centimeters to be correct, the screen metrics, namely the width, height and number of dots per inch (DPI) have to be set once they are known to the user interface (\textit{FingertipFragment}). The coordinates are calculated using Equation \ref{eq:conc:dftm:world} from page \pageref{eq:conc:dftm:world} with $r$ being the dots per inch as set by the user interface class.
 
@@ -813,5 +815,26 @@ public class FingertipPointer {
 	public boolean isPresent();
 	public void setPresent(boolean present);
 }
-
 \end{lstlisting}
+
+Once a new position for a fingertip is found, the \textit{update loop} is started. The update loop for this approach is very similar to the one of the \textit{CartesianArmManager} depicted in Figure \ref{fig:impl:cartarmstate} on page \pageref{fig:impl:cartarmstate}. The \textit{DftmProxy} requests new solutions for the current pointers' locations until either no pointers are registered anymore or the \textit{DftmProxy} is disabled using the \textit{setEnabled()} method. Once a new solution is returned to \textit{DftmProxy}, it is also checked against a maximum movement of 15 degrees on a per-joint basis, solutions with a too big displacement are discarded and a new solution is requested.
+
+To request a solution the desired locations of the fingertips in three-dimensional space have to be calculated first. As the position of the fingertips is known in meters from the top-left corner of the screen, the simple calculations described in Section \ref{sec:conc:dftm} can be done using no more conversions. The \textit{PointInSpace} class offers all functionality needed for these calculations. The base vector and the two spanning vectors are currently defined as fixed values and shown in Listing \ref{lst:impl:dftm:vect}. Listing \ref{lst:impl:dftm:mapping} shows how the mapping from two-dimensional screen coordinates into three-dimensional coordinates is performed.
+
+\begin{lstlisting}[caption={Vectors used for planar mapping},label=lst:impl:dftm:vect]
+PointInSpace surfaceBase = new PointInSpace(0.0, -1.25, 1.2);
+PointInSpace surfaceYBaseVect = new PointInSpace(0, 1, 0);
+PointInSpace surfaceXBaseVect = new PointInSpace(-1, 0, 0);
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Mapping of points from two into three dimensions},label=lst:impl:dftm:mapping]
+FingertipPointer p = _pointers[i];
+
+PointInSpace wloc = surfaceBase
+	.add(surfaceXBaseVect.multiply(p.getWorldLocation().getX()))
+	.add(surfaceYBaseVect.multiply(p.getWorldLocation().getY()));
+\end{lstlisting}
+
+Once this calculation has been done for all pointers current present, the request at the BioIK service is made. In addition to the fingertip locations, the \textit{C5LwrNode} class adds a \textit{MinimalDisplacementGoal} to the request to indicate to the service that a solution with minimal displacement of all joints is desirable. Additionally, a \textit{OrientationGoal} is added, forcing the palm of the robotic hand into a top-down orientation. Otherwise, the IK solver could find solutions where the fingertips are at the correct positions but were placed there from the bottom, which is correct in principle, but neither a expected nor a desired solution.
+
+The safety interlock button on the screen sets the enabled flag of the \textit{DftmProxy} which is redirected to the \textit{AxisManager}. This means that once the safety interlock button is released, no movement is done by the robot. If an IK request is still pending and the result is returned after the button has been released, the solution is discarded since the \textit{AxisManager} does not accept new joint angles. At the time of writing it is not possible to move the base vector of the plane fingertips are mapped to. Thus actions are limited to a very small workspace. Functionality to \textit{scroll} the workspace can be implemented by changing the base vector, but it has to made sure that the movement is safe and no unexpected joint angle changes occur.
