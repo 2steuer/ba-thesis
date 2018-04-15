@@ -299,14 +299,14 @@ The most important and most central functionality of the overall application is 
 
 All information about an axis is stored in a \textit{AxisInformationImpl} object. This class implements the \textit{AxisInformation} interface, which is returned when axis information shall be given to callers in a read-only manner. The \textit{AxisInformation} interface is given in Listing \ref{lst:impl:axisinformation}. All the information stored about an axis is accessible here. In particular, this is: 
 \begin{itemize}
-	\item the identifier of an axis, i.e. a string literal containing the name at which the axis or joint is known to the ROS nodes.
-	\item the maximum speed the axis may move at.
-	\item the target value to which the axis shall be currently moved.
-	\item the value representing the axis' current position.
-	\item the value representing the axis' \textit{current target value} (see Section \ref{sec:impl:axismovements} for details).
-	\item the minimum and maximum values the axis may have as position value.
+	\item The identifier of an axis, i.e. a string literal containing the name at which The axis or joint is known to the ROS nodes.
+	\item The maximum speed the axis may move at.
+	\item The target value to which the axis shall be currently moved.
+	\item The value representing the axis' current position.
+	\item The value representing the axis' \textit{current target value} (see Section \ref{sec:impl:axismovements} for details).
+	\item The minimum and maximum values the axis may have as position value.
 	\item flags indicating whether the axis is enabled and moving.
-	\item an integer representing the type of an axis. Allowed types are \textit{JointType.ARM} and \textit{JointType.HAND}.
+	\item An integer representing the type of an axis. Allowed types are \textit{JointType.ARM} and \textit{JointType.HAND}.
 \end{itemize}
 
 \begin{lstlisting}[caption={The AxisInformation interface}, label=lst:impl:axisinformation]
@@ -451,11 +451,11 @@ public interface GestureObserver {
 
 If the pointer count of a gesture changes, the \textit{GestureParser} calls the \textit{onGestureRemove()} method of observers, and then the \textit{onGestureAdd()} method. Both with the same \textit{Gesture} object.
 
-When a gesture is added or its pointer count changes, it is marked as \textit{locked} by the \textit{GestureParser} for the duration of one second. This indicates to dependent classes, that the gesture is new and the data should not yet be used for any control purposes, as the user might still adjust finger positions. This also takes care of the fact that, to add a multi-pointer gesture, the android system calls different events for each pointer subsequently, meaning that to the software it looks as if a one-pointer gesture was added, then a two-pointer gesture and then a three-pointer gesture, if 3 fingers were laid on the touchscreen. By ignoring gesture input for the first second of a new gesture, the user should have put all fingers onto the screen and can then control the application. Having input by an unwanted gesture may cause unexpected behaviour. In the following the functionality of the three main material classes \textit{Location}, \textit{Pointer} and \textit{Gesture} is explained.
+When a gesture is added or its pointer count changes, it is marked as \textit{locked} by the \textit{GestureParser} for the duration of one second. This indicates to dependent classes, that the gesture is new and the data should not yet be used for any control purposes, as the user might still adjust finger positions. This also takes care of the fact that, to add a multi-pointer gesture, the android system calls different events for each pointer subsequently, meaning that to the software it looks as if a one-pointer gesture was added, then a two-pointer gesture and then a three-pointer gesture, if three fingers were laid on the touchscreen. By ignoring gesture input for the first second of a new gesture, the user should have put all fingers onto the screen and can then control the application. Having input by an unwanted gesture may cause unexpected behaviour. In the following the functionality of the three main material classes \textit{Location}, \textit{Pointer} and \textit{Gesture} is explained.
 
 \subsubsection{The Location class}
 
-The \textit{Location} class represents a two-dimensional vector within the program. It has two coordinates, $x$ and $y$, which can be accessed by getter methods. It also offers basic functionality to work with vectors, including addition, subtraction, multiplication with scalars and the scalar-product. All functionality is implemented as expected by common sense. When a mathematical operation is performed using two \textit{Location} objects, the result is returned as a new one, as a \textit{Location} is immutable once it is created.
+The \textit{Location} class represents a two-dimensional vector within the program. It has two coordinates, $x$ and $y$, which can be accessed by \textit{getter methods}. It also offers basic functionality to work with vectors, including addition, subtraction, multiplication with scalars and the scalar-product. All functionality is implemented as expected by common sense. When a mathematical operation is performed using two \textit{Location} objects, the result is returned as a new one, as a \textit{Location} is immutable once it is created.
 
 \begin{lstlisting}[caption={The public interface of the Location class}, label=lst:impl:location]
 public class Location {
@@ -551,7 +551,7 @@ The first two methods set and query the \textit{locked} state of a gesture, foll
 \label{sec:impl:armcontrol}
 \subsubsection{The PointInSpace class}
 
-The \textit{PointInSpace} class implements functionality as a vector in three dimensions, offering basic operations like adding other \textit{PointInSpace} instances and multiplying with scalars. It is not as elaborated as the \textit{Location} class, but extending the functionality according to \textit{Location} if needed could easily be done.
+The \textit{PointInSpace} class implements functionality as a vector in three dimensions, offering basic operations like adding other \textit{PointInSpace} instances and multiplying with scalars. It is not as elaborated as the \textit{Location} class, but extending the functionality according to \textit{Location} could easily be done if needed.
 
 \begin{lstlisting}[caption={The public interface of PointInSpace}]
 public class PointInSpace {
@@ -569,7 +569,7 @@ public class PointInSpace {
 
 \subsubsection{The CartesianArmManager class}
 
-The functionality to move the arm (or better: The palm of the robotic hand) in Cartesian space is provided by the \textit{CartesianArmManager}. It accepts positions for the palm and manages the querying of the BioIK service asynchronously in the background. Once it received a result from the IK service it forwards it to the \textit{AxisManager} instance. It holds a list of all joints that shall not be affected by the \textit{CartesianArmManager}, i.e. all joints of the Shadow C5 hand, thus placement of the palm only takes place by moving joints belonging to the Kuka robot arm. It also only updates joints in the \textit{AxisManager} that it shall affect, leaving control to all the other joints to different parts of the software.
+The functionality to move the arm (or better: the palm of the robotic hand) in Cartesian space is provided by the \textit{CartesianArmManager}. It accepts positions for the palm and manages the querying of the BioIK service asynchronously in the background. Once it received a result from the IK service it forwards it to the \textit{AxisManager} instance. It holds a list of all joints that shall not be affected by the \textit{CartesianArmManager}, i.e. all joints of the Shadow C5 hand, thus placement of the palm only takes place by moving joints belonging to the Kuka robot arm. It also only updates joints in the \textit{AxisManager} that it shall affect, leaving control to all the other joints to different parts of the software.
 
 \begin{lstlisting}[caption={The public interface of CartesianArmManager}, label=lst:impl:cartarm]
 public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.GetIKResponse> {
