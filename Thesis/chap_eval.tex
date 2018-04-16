@@ -5,12 +5,15 @@
 
 First tests and trials have shown that the different approaches are performing differently well. No formal tests and studies have been conducted by now, the following experiences are subjective and by far not representative.
 
-Zittern des Roboters
+Controlling the hand grasps using the grasp synergy approaches works quite good. The absolute version seems to give the user a little better and direct control about what's actually happening with the hand and thus more dexterity in the grasp operations than the relative approach. Controlling the arm in both approaches, however, is a little inaccurate. While in the absolute approach a small screen is mapped to a relatively large space, the relative approach has it's disadvantages as the gesture activation time takes one second every time a gesture to move the arm is lifted from the screen and the hand is moved to the other edge of the screen and placed down, which affects the workflow significantly, albeit being much more precise. In both approaches, however, the arm does not remain at one stable position when the control gesture is on the screen, but not moved. This results in a noticeable jitter of the arm. The reason for this seems to be the BioIK solver returning different solutions for the same pose. As long as the gesture is active on the screen, new solutions are queried by the application in an endless loop, since the position of the pointers change very little. These changes are in the second to fourth decimal digit of the value of the amplitude, however the BioIK solver returns a new -- and different -- solution for the same position. This effect was dramatically reduced once the \textit{MinimalDisplacementGoals} were added to the request messages, but are still noticeable. Additionally, finding solutions with the \textit{MinimalDisplacementGoal} active in the request takes significantly longer (about factor two, see Section \ref{sec:eval:ikservice}).  These small movements made precise control and positioning of the hand difficult. 
+
+In the direct fingertip mapping, these jitters were even more significant, as the position of the fingertips were to be mapped to positions in space with high dexterity. However, because of the jitter occurring within the BioIK solutions, it is very hard to precisely grasp objects. Again, adding the \textit{MinimumDisplacementGoal} reduced this effect significantly, but slowed down the (already slow) solution finding of BioIK even more.
 
 \section{Performance}
 
 \subsection{Application}
 
 \subsection{BioIK Service}
+\label{sec:eval:ikservice}
 
 \section{Possible User Studies}
