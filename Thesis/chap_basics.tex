@@ -37,7 +37,7 @@ To create a \textit{service client} in rosjava, an instance of
 org.ros.node.service.ServiceClient
 \end{lstlisting}
 
-is created within the node's \textit{onStart} callback, passing the name of the service node and the service message types. Listing \ref{lst:rosservice} demonstrates how such a start-up routine could look like.
+is created within the \textit{onStart} callback of the node, passing the name of the service node and the service message types. Listing \ref{lst:rosservice} demonstrates how such a start-up routine could look like.
 
 \begin{lstlisting}[caption={Example on how to connect to a ROS service in rosjava},label=lst:rosservice]
 @Override
@@ -95,7 +95,7 @@ A similar robotic hand powered by electrical motors instead of pneumatic muscles
 \subsection{Integration into ROS}
 
 \begin{wrapfigure}{L}{0.4\textwidth}
-	\caption{\label{fig:hand:ros_integration}Schematic overview of the hand's integration into a ROS environment}
+	\caption{\label{fig:hand:ros_integration}Schematic overview to the integration of the hand into a ROS environment}
 	\includegraphics[width=0.4\textwidth]{assets/chpt_basics/hand/ros_integration.eps}
 \end{wrapfigure}
 

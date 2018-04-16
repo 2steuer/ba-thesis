@@ -28,7 +28,7 @@ Interaction with the application is done using the commonly known touch gestures
 
 \subsection{General Screen Layout}
 \label{sec:ui:layout}
-As a screen of a diagonal size of 10 inches (25.4cm) is very limited compared to the size of the robot's workspace good considerations have to be made according to a well-designed user interface. Since we are mainly operating the robot with touch gestures, significant parts of the screen should be blank, as only few information can be displayed while the user poses his hands above or on the screen. Figure \ref{fig:firstmockup} gives a first overview of how the portions of the screen shall be distributed. The biggest part of the screen is reserved for touch interactions by the user. Since multiple approaches to control the robot shall be implemented, the method shall be selected and switched using a tabbed layout with the tabs on the top, as they use the least space of the screen this way.
+As a screen of a diagonal size of 10 inches (25.4cm) is very limited compared to the size of the workspace of the robot good considerations have to be made according to a well-designed user interface. Since we are mainly operating the robot with touch gestures, significant parts of the screen should be blank, as only few information can be displayed while the user poses his hands above or on the screen. Figure \ref{fig:firstmockup} gives a first overview of how the portions of the screen shall be distributed. The biggest part of the screen is reserved for touch interactions by the user. Since multiple approaches to control the robot shall be implemented, the method shall be selected and switched using a tabbed layout with the tabs on the top, as they use the least space of the screen this way.
 
 \subsubsection{Interlock Button}
 On all screens where the robot can be remotely operated, a security interlock button shall be displayed. For the actions on the screen to have effect on the robot (i.e. to be sent to the controller) the button shall remain pressed. This implements the functionality of a dead-man-switch, stopping all robot action once released. Although this is only a software measure it should be a good solution against unwanted movements of the robot as the button can easily be released when pressed with a single finger of the left hand. \textbf{Of course, this software measure does not replace hardware safety measures like emergency switches, but only supports them.}
@@ -40,7 +40,7 @@ On all screens where the robot can be remotely operated, a security interlock bu
 	\includegraphics[width=0.6\textwidth]{assets/chpt_concepts/grasp_synergy_page}
 \end{wrapfigure}
 
-As the control of grasp synergies allows multiple different types of synergies to be selected, a drop-down selection of the synergy shall be displayed to the left side of the screen. This keeps the right side of the screen clear for better operability by right-hand users. Additionally, a cross of lines shall be displayed on the screen so the user knows where the middle of the touch interaction area is. As described later, this is particularly important in the approach with absolute synergy control (See Chapter \ref{sec:synergies:absolute}). To give the user some information about the state of a synergy, the values of significant amplitudes applied to the synergy shall also be displayed on the left hand side of the screen. A button to set the hand into the synergy's idle state (i.e. all significant amplitudes set to $0$) is also sensible to be implemented. A sample of how this screen could look like is demonstrated in Figure \ref{fig:screen:synergy}.
+As the control of grasp synergies allows multiple different types of synergies to be selected, a drop-down selection of the synergy shall be displayed to the left side of the screen. This keeps the right side of the screen clear for better operability by right-hand users. Additionally, a cross of lines shall be displayed on the screen so the user knows where the middle of the touch interaction area is. As described later, this is particularly important in the approach with absolute synergy control (See Chapter \ref{sec:synergies:absolute}). To give the user some information about the state of a synergy, the values of significant amplitudes applied to the synergy shall also be displayed on the left hand side of the screen. A button to set the hand into the idle state of the synergy (i.e. all significant amplitudes set to $0$) is also sensible to be implemented. A sample of how this screen could look like is demonstrated in Figure \ref{fig:screen:synergy}.
 
 \subsection{Direct Fingertip Mapping Screen}
 
@@ -271,13 +271,13 @@ It is $c:G\rightarrow\mathbb{R}^2$, $s:G\rightarrow\mathbb{R}$ and $o:G\rightarr
 	\item The gesture size has a range corresponding to the user's finger span, which should usually be around $\frac{2}{3}$ of the screen width
 \end{itemize}
 
-In first tests, it turned out complicated to have the position of a gesture remain at the same place in both axes while rotating it or changing its size, the $x$ component of the position is chosen as one DOF, since it is larger and thus it is possible to have more granular control on the amplitude's value.
+In first tests, it turned out complicated to have the position of a gesture remain at the same place in both axes while rotating it or changing its size, the $x$ component of the position is chosen as one DOF, since it is larger and thus it is possible to have more granular control on the value of the amplitude.
 
 All mappings from gestures' properties to DOF values shall be done linearly. A general approach has to be found to create these linear functions for all DOF of the hand synergy as well as the arm.
 
 \subsubsection{Linear DOF mapping}
 
-There are multiple requirements for the function to find. Firstly, the linear equation shall be defined by two points $x, y \in \mathbb{R}^2$ with $x_1$ and $y_1$ being in gesture property's space and $x_2$, $y_2$ being in the corresponding DOF space (amplitude or arm position). Secondly, the output value shall be limited to the possible values of the DOF, for the synergies' amplitudes this will be $-50$ and $50$.
+There are multiple requirements for the function to find. Firstly, the linear equation shall be defined by two points $x, y \in \mathbb{R}^2$ with $x_1$ and $y_1$ being in gesture property space and $x_2$, $y_2$ being in the corresponding DOF space (amplitude or arm position). Secondly, the output value shall be limited to the possible values of the DOF, for the synergies' amplitudes this will be $-50$ and $50$.
 
 A function $lm:(x \in \mathbb{R}^2, y \in \mathbb{R}^2, v_{min} \in \mathbb{R}, v_{max} \in \mathbb{R}, p \in \mathbb{R}) \rightarrow \mathbb{R}$ shall be found with the parameters being the two points the linear equation spans in between, the minimum and maximum output value and the value of the gesture property. It outputs the value that can then directly be passed into the DOF value.
 
@@ -323,14 +323,14 @@ Let $w_{screen}$ be the width of the screen in pixels, $\alpha \in \mathbb{R}^N$
 	
 	\item $\alpha_2 = lm\left((w_{screen} \cdot 0.25, 50), (w_{screen} \cdot 0.75, -50), -50, 50, (c(G))_1\right)$
 	
-	For the second significant amplitude the $x$ component of the gesture position is chosen. It is mapped between $\frac{1}{4}$ and $\frac{3}{4}$ of the screen's width as the actual limits cannot be reached with gesture positions due to all pointers having to be at (or beyond) screen borders.
+	For the second significant amplitude the $x$ component of the gesture position is chosen. It is mapped between $\frac{1}{4}$ and $\frac{3}{4}$ of the width of the screen as the actual limits cannot be reached with gesture positions due to all pointers having to be at (or beyond) screen borders.
 	
 	\item $\alpha_3 = lm\left( \left( -\frac{\pi}{2}, 50 \right), \left( \frac{\pi}{2}, -50 \right), -50, 50, o(G) \right)$
 	
-	For the third significant amplitude the orientation is mapped from $-90^\circ \widehat{=} -\frac{\pi}{2}$ to $90^\circ \widehat{=} \frac{\pi}{2}$. Rotations to values greater or less than these have shown to be only possible when moving the tablet or changing the gesture's size and position.
+	For the third significant amplitude the orientation is mapped from $-90^\circ \widehat{=} -\frac{\pi}{2}$ to $90^\circ \widehat{=} \frac{\pi}{2}$. Rotations to values greater or less than these have shown to be only possible when moving the tablet or changing the size and position of a gesture.
 \end{itemize}
 
-$\alpha_i,\,i=\{1,2,3\}$ are evaluated simultaneously whenever a pointer's position within the gesture changes. Joint angle values are then calculated using (\ref{eq:syn}) with $S$ being the currently selected synergy. Once the joint values are calculated they can be published to the ROS nodes of the Shadow C5 hand.
+$\alpha_i,\,i=\{1,2,3\}$ are evaluated simultaneously whenever the position of a pointer within the gesture changes. Joint angle values are then calculated using (\ref{eq:syn}) with $S$ being the currently selected synergy. Once the joint values are calculated they can be published to the ROS nodes of the Shadow C5 hand.
 
 \subsection{Relative Approach}
 \label{sec:app:rel}
@@ -386,12 +386,12 @@ Whether these values are well chosen and usable has to be evaluated during tests
 	\includegraphics[width=\linewidth]{assets/chpt_concepts/coordinates.png}
 \end{wrapfigure}
 
-Controlling the arm with touch gestures is not as easy as controlling the grasp synergies since the arm's joint angles have to be calculated using the BioIK service. The objective is to give the user the opportunity to control the position of the robot's hand-palm in Cartesian coordinates. To achieve this, it is important to know the orientation of the coordinate system around the arm as well as \textit{safe} coordinates, where the robot arm can move without causing any danger to its environment. Figure \ref{fig:arm:coord} gives a good insight in the coordinate system used. Potentially, an arbitrary coordinate system could be used, but the BioIK service at the point of writing only accepts coordinates in the so-called \textit{world} coordinate system. It has its origin on the floor below the robot arm's base. Each square in the illustration represents one meter in the real set-up. The shown model is assumed to be sufficiently exact to use it as a simulation for the real robot with its surroundings. It is important to keep in mind that the y-coordinate is counter-intuitively rising to the back, which means it is falling in the direction to the front. Also, from the robot's perspective, the x axis is oriented to the left.
+Controlling the arm with touch gestures is not as easy as controlling the grasp synergies since the arm's joint angles have to be calculated using the BioIK service. The objective is to give the user the opportunity to control the position of the palm of the robotic hand in Cartesian coordinates. To achieve this, it is important to know the orientation of the coordinate system around the arm as well as \textit{safe} coordinates, where the robot arm can move without causing any danger to its environment. Figure \ref{fig:arm:coord} gives a good insight in the coordinate system used. Potentially, an arbitrary coordinate system could be used, but the BioIK service at the point of writing only accepts coordinates in the so-called \textit{world} coordinate system. It has its origin on the floor below the base of the robot arm. Each square in the illustration represents one meter in the real set-up. The shown model is assumed to be sufficiently exact to use it as a simulation for the real robot with its surroundings. It is important to keep in mind that the y-coordinate is counter-intuitively rising to the back, which means it is falling in the direction to the front. Also, from the perspective of the robot, the x axis is oriented to the left.
 
-In order to prevent damages to the robot or its environment, a \textit{bounding box} has to be found where the robot's movements do not cause any unwanted movements. Unwanted movements can occur since the shortest way from position $x$ to position $y$ may be very short in cartesian space, but still very long in joint coordinates. It is important to keep in mind, that for very close points, the BioIK service might output very different joint positions, as it assumes the new solution more fitting than the old one. This, however, results in a quite small work space for the robot compared to the overall table size. For the first approach, the limits for all 3 axes assumed \textit{safe} are denoted in Table \ref{tab:safeaxes}.
+In order to prevent damages to the robot or its environment, a \textit{bounding box} has to be found where the movements of the robot do not cause any unwanted movements. Unwanted movements can occur since the shortest way from position $x$ to position $y$ may be very short in cartesian space, but still very long in joint coordinates. It is important to keep in mind, that for very close points, the BioIK service might output very different joint positions, as it assumes the new solution more fitting than the old one. This, however, results in a quite small work space for the robot compared to the overall table size. For the first approach, the limits for all 3 axes assumed \textit{safe} are denoted in Table \ref{tab:safeaxes}.
 
 \begin{wraptable}{L}{0.3\linewidth}
-	\caption{\label{tab:safeaxes}Position limits for the robot's hand's palm}
+	\caption{\label{tab:safeaxes}Position limits for the palm of the robot's hand}
 	\begin{tabular}{|c|c|c|}
 		\hline
 		\textbf{Axis} & \textbf{Min.} & \textbf{Max.} \\
@@ -405,15 +405,15 @@ In order to prevent damages to the robot or its environment, a \textit{bounding 
 	\end{tabular}
 \end{wraptable}
 
-In order to prevent damages to the robot or its environment, a \textit{bounding box} has to be found where the robot's actions do not cause any unwanted movements which can occur since the shortest way from position $x$ to position $y$ may be short in cartesian space, but still long in joint coordinates. It is important to keep in mind that for close points, the BioIK service might output extremely different joint positions, as it assumes the new solution more fitting than the old one. This, however, results in a quite small work space for the robot compared to the overall table size. For the first approach, the limits for all 3 axes assumed \textit{safe} are denoted in Table \ref{tab:safeaxes}.
+In order to prevent damages to the robot or its environment, a \textit{bounding box} has to be found where the actions of the robot do not cause any unwanted movements which can occur since the shortest way from position $x$ to position $y$ may be short in cartesian space, but still long in joint coordinates. It is important to keep in mind that for close points, the BioIK service might output extremely different joint positions, as it assumes the new solution more fitting than the old one. This, however, results in a quite small work space for the robot compared to the overall table size. For the first approach, the limits for all 3 axes assumed \textit{safe} are denoted in Table \ref{tab:safeaxes}.
 
-To map touch interactions to positions of the hand's palm the same functions as in Sections \ref{sec:synergies:absolute} and \ref{sec:app:rel} are used with the clipping borders set to the safe axes' limits. As a starting point, the x-axis is mapped to the x-position of a three-pointer gesture, the z-axis to the y-position of a three-pointer gesture. As before, only half of each screen dimension will be mapped, leaving out a quarter on each end to make it easier to reach all limits. The y-axis will later be mapped to another property of the three-pointer gesture or the position of a four-pointer gesture. Once the desired palm position was calculated it is passed to the BioIK service first, the resulting joint angles returned by the service are then passed to the robot.
+To map touch interactions to positions of the palm of the hand the same functions as in Sections \ref{sec:synergies:absolute} and \ref{sec:app:rel} are used with the clipping borders set to the safe axes' limits. As a starting point, the x-axis is mapped to the x-position of a three-pointer gesture, the z-axis to the y-position of a three-pointer gesture. As before, only half of each screen dimension will be mapped, leaving out a quarter on each end to make it easier to reach all limits. The y-axis will later be mapped to another property of the three-pointer gesture or the position of a four-pointer gesture. Once the desired palm position was calculated it is passed to the BioIK service first, the resulting joint angles returned by the service are then passed to the robot.
 
 \section{Direct Fingertip Mapping}
 \label{sec:conc:dftm}
 As \citeauthor{conf:humanoids:TohHLBZP12} \cite{conf:humanoids:TohHLBZP12} state in their work, dexterous grasping and telemanipulation tasks frequently focus on precise control of fingertips in a plane surface. They directly map fingertip positions from the touchscreen to a plane in the working space. As this approach seems interesting it shall also be implemented within this thesis.
 
-Heavy use of the BioIK service is made for this, as not only the position of the hand's palm will be given to the service as a goal, but potentially up to 5 positions for each fingertip will be passed. For the first approach only 3 fingertips shall be usable by the functionality. To find out which positions in three-dimensional space shall be passed for the fingertips, we first have to define a plane the fingertips shall be placed on in three-dimensional space. This is done using the parametrized form to represent a plane 
+Heavy use of the BioIK service is made for this, as not only the position of the palm will be given to the service as a goal, but potentially up to 5 positions for each fingertip will be passed. For the first approach only 3 fingertips shall be usable by the functionality. To find out which positions in three-dimensional space shall be passed for the fingertips, we first have to define a plane the fingertips shall be placed on in three-dimensional space. This is done using the parametrized form to represent a plane 
 
 \begin{equation*}
 \vec{E} = \vec{b} + t\cdot \vec{e_1} + s \cdot \vec{e_2}
@@ -421,7 +421,7 @@ Heavy use of the BioIK service is made for this, as not only the position of the
 
 with $\vec{b}$ being the base vector of the plane and $\vec{e_1}$, $\vec{e_2}$ determining the orientation of the plane from the base. It is $|\vec{e_1}| = |\vec{e_2}| = 1$ and $\vec{e_1} \cdot \vec{e_2} = 0$, which means that on the surface a new two-dimensional coordinate system is \textit{created} with its origin in $\vec{b}$. By assigning the $x$ and $y$ coordinates of a point to $t$ and $s$, points from a two-dimensional coordinate system can then easily be mapped into three dimensions.
 
-As one unit in the robot's coordinate system represents one meter in the real world, the coordinates of pointers on the screen shall be calculated in meters of distance to the screen's origin (which usually is the top-left corner). The position of a pointer is known in pixels and the screen resolution is known in dots per inch (DPI). To transform a pixel value $p$ into meters on a screen with a resolution of $r$ DPI, the calculation
+As one unit in the coordinate system of the robot represents one meter in the real world, the coordinates of pointers on the screen shall be calculated in meters of distance to the origin of the screen (which usually is the top-left corner). The position of a pointer is known in pixels and the screen resolution is known in dots per inch (DPI). To transform a pixel value $p$ into meters on a screen with a resolution of $r$ DPI, the calculation
 \begin{equation}
 \label{eq:conc:dftm:world}
 p_m = \frac{p}{r} \cdot \frac{2.54}{100}
@@ -443,7 +443,7 @@ For first tests, the vectors defining the plane are chosen as
 	\vec{e_2} = \vecthr{0}{1}{0}
 	\end{equation*}
 	
-The x value rises to the left for the robot's coordinate system, but to the right for the tablet's screen, which is why the first component of $\vec{e_1}$ is negative. The robot's coordinate system's $y$ coordinate rises to the bottom, so does the $y$ coordinate of the touch screen, the corresponding component in $\vec{e_2}$ is therefore positive (See Figure \ref{fig:dfmt:coords} for a visual comparison of the coordinate systems).
+The x value rises to the left for the coordinate system of the robot, but to the right for the screen of the tablet, which is why the first component of $\vec{e_1}$ is negative. The $y$ coordinate of the robot's coordinate system rises to the bottom, so does the $y$ coordinate of the touch screen, the corresponding component in $\vec{e_2}$ is therefore positive (See Figure \ref{fig:dfmt:coords} for a visual comparison of the coordinate systems).
 
 \begin{figure}
 	\caption{\label{fig:dfmt:coords}Comparison of the coordinate systems between which shall be mapped. Left: Tablet, Right: Arm coordinate system}
@@ -525,7 +525,7 @@ Aside from the original \textit{Observer} pattern described in \cite{Eilebrecht2
 
 \subsection{Singleton}
 
-As several classes exist of which only one instance is needed (and sensible to be created) within all of the application's functionality, the \textit{Singleton-Pattern} is used to ensure that only one instance exists. The singleton pattern is implemented by creating a private constructor which is called from a static method on the desired class. The created instance is saved into a static field and then returned on all subsequent calls. An example implementation of the pattern (as taken from \cite{Eilebrecht2013}) can be found in Listing \ref{lst:conc:obs}.
+As several classes exist of which only one instance is needed (and sensible to be created) within all of the functionality of the application, the \textit{Singleton-Pattern} is used to ensure that only one instance exists. The singleton pattern is implemented by creating a private constructor which is called from a static method on the desired class. The created instance is saved into a static field and then returned on all subsequent calls. An example implementation of the pattern (as taken from \cite{Eilebrecht2013}) can be found in Listing \ref{lst:conc:obs}.
 
 The \textit{Observer-Pattern} is implemented by the following classes:
 \begin{itemize}
