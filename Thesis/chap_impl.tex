@@ -1,7 +1,7 @@
 \chapter{Implementation}
 \label{chap:implementation}
 \section{Preparations}
-\subsection{Setting up a virtual machine}
+\subsection{Setting up a Virtual Machine}
 
 For all developments within this thesis a virtual machine was used. This makes it easy to reproduce the environment within the labs at the TKRN group as well as having a portable development solution isolated from the rest of the computer's operating system. As the ROS version called \textit{Kinetic} is widely used within the set-ups around the robot, I will also develop the application using this version. This reduces the risk of incompatibility issues during development. ROS \textit{Kinetic} is available as packages for Ubuntu up to version 16.04\cite{ros:install}, which is why we install this version of Ubuntu within a new virtual machine. Enough virtual hard disk space and memory is assigned to the virtual machine (200GB HDD, 8 GB RAM) as well as 4 processing cores. This set-up should be sufficient for all purposes during this thesis. 
 
@@ -39,7 +39,7 @@ source ~/.bashrc
 
 When this is done, ROS is completely set up on the development machine.
 
-\subsubsection[Setting up catkin]{Setting up a catkin workspace} 
+\subsubsection[Setting up Catkin]{Setting up a Catkin Workspace} 
 
 \textit{Catkin} is a build system and workspace management utility provided with ROS. It supports developers to create, develop and build packages for ROS applications. To create a catkin workspace within the current user's home directory, issue the commands from Listing \ref{lst:ros:catkin} after setting up ROS and sourcing the \textit{setup.bash}-file. The instructions to set up catkin are taken from \cite{ros:install:catkin}.
 
@@ -68,7 +68,7 @@ After Android Studio was installed successfully, it is important to select and i
 	\end{center}
 \end{figure}
 
-\subsection{Modifying and compiling rosandroid}
+\subsection{Modifying and Compiling Rosandroid}
 \label{impl:compiling_rosandroid}
 
 Since the application developed in this thesis shall work on Android from versions beginning at 4.0.3 we have to modify the rosandroid code on one little detail to make everything work fine. In the created catkin workspace, go to the \textit{src} folder and clone the rosjava and rosandroid repositories there:
@@ -91,7 +91,7 @@ public abstract class RosActivity extends android.support.v7.app.AppCompatActivi
 
 This gives us the ability to use the already-built features in rosandroid like the automatically displayed activity to connect to a ROS master and built-in node handling even in older Android versions. When changes are made, issue a \textit{catkin\_make} command in the catkin workspace's root directory. \textit{Rosjava} and \textit{rosandroid} will then be built from source and deployed to a \textit{Maven}\footnote{Maven is a dependency and package management system for Java libraries.} repository from where the binaries will be loaded by Android Studio on compile time.
 
-\subsection{Starting the environment}
+\subsection{Starting the Environment}
 
 To start up the development environment with the ROS master, the BioIK service and the \textit{rviz!} simulation of the robot, first the \textit{tams\_cml}\footnote{\url{https://gogs.crossmodal-learning.org/norman.hendrich/tams_cml}} and \textit{bio\_ik\_service}\footnote{\url{https://gogs.crossmodal-learning.org/philipp.ruppel/bio_ik_service}} packages has to be cloned into the catkin workspace, as well as the \textit{tams\_multitouch} package, which has to be copied into the workspace. After \textit{catkin\_make} was executed successfully, the programs are ready to be started. The following commands have to be entered in this order, but within different terminal sessions:
 \begin{lstlisting}[caption={Commands to start up the development environment}]
@@ -240,7 +240,7 @@ protected void init(NodeMainExecutor nodeMainExecutor) {
 }
 \end{lstlisting}
 
-\subsection{The C5LwrNode class}
+\subsection{The C5LwrNode Class}
 
 The class \textit{C5LwrNode} inherits from \textit{AbstractNodeMain}, which already offers the very basic lifetime functionality of a ROS node. Some methods have to be implemented by the developer, like \textit{getDefaultNodeName()}, which determines the name of the ROS node as it is registered with the ROS master. In the \textit{onStart()} method, all start-up procedures are implemented, like registering topic subscriptions as well as creating publishers and \textit{service clients}. Within the \textit{onShutdown()} method, all resources created before (subscribers, publishers, service clients) shall be closed and deleted to ensure a clean de-registration from the ROS master and a clean shut-down of the application. The start-up code for the ROS node can be seen in Listing \ref{lst:impl:c5lwrnode}.
 
@@ -329,7 +329,7 @@ public interface AxisInformation {
 
 All the information is held within the \textit{AxisManager}, referenced by the axis identifier. Manipulation of the data is only done through calls to the \textit{AxisManager}, to give it full control about what happens with all axes. The difference between \textit{AxisInformation} and the concrete implementation \textit{AxisInformationImpl} is, that the implementation has a setter function for every property. All calculations are done within the \textit{AxisManager} itself.
 
-\subsection{AxisManager timer tick}
+\subsection{AxisManager Timer Tick}
 
 The \textit{AxisManager} is designed to work fully asynchronous. All information about axes' target values is stored in the according \textit{AxisInformation} object, but only processed from within the main timer event used in \textit{AxisManager}. The timer is set to a frequency of $f_{am} = 10Hz$. This value can easily be changed by altering the static constant field \textit{UPDATE\_FREQ} in the \textit{AxisManager} task. An implementation of a timer is used which gives the ability to schedule an event at a fixed rate. \textit{java.util.Timer} is able to ensure the desired frequency is reached in the long run by slightly alternating the delays between two executions\cite{AndroidTimer2018}. This is important to have axis movements and publishing done at the correct speed and frequency. To use with functionality, the method \textit{scheduleAtFixedRate()} on the timer has to be used. 
 
@@ -340,12 +340,12 @@ All calculations regarding axis movements (Section \ref{sec:impl:axismovements})
 When the application starts or is resumed from a sleeping device (i.e. the screen went off), the \textit{AxisManager} is initialized. This means that it blocks all actions until it has received a specific number of joint states from the \textit{C5LwrNode}. This measure was implemented to prevent the application from sending joint data to a non-existent robot and to initialize the joint data within memory with the current state of the robot. After 20 samples (\textit{JointState}s) have been received, the values are copied into the target values for each axis.
 Initializing all joint target values with 0 is obviously not a good choice, as the robot would then go to this position out of any state it is currently in, causing unwanted movements and behaviour. During initialization a modal dialog is shown, blocking all user interaction with the graphical user interface.
 
-\subsection{Axis movements}
+\subsection{Axis Movements}
 \label{sec:impl:axismovements}
 
 The main task of the \textit{AxisManager} is managing movement of all axes in a safe manner. To accomplish this, it restricts the movement for each axis to the maximum speed stored within the \textit{AxisInformation}. Two main modes are available for movement. The first one is by enabling a constant movement of an axis at a specified speed. The second is by setting target values, which the axis will then be moved to at a maximum speed defined on a per-axis basis in the \textit{AxisInformation} object.
 
-\subsubsection{Constant movement}
+\subsubsection{Constant Movement}
 
 To set an axis to constant movement at a constant speed, the method
 \begin{lstlisting}
@@ -357,7 +357,7 @@ public boolean stopMoving(String identifier);
 \end{lstlisting}
 has to be called with the string literal identifying the axis which shall be stopped.
 
-\subsubsection{Setting target values}
+\subsubsection{Setting Target Values}
 
 The most common use-case in the application is that different parts of the program set values for each axis to be reached. Instead of simply sending the values received by other parts of the program to the robot over ROS, the axis manager implements a safety feature limiting the movement speeds of an axis at a maximum speed. To accomplish this another variable is introduced in \textit{AxisInformation}, the \textit{current target value}. While the \textit{target value} of an axis determines the desired position where the axis shall be at the end, the \textit{current target value} is the value which is actually sent to the robot. The \textit{current target value} is modified in the timer tick.
 
@@ -391,7 +391,7 @@ p_c - \Delta p & |p_t - p_c| > \Delta p \land p_t < p_c
 
 The calculated value $p_{c,new}$ is then stored into the \textit{AxisInformation} for each axis.
 
-\subsection{Passing axis data to ROS}
+\subsection{Passing Axis Data to ROS}
 \label{sec:impl:aximgrros}
 
 After each execution of the movement processes described in Section \ref{sec:impl:axismovements}, the newly calculated values are published to the ROS nodes controlling the robot arm and hand. As angles for arm joints and hand joints have to be published to different ROS topics, two calls have to be made. The interface \textit{RobotJointDataReceiver}, which is implemented by \textit{C5LwrNode} has a method
@@ -402,7 +402,7 @@ accepting the joint type as the first parameter. The ROS node implementation wil
 
 At the end of the timer event in \textit{AxisManager}, first all \textit{current target values} for arm joints are taken from the list of \textit{AxisInformation}. The angle values are converted to radians and put into a Map, which has the axis identifier as the key and the angle of the corresponding axis as value. \textit{handleJointData()} is then called with \textit{JointType.ARM} and the created map. The same procedure is then executed for all \textit{AxisInformation}s with the type \textit{JointType.HAND}.
 
-\subsection{Stopping movement and setting all axes to zero}
+\subsection{Stopping Movement and Setting All Axes to Zero}
 \label{sec:impl:axism:stop}
 Two extra functions are implemented in \textit{AxisManager}. The first,
 \begin{lstlisting}
@@ -453,7 +453,7 @@ If the pointer count of a gesture changes, the \textit{GestureParser} calls the 
 
 When a gesture is added or its pointer count changes, it is marked as \textit{locked} by the \textit{GestureParser} for the duration of one second. This indicates to dependent classes, that the gesture is new and the data should not yet be used for any control purposes, as the user might still adjust finger positions. This also takes care of the fact that, to add a multi-pointer gesture, the android system calls different events for each pointer subsequently, meaning that to the software it looks as if a one-pointer gesture was added, then a two-pointer gesture and then a three-pointer gesture, if three fingers were laid on the touchscreen. By ignoring gesture input for the first second of a new gesture, the user should have put all fingers onto the screen and can then control the application. Having input by an unwanted gesture may cause unexpected behaviour. In the following the functionality of the three main material classes \textit{Location}, \textit{Pointer} and \textit{Gesture} is explained.
 
-\subsubsection{The Location class}
+\subsubsection{The Location Class}
 
 The \textit{Location} class represents a two-dimensional vector within the program. It has two coordinates, $x$ and $y$, which can be accessed by \textit{getter methods}. It also offers basic functionality to work with vectors, including addition, subtraction, multiplication with scalars and the scalar-product. All functionality is implemented as expected by common sense. When a mathematical operation is performed using two \textit{Location} objects, the result is returned as a new one, as a \textit{Location} is immutable once it is created.
 
@@ -507,7 +507,7 @@ public double getAngleTo(Location loc) {
 
 Lastly, \textit{getTurned()} returns the current \textit{Location} rotated by an angle of \textit{angleRad}. The angle may range from $-\pi$ to $\pi$, with positive angles meaning a clockwise rotation. \textit{isSame()} is a numerical comparison of the two vectors. Note that floating point numbers are compared here, on which equality comparisons are problematic. This function is used to check for exactly the same values, meaning probably the same location objects.
 
-\subsubsection{The Pointer class}
+\subsubsection{The Pointer Class}
 
 Pointers are the contents of \textit{Gestures}. They contain of a \textit{Location}, representing their coordinates on the touch-screen and an id, which is their touch-pointer-id as assigned by the Android operating system. This class was basically introduced to semantically separate the pointer id from the location. The id is needed to identify a pointer within the motion event raised by the operating system. A method is provided to update the location of a pointer, in which a new \textit{Location} object is created.
 \begin{lstlisting}[caption={The Pointer class}]
@@ -521,7 +521,7 @@ public class Pointer {
 }
 \end{lstlisting}
 
-\subsubsection{The Gesture class}
+\subsubsection{The Gesture Class}
 
 The \textit{Gesture} class represents a gesture as defined in Section \ref{sec:conc:gestures}. It is basically a set of \textit{Pointer}s with a set of properties. Its public interface is denoted in Listing \ref{lst:impl:gestureclass}.
 
@@ -549,7 +549,7 @@ The first two methods set and query the \textit{locked} state of a gesture, foll
 
 \subsection{Arm Control}
 \label{sec:impl:armcontrol}
-\subsubsection{The PointInSpace class}
+\subsubsection{The PointInSpace Class}
 
 The \textit{PointInSpace} class implements functionality as a vector in three dimensions, offering basic operations like adding other \textit{PointInSpace} instances and multiplying with scalars. It is not as elaborated as the \textit{Location} class, but extending the functionality according to \textit{Location} could easily be done if needed.
 
@@ -567,7 +567,7 @@ public class PointInSpace {
 
 \end{lstlisting}
 
-\subsubsection{The CartesianArmManager class}
+\subsubsection{The CartesianArmManager Class}
 
 The functionality to move the arm (or better: the palm of the robotic hand) in Cartesian space is provided by the \textit{CartesianArmManager}. It accepts positions for the palm and manages the querying of the BioIK service asynchronously in the background. Once it received a result from the IK service it forwards it to the \textit{AxisManager} instance. It holds a list of all joints that shall not be affected by the \textit{CartesianArmManager}, i.e. all joints of the Shadow C5 hand, thus placement of the palm only takes place by moving joints belonging to the Kuka robot arm. It also only updates joints in the \textit{AxisManager} that it shall affect, leaving control to all the other joints to different parts of the software.
 
@@ -664,7 +664,7 @@ protected abstract void handleOrientationChanges(GestureState oldState, Gesture 
 \end{lstlisting}
 All three methods take the current state of the gesture as well as the state of the gesture from the call before as parameters. The \textit{old state} of active gestures is maintained by the \textit{SynergyProxyBase} implementation. In fact, only \textit{RelativeSynergyProxy} will make use of it, as the absolute synergy control fully relies on the current state of a gesture.
 
-\subsection{Absolute control}
+\subsection{Absolute Control}
 \label{sec:impl:syn:absc}
 The \textit{AbsoluteSynergyProxy} is contained within the \textit{AbsoluteSynergyTouchFragment}, which passes touch events on to the \textit{GestureParser} and registers eht \textit{AbsoluteSynergyProxy} with the \textit{GestureParser} to receive events. It also maintains the list of loaded synergies and assigns the one currently selected to the \textit{AbsoluteSynergyProxy}. Within the three abstract methods of \textit{SynergyProxyBase} that are implemented here current states of gestures are handled. According to their pointer count different actions are made, as two-pointer gestures are used to control the hand synergies, while three-pointer-gestures are used to control the robotic arm. Only the X and Z position of the robot hand palm are used when controlling the arm at the time of writing. The \textit{CartesianArmManager} described in Section \ref{sec:impl:armcontrol} is used to control the position of the palm. 
 
@@ -726,7 +726,7 @@ protected void handleLocationChanged(GestureState oldState, Gesture gesture) {
 }
 \end{lstlisting}
 
-\subsection{Relative control}
+\subsection{Relative Control}
 
 The implementation of \textit{RelativeSynergyProxy} is similarly embedded into the environment of \textit{RelativeSynergyTouchFragment}, \textit{GestureParser} and \textit{CartesianArmManager} as the \textit{AbsoluteSynergyProxy}. Within the methods that are called when a gesture changes, the \textit{RelativeChanger} class is used to change amplitudes or the position of the arm relatively to their current position. The parameter \textit{oldState} within all gesture events comes into action here, as only the difference between the old and the current state matters for the calculations. 
 
@@ -773,7 +773,7 @@ protected void handleLocationChanged(GestureState oldState, Gesture gesture) {
 \end{lstlisting}
 
 
-\section{Direct Finger Positioning}
+\section{Direct Fingertip Mapping (DFTM)}
 \label{sec:impl:dfmt}
 
 The \textit{direct fingertip mapping} (DFTM) is mainly implemented using the \textit{DfmtProxy} and \textit{FingertipPointer} classes, in which most of the functionality is contained. The \textit{DftmProxy} class implements the \textit{Singleton} pattern. Its instance is used from the \textit{FingertipFragment} class which offers the user interface for this approach and forwards all touch events of the user interface to the \textit{DftmProxy}. For BioIK service interactions, the \textit{DftmProxy} class directly depends on the \textit{C5LwrNode} which offers the functionality needed to request joint angle solutions for a set of given fingertip positions.

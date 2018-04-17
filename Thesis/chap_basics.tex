@@ -19,7 +19,7 @@ where \textit{/robot/hand} is the name space and \textit{controller} the node na
 
 Numerous implementations of the ROS client libraries are available, the most common ones are developed and used in C/C++ and Python\cite{ros:client_libraries}. For developing a ROS-enabled Android application, an implementation of the ROS client library in Java is chosen. 
 
-\subsection{rosjava / rosandroid}
+\subsection{Rosjava / Rosandroid}
 
 There is an implementation of the ROS client library published on GitHub\footnote{\url{https://github.com/rosjava/rosjava_core}}. It includes support for all needed communication structures within ROS as well as the most common message types exchanged with ROS nodes. \textit{rosjava} is specifically designed to develop ROS-enabled Android applications and is originally developed by Google\cite{ros:rosjava:readme}.
 
@@ -27,7 +27,7 @@ The package \textit{rosandroid}\footnote{\url{https://github.com/rosjava/android
 
 \textit{rosandroid} is designed for the newest versions of Android, which leads to the fact that a small change has to be made in the code to make it compatible with older versions of Android, too. These changes are described in Chapter \ref{impl:compiling_rosandroid}.
 
-\subsection{Using services in rosjava}
+\subsection{Using Services in Rosjava}
 \label{sec:using_services}
 The implementation of how to consume (i.e.~call) services is a little different in rosjava than it is in roscpp\footnote{roscpp is the C++ implementation of ROS}, which is why the main differences will be briefly be elaborated here. To call services, special ROS messages are exchanged. These so-called \textit{service message types} consist of a request and a response part. While in C++ one object containing both the request and the response is passed to the \textit{service client} which then fills out the response part\cite{ros:serviceclient}, in other implementations like \textit{rospy} or \textit{rosjava} these messages are separated.
 
