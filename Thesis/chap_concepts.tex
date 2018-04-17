@@ -3,7 +3,8 @@
 
 \section{User Interface}
 
-\begin{wrapfigure}[13]{R}{0.5\linewidth}
+\begin{wrapfigure}[12]{R}{0.5\linewidth}
+	\vspace{-2.2em}
 	\caption{\label{fig:ui:tablet}Example placement of the control device}
 	\includegraphics[width=\linewidth]{assets/chpt_concepts/tablet.png}
 \end{wrapfigure}
@@ -35,10 +36,10 @@ On all screens where the robot can be remotely operated, a security interlock bu
 
 \subsection{Grasp Synergy Screens}
 
-\begin{wrapfigure}[11]{R}{0.6\textwidth}
+\begin{figure}
 	\caption{\label{fig:screen:synergy}Synergy control screen}
-	\includegraphics[width=0.6\textwidth]{assets/chpt_concepts/grasp_synergy_page}
-\end{wrapfigure}
+	\includegraphics[width=\linewidth]{assets/chpt_concepts/grasp_synergy_page}
+\end{figure}
 
 As the control of grasp synergies allows multiple different types of synergies to be selected, a drop-down selection of the synergy shall be displayed to the left side of the screen. This keeps the right side of the screen clear for better operability by right-hand users. Additionally, a cross of lines shall be displayed on the screen so the user knows where the middle of the touch interaction area is. As described later, this is particularly important in the approach with absolute synergy control (See Chapter \ref{sec:synergies:absolute}). To give the user some information about the state of a synergy, the values of significant amplitudes applied to the synergy shall also be displayed on the left hand side of the screen. A button to set the hand into the idle state of the synergy (i.e. all significant amplitudes set to $0$) is also sensible to be implemented. A sample of how this screen could look like is demonstrated in Figure \ref{fig:screen:synergy}.
 
@@ -71,7 +72,7 @@ Multiple of these widgets shall be added to the axis control screen, one for eac
 
 \begin{figure}
 	\caption{\label{fig:axiscontrol:screen}Axis control screen draft}
-	\frame{\includegraphics[width=0.8\textwidth]{assets/chpt_concepts/AxisControlPage}}
+	\frame{\includegraphics[width=\linewidth]{assets/chpt_concepts/AxisControlPage}}
 \end{figure}
 
 \section{Using the BioIK Service}
@@ -381,7 +382,8 @@ Whether these values are well chosen and usable has to be evaluated during tests
 
 \subsection{Arm Control}
 
-\begin{wrapfigure}[14]{R}{0.4\linewidth}
+\begin{wrapfigure}[13]{R}{0.4\linewidth}
+	\vspace{-2.2em}
 	\caption{\label{fig:arm:coord}The coordinate system relative to the arm}
 	\includegraphics[width=\linewidth]{assets/chpt_concepts/coordinates.png}
 \end{wrapfigure}
@@ -447,8 +449,8 @@ The x value rises to the left for the coordinate system of the robot, but to the
 
 \begin{figure}
 	\caption{\label{fig:dfmt:coords}Comparison of the coordinate systems between which shall be mapped. Left: Tablet, Right: Arm coordinate system}
-	\includegraphics[width=0.6\linewidth]{assets/chpt_concepts/dfmt_coord_screen.png}
-	\includegraphics[width=0.4\linewidth]{assets/chpt_concepts/dfmt_coord_arm.png}
+	\includegraphics[width=0.655\linewidth]{assets/chpt_concepts/dfmt_coord_screen.png}
+	\includegraphics[width=0.333\linewidth]{assets/chpt_concepts/dfmt_coord_arm.png}
 \end{figure}
 
 \section{Software Architecture}
