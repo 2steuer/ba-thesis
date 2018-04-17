@@ -597,7 +597,8 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
 }
 \end{lstlisting}
 
-\begin{wrapfigure}[20]{R}{0.5\linewidth}
+\begin{wrapfigure}[19]{R}{0.5\linewidth}
+	\vspace{-2.2em}
 	\caption{\label{fig:impl:cartarmstate}State diagram for the CartesianArmManager update loop}
 	\includegraphics[width=\linewidth]{assets/chpt_impl/sw/CartesianArmManager_loop}
 \end{wrapfigure}
@@ -628,34 +629,21 @@ Within the above names fragment classes, loading of synergies is surrounded with
 loadSynergy("Grasp 1", R.raw.g1mean_n, R.raw.g1vecs_n);
 \end{lstlisting}
 
-\begin{wraptable}[22]{R}{0.2\linewidth}
+\begin{table}
 	\caption{\label{tab:impl:indexjoints}The mapping from array index to joint name}
-	\begin{tabular}{|c|l|}
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
 		\hline
-		0 & FFJ1 \\
-		1 & FFJ2 \\
-		2 & FFJ3 \\
-		3 & FFJ4 \\
-		4 & MFJ1 \\
-		5 & MFJ2 \\
-		6 & MFJ3 \\
-		7 & MFJ4 \\
-		8 & RFJ1 \\
-		9 & RFJ2 \\
-		10 & RFJ3 \\
-		11 & RFJ4 \\
-		12 & LFJ1\\
-		13 & LFJ2\\
-		14 & LFJ3\\
-		15 & LFJ4\\
-		16 & THJ1\\
-		17 & THJ2\\
-		18 & THJ3\\
-		19 & THJ4\\
-		20 & THJ5 \\
+		0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
+		\hline
+		FFJ1 & FFJ2 & FFJ3 & FFJ4 & MFJ1 & MFJ2 & MFJ3 & MFJ4 & RFJ1 & RFJ2 & RFJ3 \\
+		\hline
+		\hline
+		11 & 12 & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & \\
+		\hline
+		RFJ4 & LFJ1 & LFJ2 & LFJ3 & LFJ4 & THJ1 & THJ2 & THJ3 & THJ4 & THJ5 & \\
 		\hline
 	\end{tabular}
-\end{wraptable}
+\end{table}
 
 Once loaded a grasp synergy is used by passing an array of double values to the \textit{toJoints()} method on the \textit{GraspSynergy} object. As described in Section \ref{sec:conc:synergy}, the amplitude values have to be in a range from $-50$ to $50$. The return value of this method is again an array of double values, representing the calculated joint angles in degrees. The mapping of the index within the returned array to the joint name the angle shall be assigned to had to be extracted from code, so it is available in Table \ref{tab:impl:indexjoints} for reasons of completeness. 
 
