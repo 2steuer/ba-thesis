@@ -182,7 +182,7 @@ Although pointer positions on a touch screen are usually given in integer number
 \end{itemize}
 \end{defn}
 
-In other words: The position of a gesture is the \textit{center of mass} of all pointers of a gesture. The size is the doubled mean distance of all pointers to the position of a gesture. Before defining the last property of a gesture, the \textbf{orientation} we first have to define what the \textbf{thumb pointer} of a gesture is.
+In other words: The position of a gesture is the \textit{center of mass} of all pointers of a gesture. The size is the doubled mean distance of all pointers to the position of a gesture. Before defining the last property of a gesture, the \textbf{orientation}, we first have to define what the \textbf{thumb pointer} of a gesture is.
 
 \begin{defn}
 	The \textbf{thumb pointer} $th(G)$ of a gesture $G$ is defined as
@@ -278,7 +278,7 @@ All mappings from gestures' properties to DOF values shall be done linearly. A g
 
 \subsubsection{Linear DOF Mapping}
 
-There are multiple requirements for the function to find. Firstly, the linear equation shall be defined by two points $x, y \in \mathbb{R}^2$ with $x_1$ and $y_1$ being in gesture property space and $x_2$, $y_2$ being in the corresponding DOF space (amplitude or arm position). Secondly, the output value shall be limited to the possible values of the DOF, for the synergies' amplitudes this will be $-50$ and $50$.
+There are multiple requirements for the function to find. Firstly, the linear equation shall be defined by two points $x, y \in \mathbb{R}^2$ with $x_1$ and $y_1$ being in gesture property space and $x_2$, $y_2$ being in the corresponding DOF space (amplitude or arm position). Secondly, the output value shall be limited to the possible values of the DOF, for the synergy amplitudes this will be $-50$ and $50$.
 
 A function $lm:(x \in \mathbb{R}^2, y \in \mathbb{R}^2, v_{min} \in \mathbb{R}, v_{max} \in \mathbb{R}, p \in \mathbb{R}) \rightarrow \mathbb{R}$ shall be found with the parameters being the two points the linear equation spans in between, the minimum and maximum output value and the value of the gesture property. It outputs the value that can then directly be passed into the DOF value.
 
@@ -320,7 +320,7 @@ Let $w_{screen}$ be the width of the screen in pixels, $\alpha \in \mathbb{R}^N$
 \begin{itemize}
 	\item $\alpha_1 = lm\left((1200, 50), (300, -50), -50, 50, s(G)\right)$
 	
-	As the size of a gesture is the property easiest to manipulate (with 2 pointers by the so-called pinch-zoom-movement) the amplitude with the biggest effect is assigned to it. The values of 1200 and 300 are chosen as 1200 is the size of a gesture with normally spanned fingers, 300 is the size of a gesture when the pointers are already relatively close. Values lower than 300 render the amplitude value of $-50$ unreachable, as pointers are perhaps not be able to be placed that close.
+	As the size of a gesture is the property easiest to manipulate (with 2 pointers by the so-called pinch-zoom-movement) the amplitude with the biggest effect is assigned to it. The values of 1200 and 300 are chosen as 1200 is the size of a gesture with normally spanned fingers, and 300 is the size of a gesture when the pointers are already relatively close. Values lower than 300 render the amplitude value of $-50$ unreachable, as pointers are perhaps not be able to be placed that close.
 	
 	\item $\alpha_2 = lm\left((w_{screen} \cdot 0.25, 50), (w_{screen} \cdot 0.75, -50), -50, 50, (c(G))_1\right)$
 	
@@ -389,8 +389,6 @@ Whether these values are well chosen and usable has to be evaluated during tests
 \end{wrapfigure}
 
 Controlling the arm with touch gestures is not as easy as controlling the grasp synergies since the arm's joint angles have to be calculated using the BioIK service. The objective is to give the user the opportunity to control the position of the palm of the robotic hand in Cartesian coordinates. To achieve this, it is important to know the orientation of the coordinate system around the arm as well as \textit{safe} coordinates, where the robot arm can move without causing any danger to its environment. Figure \ref{fig:arm:coord} gives a good insight in the coordinate system used. Potentially, an arbitrary coordinate system could be used, but the BioIK service at the point of writing only accepts coordinates in the so-called \textit{world} coordinate system. It has its origin on the floor below the base of the robot arm. Each square in the illustration represents one meter in the real set-up. The shown model is assumed to be sufficiently exact to use it as a simulation for the real robot with its surroundings. It is important to keep in mind that the y-coordinate is counter-intuitively rising to the back, which means it is falling in the direction to the front. Also, from the perspective of the robot, the x axis is oriented to the left.
-
-In order to prevent damages to the robot or its environment, a \textit{bounding box} has to be found where the movements of the robot do not cause any unwanted movements. Unwanted movements can occur since the shortest way from position $x$ to position $y$ may be very short in cartesian space, but still very long in joint coordinates. It is important to keep in mind, that for very close points, the BioIK service might output very different joint positions, as it assumes the new solution more fitting than the old one. This, however, results in a quite small work space for the robot compared to the overall table size. For the first approach, the limits for all 3 axes assumed \textit{safe} are denoted in Table \ref{tab:safeaxes}.
 
 \begin{wraptable}{L}{0.3\linewidth}
 	\caption{\label{tab:safeaxes}Position limits for the palm of the robot's hand}

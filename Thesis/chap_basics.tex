@@ -9,13 +9,13 @@ The communication is organized by a program called \textit{ROS Core}. All nodes 
 
 Sometimes, the publish-subscribe-pattern (and its inherent asynchrony) are not sufficient, as some calculations, which might be too heavy to be executed locally, might still have to be done synchronously. For this case, ROS introduces so-called \textit{services}. These are basically function calls that are offered by a node which may then be called by any other node over the network. These calls are executed synchronously and directly return a result.
 
-Nodes have names seperated in so-called \textit{name spaces}. an example node name can look like in Listing \ref{code:ros:nodename}.
+Nodes have names seperated in so-called \textit{name spaces}. an example node name is given in Listing \ref{code:ros:nodename}.
 \begin{lstlisting}[caption={An example ROS node name},label=code:ros:nodename]
 /robot/hand/controller
 \end{lstlisting}
 
 
-where \textit{/robot/hand} is the name space and \textit{controller} the node name. Topics and services do also have a specific name including a name space. This addressing scheme allows it to have multiple equally-called nodes or topics (e.g. for multiple sensors of the same type) by just putting them into different name spaces but preserving there names.
+where \textit{/robot/hand} is the name space and \textit{controller} the node name. Topics and services do also have a specific name including a name space. This addressing scheme allows it to have multiple equally-called nodes or topics (e.g. for multiple sensors of the same type) by just putting them into different name spaces but preserving their names.
 
 Numerous implementations of the ROS client libraries are available, the most common ones are developed and used in C/C++ and Python\cite{ros:client_libraries}. For developing a ROS-enabled Android application, an implementation of the ROS client library in Java is chosen. 
 
@@ -29,7 +29,7 @@ The package \textit{rosandroid}\footnote{\url{https://github.com/rosjava/android
 
 \subsection{Using Services in Rosjava}
 \label{sec:using_services}
-The implementation of how to consume (i.e.~call) services is a little different in rosjava than it is in roscpp\footnote{roscpp is the C++ implementation of ROS}, which is why the main differences will be briefly be elaborated here. To call services, special ROS messages are exchanged. These so-called \textit{service message types} consist of a request and a response part. While in C++ one object containing both the request and the response is passed to the \textit{service client} which then fills out the response part\cite{ros:serviceclient}, in other implementations like \textit{rospy} or \textit{rosjava} these messages are separated.
+The implementation of how to consume (i.e.~call) services is a little different in rosjava than it is in roscpp\footnote{roscpp is the C++ implementation of ROS}, which is why the main differences will be briefly be elaborated on here. To call services, special ROS messages are exchanged. These so-called \textit{service message types} consist of a request and a response part. While in C++ one object containing both the request and the response is passed to the \textit{service client} which then fills out the response part\cite{ros:serviceclient}, in other implementations like \textit{rospy} or \textit{rosjava} these messages are separated.
 
 To create a \textit{service client} in rosjava, an instance of 
 
@@ -198,7 +198,7 @@ Many approaches to this problem have come up during the years. \citeauthor{andre
 
 \subsection{BioIK}
 \label{sec:bioik}
-BioIK is the name of a newly developed algorithm for inverse kinematics at the TAMS research group at the University of Hamburg\cite{Starke2017}. BioIK is a multi-goal evolutionary algorithm. This means in particular, that it accepts goals for multiple end-effectors in a kinematic chain whereas most other algorithms only accept one goal for one end-effector. This makes the algorithm especially suitable for highly articulated robots and models like humanoids\cite{Starkea2017}. Being an evolutionary algorithm means that solutions are created using predecessors and applying random mutation to a solution. Solutions of the algorithm are then classified by a fitness function, while good solutions remain within the so-called genom and bad solutions are not used for further evolutions\cite{Ruppel17} - similar to the so-called and name giving real world evolution. Within this thesis BioIK is used to calculate joint angles for given robot poses. The big advantage of BioIK is that it accepts multiple goals, i.e.~one goal for every fingertip, and calculates corresponding joint positions based on the given goals.
+BioIK is the name of a newly developed algorithm for inverse kinematics by the TAMS research group at the University of Hamburg\cite{Starke2017}. BioIK is a multi-goal evolutionary algorithm. This means in particular, that it accepts goals for multiple end-effectors in a kinematic chain whereas most other algorithms only accept one goal for one end-effector. This makes the algorithm especially suitable for highly articulated robots and models like humanoids\cite{Starkea2017}. Being an evolutionary algorithm means that solutions are created using predecessors and applying random mutation to a solution. Solutions of the algorithm are then classified by a fitness function, while good solutions remain within the so-called genom and bad solutions are not used for further evolutions\cite{Ruppel17} - similar to the so-called and name giving real world evolution. Within this thesis BioIK is used to calculate joint angles for given robot poses. The big advantage of BioIK is that it accepts multiple goals, i.e.~one goal for every fingertip, and calculates corresponding joint positions based on the given goals.
 
 \subsubsection{Integration into ROS}
 Philipp Ruppel integrated BioIK into ROS during his Master Thesis\cite{Ruppel17}. He integrated the BioIK solver into \textit{MoveIt!}, which is a motion planning framework integrated into ROS\cite{Coleman15}. Using \textit{MoveIt!} it is possible to plan motions and poses of robots from just calculating a pose of a robot to plan full motion trajectories from one pose to another while avoiding obstacles and collisions.
