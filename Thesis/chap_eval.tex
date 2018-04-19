@@ -50,13 +50,13 @@ Since debugging of foreign code can be very time-consuming, especially in projec
 
 for the following cases:
 \begin{itemize}
-	\item With OrientationGoal for the palm, without MinimumDisplacementGoal.
-	\item Without OrientationGoal for the palm, without MinimumDisplacementGoal.
-	\item With OrientationGoal for the palm, with MinimumDisplacementGoal.
-	\item Without OrientationGoal for the palm, with MinimumDisplacementGoal.
+	\item With \textit{OrientationGoal} for the palm, without \textit{MinimumDisplacementGoal}.
+	\item Without \textit{OrientationGoal} for the palm, without \textit{MinimumDisplacementGoal}.
+	\item With \textit{OrientationGoal} for the palm, with \textit{MinimumDisplacementGoal}.
+	\item Without \textit{OrientationGoal} for the palm, with \textit{MinimumDisplacementGoal}.
 \end{itemize}
 
-Every test request was executed 200 times, as a result the mean execution time of all calls was taken. The aim was to find out what affects execution time of the BioIK service the most, the suspected properties were the MinimumDisplacementGoal, the additional OrientationGoal for the palm and the \textit{approximate} property of the IK request. Measurements were initially done with a timeout of one second passed to the BioIK solver. A plot of the measurements can be reviewed in Figure \ref{fig:eval:1000ms}. Three interesting aspects are visible on the first sight:
+Every test request was executed 200 times, as a result the mean execution time of all calls was taken. The aim was to find out what affects execution time of the BioIK service the most, the suspected properties were the \textit{MinimumDisplacementGoal}, the additional \textit{OrientationGoal} for the palm and the \textit{approximate} property of the IK request. Measurements were initially done with a timeout of one second passed to the BioIK solver. A plot of the measurements can be reviewed in Figure \ref{fig:eval:1000ms}. Three interesting aspects are visible on the first sight:
 \begin{itemize}
 	\item If the request is marked with \textit{approximate = true}, the solver takes about twice the time as if a precise solution is requested.
 	\item The \textit{MinimumDisplacementGoal} seems to have a huge effect on execution time, multiplying the time by a factor of about 4-5.
