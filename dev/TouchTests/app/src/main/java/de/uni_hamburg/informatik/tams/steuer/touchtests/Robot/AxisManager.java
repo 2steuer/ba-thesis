@@ -70,13 +70,13 @@ public class AxisManager implements RobotJointDataReceiver {
         AngleRadianConverter c = new AngleRadianConverter();
 
         // Arm's joints
-        addAxis("lwr_arm_0_joint", -168, 168, 10, c, JointType.HAND);
-        addAxis("lwr_arm_1_joint", -118, 118, 10, c, JointType.HAND);
-        addAxis("lwr_arm_2_joint", -168, 168, 10, c, JointType.HAND);
-        addAxis("lwr_arm_3_joint", -118, 118, 10, c, JointType.HAND);
-        addAxis("lwr_arm_4_joint", -168, 168, 10, c, JointType.HAND);
-        addAxis("lwr_arm_5_joint", -118, 118, 10, c, JointType.HAND);
-        addAxis("lwr_arm_6_joint", -168, 168, 10, c, JointType.HAND);
+        addAxis("lwr_arm_0_joint", -168, 168, 10, c, JointType.ARM);
+        addAxis("lwr_arm_1_joint", -118, 118, 10, c, JointType.ARM);
+        addAxis("lwr_arm_2_joint", -168, 168, 10, c, JointType.ARM);
+        addAxis("lwr_arm_3_joint", -118, 118, 10, c, JointType.ARM);
+        addAxis("lwr_arm_4_joint", -168, 168, 10, c, JointType.ARM);
+        addAxis("lwr_arm_5_joint", -118, 118, 10, c, JointType.ARM);
+        addAxis("lwr_arm_6_joint", -168, 168, 10, c, JointType.ARM);
 
         // Wrist
         addAxis("WRJ1", 0, 90, 10, c, JointType.HAND);

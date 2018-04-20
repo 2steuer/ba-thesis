@@ -296,6 +296,7 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
         q.setY(0);
         q.setZ(0);
         q.setW(0.7071);
+        og.setWeight(0.5);
 
         req.getOrientationGoals().add(og);
 
@@ -323,7 +324,7 @@ public class C5LwrNode extends org.ros.node.AbstractNodeMain implements RobotJoi
             g.getPosition().setX(p.getX());
             g.getPosition().setY(p.getY());
             g.getPosition().setZ(p.getZ());
-
+            g.setWeight(1);
             goals.add(g);
         }
 
