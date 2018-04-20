@@ -29,7 +29,7 @@ Interaction with the application is done using the commonly known touch gestures
 
 \subsection{General Screen Layout}
 \label{sec:ui:layout}
-As a screen of a diagonal size of 10 inches (25.4cm) is very limited compared to the size of the workspace of the robot good considerations have to be made according to a well-designed user interface. Since we are mainly operating the robot with touch gestures, significant parts of the screen should be blank, as only few information can be displayed while the user poses his hands above or on the screen. Figure \ref{fig:firstmockup} gives a first overview of how the portions of the screen shall be distributed. The biggest part of the screen is reserved for touch interactions by the user. Since multiple approaches to control the robot shall be implemented, the method shall be selected and switched using a tabbed layout with the tabs on the top, as they use the least space of the screen this way.
+As a screen of a diagonal size of 10 inches (25.4cm) is very limited compared to the size of the workspace of the robot, good considerations have to be made according to a well-designed user interface. Since we are mainly operating the robot with touch gestures, significant parts of the screen should be blank, as only few information can be displayed while the user poses his hands above or on the screen. Figure \ref{fig:firstmockup} gives a first overview of how the portions of the screen shall be distributed. The biggest part of the screen is reserved for touch interactions by the user. Since multiple approaches to control the robot shall be implemented, the method shall be selected and switched using a tabbed layout with the tabs on the top, as they use the least space of the screen this way.
 
 \subsubsection{Interlock Button}
 On all screens where the robot can be remotely operated, a security interlock button shall be displayed. For the actions on the screen to have effect on the robot (i.e. to be sent to the controller) the button shall remain pressed. This implements the functionality of a dead-man-switch, stopping all robot action once released. Although this is only a software measure it should be a good solution against unwanted movements of the robot as the button can easily be released when pressed with a single finger of the left hand. \textbf{Of course, this software measure does not replace hardware safety measures like emergency switches, but only supports them.}
@@ -66,7 +66,7 @@ Within this interface, the currently measured joint angle shall be displayed for
 	\item Red for $\Delta\alpha > 2.5^\circ$ 
 \end{itemize}
 
-The buttons to move the axis shall be displayed right and left of the angle displays. The visual feedback shall be shown as the background of the angle values. All these requirements put together, an axis control widget for a single joint or axis could look like depicted in Figure \ref{fig:axiscontrol}. To each control widget, a heading will be added to unambiguously denote which axis or joint will be controlled when using the corresponding buttons.
+The buttons to move the axis shall be displayed right and left of the angle displays. The visual feedback shall be shown as the background of the angle values. With all these requirements put together, an axis control widget for a single joint or axis could look like depicted in Figure \ref{fig:axiscontrol}. To each control widget, a heading will be added to unambiguously denote which axis or joint will be controlled when using the corresponding buttons.
 
 Multiple of these widgets shall be added to the axis control screen, one for each controllable joint or axis. This will result in a screen containing 29 of these (22 for the hand, 7 for the robot arm). To get an idea of how the control screen for individual joint control will look like, the reader is referred to Figure \ref{fig:axiscontrol:screen}. Please note, however, that the number of hinted joint control widgets does not resemble the actual number of controllable joints for each part of the robot.
 
@@ -78,7 +78,7 @@ Multiple of these widgets shall be added to the axis control screen, one for eac
 \section{Using the BioIK Service}
 \label{sec:robotarm:ctrl}
 
-The BioIK serivce (see Section \ref{sec:bioik}) is used according Section \ref{sec:using_services}. The important messages types are:
+The BioIK serivce (see Section \ref{sec:bioik}) is used according Section \ref{sec:using_services}. The important message types are:
 \begin{itemize}
 	\item \textbf{GetIK} The combined Request/Response service message type
 	\item \textbf{GetIKRequest} The message type containing the request to the service
@@ -182,7 +182,7 @@ Although pointer positions on a touch screen are usually given in integer number
 \end{itemize}
 \end{defn}
 
-In other words: The position of a gesture is the \textit{center of mass} of all pointers of a gesture. The size is the doubled mean distance of all pointers to the position of a gesture. Before defining the last property of a gesture, the \textbf{orientation} we first have to define what the \textbf{thumb pointer} of a gesture is.
+In other words: The position of a gesture is the \textit{center of mass} of all pointers of a gesture. The size is the doubled mean distance of all pointers to the position of a gesture. Before defining the last property of a gesture, the \textbf{orientation}, we first have to define what the \textbf{thumb pointer} of a gesture is.
 
 \begin{defn}
 	The \textbf{thumb pointer} $th(G)$ of a gesture $G$ is defined as
@@ -197,7 +197,7 @@ In other words: The position of a gesture is the \textit{center of mass} of all 
 	\end{equation}
 \end{defn}
 The thumb pointer shall be evaluated and memorized whenever $|G|$ changes, i.e.~a pointer is added or removed from a gesture.
-Note that the $y$ coordinate is rising to the bottom, as it is usual on digital screens. Having this in mind the thumb pointer is the lowest pointer in a 2-pointer gesture or the one furthest away from the position of a gesture with 3 or more pointers. The last part of the definition is important, as the lowest pointer does not necessarily remain the lowest when the gesture is rotated on the screen, so to have a consistent definition of the orientation, the thumb pointer may only be evaluated when pointers are added or removed from a gesture.
+Note that the $y$ coordinate is rising to the bottom, as it is usual on digital screens. Having this in mind, the thumb pointer is the lowest pointer in a 2-pointer gesture or the one furthest away from the position of a gesture with 3 or more pointers. The last part of the definition is important, as the lowest pointer does not necessarily remain the lowest when the gesture is rotated on the screen, so to have a consistent definition of the orientation, the thumb pointer may only be evaluated when pointers are added or removed from a gesture.
 
 \begin{defn}
 	Let $G$ be a gesture, $b_y = (0, -1) \in \mathbb{R}^2$. For $v = c(G) - th(G)$, the orientation $o(G)$ is defined as
@@ -278,7 +278,7 @@ All mappings from gestures' properties to DOF values shall be done linearly. A g
 
 \subsubsection{Linear DOF Mapping}
 
-There are multiple requirements for the function to find. Firstly, the linear equation shall be defined by two points $x, y \in \mathbb{R}^2$ with $x_1$ and $y_1$ being in gesture property space and $x_2$, $y_2$ being in the corresponding DOF space (amplitude or arm position). Secondly, the output value shall be limited to the possible values of the DOF, for the synergies' amplitudes this will be $-50$ and $50$.
+There are multiple requirements for the function to find. Firstly, the linear equation shall be defined by two points $x, y \in \mathbb{R}^2$ with $x_1$ and $y_1$ being in gesture property space and $x_2$, $y_2$ being in the corresponding DOF space (amplitude or arm position). Secondly, the output value shall be limited to the possible values of the DOF, for the synergy amplitudes this will be $-50$ and $50$.
 
 A function $lm:(x \in \mathbb{R}^2, y \in \mathbb{R}^2, v_{min} \in \mathbb{R}, v_{max} \in \mathbb{R}, p \in \mathbb{R}) \rightarrow \mathbb{R}$ shall be found with the parameters being the two points the linear equation spans in between, the minimum and maximum output value and the value of the gesture property. It outputs the value that can then directly be passed into the DOF value.
 
@@ -320,7 +320,7 @@ Let $w_{screen}$ be the width of the screen in pixels, $\alpha \in \mathbb{R}^N$
 \begin{itemize}
 	\item $\alpha_1 = lm\left((1200, 50), (300, -50), -50, 50, s(G)\right)$
 	
-	As the size of a gesture is the property easiest to manipulate (with 2 pointers by the so-called pinch-zoom-movement) the amplitude with the biggest effect is assigned to it. The values of 1200 and 300 are chosen as 1200 is the size of a gesture with normally spanned fingers, 300 is the size of a gesture when the pointers are already relatively close. Values lower than 300 render the amplitude value of $-50$ unreachable, as pointers are perhaps not be able to be placed that close.
+	As the size of a gesture is the property easiest to manipulate (with 2 pointers by the so-called pinch-zoom-movement) the amplitude with the biggest effect is assigned to it. The values of 1200 and 300 are chosen as 1200 is the size of a gesture with normally spanned fingers, and 300 is the size of a gesture when the pointers are already relatively close. Values lower than 300 render the amplitude value of $-50$ unreachable, as pointers are perhaps not be able to be placed that close.
 	
 	\item $\alpha_2 = lm\left((w_{screen} \cdot 0.25, 50), (w_{screen} \cdot 0.75, -50), -50, 50, (c(G))_1\right)$
 	
@@ -390,8 +390,6 @@ Whether these values are well chosen and usable has to be evaluated during tests
 
 Controlling the arm with touch gestures is not as easy as controlling the grasp synergies since the arm's joint angles have to be calculated using the BioIK service. The objective is to give the user the opportunity to control the position of the palm of the robotic hand in Cartesian coordinates. To achieve this, it is important to know the orientation of the coordinate system around the arm as well as \textit{safe} coordinates, where the robot arm can move without causing any danger to its environment. Figure \ref{fig:arm:coord} gives a good insight in the coordinate system used. Potentially, an arbitrary coordinate system could be used, but the BioIK service at the point of writing only accepts coordinates in the so-called \textit{world} coordinate system. It has its origin on the floor below the base of the robot arm. Each square in the illustration represents one meter in the real set-up. The shown model is assumed to be sufficiently exact to use it as a simulation for the real robot with its surroundings. It is important to keep in mind that the y-coordinate is counter-intuitively rising to the back, which means it is falling in the direction to the front. Also, from the perspective of the robot, the x axis is oriented to the left.
 
-In order to prevent damages to the robot or its environment, a \textit{bounding box} has to be found where the movements of the robot do not cause any unwanted movements. Unwanted movements can occur since the shortest way from position $x$ to position $y$ may be very short in cartesian space, but still very long in joint coordinates. It is important to keep in mind, that for very close points, the BioIK service might output very different joint positions, as it assumes the new solution more fitting than the old one. This, however, results in a quite small work space for the robot compared to the overall table size. For the first approach, the limits for all 3 axes assumed \textit{safe} are denoted in Table \ref{tab:safeaxes}.
-
 \begin{wraptable}{L}{0.3\linewidth}
 	\caption{\label{tab:safeaxes}Position limits for the palm of the robot's hand}
 	\begin{tabular}{|c|c|c|}
@@ -455,7 +453,7 @@ The x value rises to the left for the coordinate system of the robot, but to the
 
 \section{Software Architecture}
 
-Within this section the software architectural design will be discussed. The goal is to create a software design which is easily extensible by further work, making the software a basis for future research. To accomplish this, use of well-known design patterns is made. The three most commonly used patterns in the software are:
+Within this section the software architectural design will be discussed. The goal is to create a software design which is easily extensible by further work, making the software a basis for future research. To accomplish this, well-known design patterns are used. The three most commonly used patterns in the software are:
 \begin{itemize}
 	\item Model-View-Controller (MVC)
 	\item Observer
@@ -475,7 +473,7 @@ Model-View-Controller is a pattern widely used in applications where a set of da
 
 \subsubsection{Model}
 
-The Model, which in this case is the data about the robot and its joints, is accessed using the \textit{AxisManager}. The actual communication is done within the \textit{C5LwrNode} class, encapsulating all ROS-specific calls and hiding away the actual communication layer from the rest of the application. Having chosen this design it is relatively easy to replace either the joint data management or the communication layer to the robot.
+The Model, which in this case is the data about the robot and its joints, is accessed using the \textit{AxisManager}. The actual communication is done within the \textit{C5LwrNode} class, encapsulating all ROS-specific calls and hiding away the actual communication layer from the rest of the application. Having chosen this design, it is relatively easy to replace either the joint data management or the communication layer to the robot.
 
 The \textit{AxisManager} offers functionality to get or set information for each axis of the robot. It gives interface methods to
 \begin{itemize}
