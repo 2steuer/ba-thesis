@@ -1,0 +1,28 @@
+1 Fingertip, Precise: 5.3 ms
+1 Fingertip, Approx: 10.6 ms
+2 Fingertips, Precise: 13.2 ms
+2 Fingertips, Approx: 26.4 ms
+3 Fingertips, Precise: 39.7 ms
+3 Fingertips, Approx: 53.0 ms
+With minimum displacement goal!
+1 Fingertip, Precise: 13.0 ms
+1 Fingertip, Approx: 26.2 ms
+2 Fingertips, Precise: 13.2 ms
+2 Fingertips, Approx: 26.5 ms
+3 Fingertips, Precise: 39.7 ms
+3 Fingertips, Approx: 52.9 ms
+Without orientation for palm
+1 Fingertip, Precise: 4.4 ms
+1 Fingertip, Approx: 8.5 ms
+2 Fingertips, Precise: 13.2 ms
+2 Fingertips, Approx: 26.4 ms
+3 Fingertips, Precise: 39.6 ms
+3 Fingertips, Approx: 52.9 ms
+With minimum displacement goal!
+Without orientation for palm
+1 Fingertip, Precise: 5.6 ms
+1 Fingertip, Approx: 11.3 ms
+2 Fingertips, Precise: 13.2 ms
+2 Fingertips, Approx: 26.5 ms
+3 Fingertips, Precise: 39.7 ms
+3 Fingertips, Approx: 53.0 ms
