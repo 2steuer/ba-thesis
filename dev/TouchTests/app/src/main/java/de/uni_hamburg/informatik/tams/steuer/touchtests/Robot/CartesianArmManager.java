@@ -34,8 +34,8 @@ public class CartesianArmManager implements ServiceResponseListener<bio_ik_msgs.
     public static final double Y_MAX = -0.8;
     public static final double X_MIN = -0.2;
     public static final double X_MAX = 0.4;
-    public static final double Z_MIN = 1.05;
-    public static final double Z_MAX = 1.17;
+    public static final double Z_MIN = 1.10;
+    public static final double Z_MAX = 1.35;
 
     public static final int MAX_AXIS_CHANGE = 15;
 
