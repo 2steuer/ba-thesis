@@ -4,7 +4,7 @@
 \usepackage[utf8]{inputenc}		% input...
 
 \usepackage{tabularx}			% local, only for this doc.
-
+\usepackage{hyperref}
 \usepackage[tamsWZ, blockBG, tams,engl]{tamsBeamer}
 %-----------------------------------------------------------------------------
 %-- options		------------------------------------------------------
@@ -169,11 +169,138 @@ $\Rightarrow$ Map fingertips on touch screen to a plane in $3D$ space
 \end{frame}
 
 \subsection{Related Work}
+
+\begin{frame}{Other Approaches}
+
+\begin{minipage}{0.49\linewidth}
+\begin{figure}
+	\includegraphics[width=\linewidth]{assets/pres/akupati.png}
+	\caption{Controlling a robotic car with an Android phone, research by \citeauthor{Akupati2017}\cite{Akupati2017}}
+\end{figure}
+\end{minipage}
+\begin{minipage}{0.49\linewidth}
+\begin{figure}
+	\includegraphics[width=\linewidth]{assets/pres/touchme.png}
+	\caption{Controlling a robot with touch actions on an AR display. Research by \citeauthor{Hashimoto2013}\cite{Hashimoto2013}}
+\end{figure}
+\end{minipage}
+
+\end{frame}
+
 \subsection{Hardware}
-\subsection{ROS}
-\subsection{Inverse Kinematics}
+
+\begin{frame}{Shadow C5 Hand}
+\begin{minipage}{0.3\linewidth}
+\begin{figure}
+	\includegraphics[width=\linewidth]{assets/chpt_basics/hand.png}
+	\caption{The Shadow C5 Robotic Hand}
+\end{figure}
+\end{minipage}
+\begin{minipage}{0.68\linewidth}
+	\begin{itemize}
+		\item by \textit{The Shadow Robot Company} \cite{web:robothand:spec}
+		\item 24 DOF
+		\item Pneumatic muscles
+		\item Designed after human forearm
+	\end{itemize}
+\end{minipage}
+\end{frame}
+
+\begin{frame}{Kuka LWR 4+}
+\begin{minipage}{0.45\linewidth}
+	\begin{figure}
+		\includegraphics[width=\linewidth]{assets/chpt_basics/arm.png}
+		\caption{The Kuka LWR robotic arm}
+	\end{figure}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+	\begin{itemize}
+		\item by \textit{KUKA Roboter GmbH} \cite{Lwr2010}
+		\item 7 DOF
+		\item Integration into ROS over FRI (\textit{Fast Research Interface})\cite{Fri2010}
+	\end{itemize}
+\end{minipage}
+\end{frame}
+
+\begin{frame}{Samsung Galaxy Tab S3}
+\begin{minipage}{0.45\linewidth}
+	\begin{figure}
+		\includegraphics[width=\linewidth]{assets/chpt_concepts/tablet.png}
+		\caption{The used Android tablet}
+	\end{figure}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+	\begin{itemize}
+		\item by \textit{Samsung} \cite{samsung:galaxytabs3}
+		\item 10 inch screen
+		\item 2048x1536 px
+		\item 2.15GHz Quad-Core CPU
+		\item \textit{rosjava} / \textit{rosandroid}
+	\end{itemize}
+\end{minipage}
+\end{frame}
+
+\subsection{BioIK}
+
+\begin{frame}{BioIK}
+\begin{itemize}
+	\item Evolutionary, multi-goal algorithm for inverse kinematics
+	\item Developed at the TAMS group \cite{Starke2017,Starkea2017}
+	\item Integrated into ROS by Philipp Ruppel \cite{Ruppel17}
+	\item Philipp also provided the BioIK ROS service\footnote{Found at \href{https://gogs.crossmodal-learning.org/philipp.ruppel/bio_ik_service}{Philipp's GOGS}}
+\end{itemize}
+\end{frame}
 
 \section{User Interface}
+
+\begin{frame}{User Interface}
+\begin{itemize}
+	\item Most area reserved for touch interaction
+	\item Functionality interchangeable by tab pages
+	\item Safety interlock button
+	\item \textbf{Interlock button does not replace hardware safety measures!}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{User Interface}
+\begin{figure}
+	\includegraphics[width=0.8\linewidth]{assets/chpt_concepts/main_touch_interface.png}
+	\caption{General screen layout}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Axis Control Page}
+\begin{minipage}{0.55\linewidth}
+\begin{itemize}
+	\item One control for every joint
+	\item +/- buttons to set joint angle
+	\item Display of target value and current value
+	\item Coloured indication of angle error
+\end{itemize}
+\end{minipage}
+\begin{minipage}{0.4\linewidth}
+	\begin{figure}
+		\includegraphics[width=\linewidth]{assets/chpt_concepts/AxisControlGreen.png}
+		
+		\includegraphics[width=\linewidth]{assets/chpt_concepts/AxisControlYellow.png}
+		
+		\includegraphics[width=\linewidth]{assets/chpt_concepts/AxisControlRed.png}
+	\end{figure}
+\end{minipage}
+\end{frame}
+
+\begin{frame}{Axis Control Page}
+\begin{figure}
+	\boxed{\includegraphics[width=0.75\linewidth]{assets/chpt_impl/axis_control.png}}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Arm Teleop}
+\begin{figure}
+	\boxed{\includegraphics[width=0.75\linewidth]{assets/chpt_impl/teleop.png}}
+\end{figure}
+\end{frame}
+
 \section{Implementation}
 \subsection{Software Architecture}
 \subsection{Synergy Approach}
